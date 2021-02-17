@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../singHealthProjectFull/SingHealthProjectSpringBoot/.idea/SingHealthProjectSpringBoot.iml" filepath="$PROJECT_DIR$/../singHealthProjectFull/SingHealthProjectSpringBoot/.idea/SingHealthProjectSpringBoot.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../singHealthProjectFull/SingHealthProjectSpringBoot/singHealthAudit/singHealthAudit.iml" filepath="$PROJECT_DIR$/../singHealthProjectFull/SingHealthProjectSpringBoot/singHealthAudit/singHealthAudit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/singHealthAudit/singHealthAudit.iml" filepath="$PROJECT_DIR$/singHealthAudit/singHealthAudit.iml" />
     </modules>
   </component>
 </project>
