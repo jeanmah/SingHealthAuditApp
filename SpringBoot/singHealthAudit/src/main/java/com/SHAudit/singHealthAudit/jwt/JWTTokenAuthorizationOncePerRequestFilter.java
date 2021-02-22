@@ -1,4 +1,4 @@
-package jwt;
+package com.SHAudit.singHealthAudit.jwt;
 
 import java.io.IOException;
 
@@ -25,13 +25,15 @@ public class JWTTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+//    @Autowired
+//    private UserDetailsService jwtInMemoryUserDetailsService;
     @Autowired
-    private UserDetailsService jwtInMemoryUserDetailsService;
+    private UserDetailsService appUserDetailsService;
 
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
-    @Value("${jwt.http.request.header}")
+    @Value("${com.SHAudit.singHealthAudit.jwt.http.request.header}")
     private String tokenHeader;
 
     @Override
@@ -51,6 +53,8 @@ public class JWTTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
             } catch (ExpiredJwtException e) {
                 logger.warn("JWT_TOKEN_EXPIRED", e);
             }
+        } else if(requestTokenHeader == null){
+            logger.warn("JWT_TOKEN_DOES_NOT_START_WITH_BEARER_STRING_NULL");
         } else {
             logger.warn("JWT_TOKEN_DOES_NOT_START_WITH_BEARER_STRING");
         }
@@ -58,7 +62,7 @@ public class JWTTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
         logger.debug("JWT_TOKEN_USERNAME_VALUE '{}'", username);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.jwtInMemoryUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = this.appUserDetailsService.loadUserByUsername(username);
 
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

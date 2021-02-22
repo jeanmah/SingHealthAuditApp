@@ -1,4 +1,4 @@
-package jwt;
+package com.SHAudit.singHealthAudit.jwt;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,10 +24,10 @@ public class JWTTokenUtil implements Serializable {
     private static final long serialVersionUID = -3301605591108950415L;
     private Clock clock = DefaultClock.INSTANCE;
 
-    @Value("${jwt.signing.key.secret}")
+    @Value("${com.SHAudit.singHealthAudit.jwt.signing.key.secret}")
     private String secret;
 
-    @Value("${jwt.token.expiration.in.seconds}")
+    @Value("${com.SHAudit.singHealthAudit.jwt.token.expiration.in.seconds}")
     private Long expiration;
 
     public String getUsernameFromToken(String token) {
@@ -90,9 +90,9 @@ public class JWTTokenUtil implements Serializable {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        JWTUserDetails user = (JWTUserDetails) userDetails;
+//        UserDetails user = userDetails;
         final String username = getUsernameFromToken(token);
-        return (username.equals(user.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     private Date calculateExpirationDate(Date createdDate) {

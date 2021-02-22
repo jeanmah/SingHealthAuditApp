@@ -1,4 +1,4 @@
-package jwt;
+package com.SHAudit.singHealthAudit.jwt;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package Auditor;
+package com.SHAudit.singHealthAudit.Auditor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +11,13 @@ public class AuditorService {
     private static long idCounter = 0;
 
     static {
-        auditors.add(new Auditor(++idCounter, "in28minutes"));
-        auditors.add(new Auditor(++idCounter, "in28minutes"));
-        auditors.add(new Auditor(++idCounter, "in28minutes"));
-        auditors.add(new Auditor(++idCounter, "in28minutes"));
+        auditors.add(new Auditor(++idCounter, "t2"));
+        auditors.add(new Auditor(++idCounter, "t2"));
+        auditors.add(new Auditor(++idCounter, "t2"));
+        auditors.add(new Auditor(++idCounter, "t2"));
     }
 
     public List<Auditor> findAll() {
         return auditors;
-
     }
 }

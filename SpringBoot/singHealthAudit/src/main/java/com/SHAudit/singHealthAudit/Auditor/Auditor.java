@@ -1,4 +1,4 @@
-package Auditor;
+package com.SHAudit.singHealthAudit.Auditor;
 
 public class Auditor {
     private Long id;
