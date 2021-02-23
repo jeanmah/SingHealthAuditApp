@@ -14,7 +14,7 @@ public class AuditorService {
         auditors.add(new Auditor(++idCounter, "t2"));
         auditors.add(new Auditor(++idCounter, "t2"));
         auditors.add(new Auditor(++idCounter, "t2"));
-        auditors.add(new Auditor(++idCounter, "t2"));
+        auditors.add(new Auditor(++idCounter, "t7"));
     }
 
     public List<Auditor> findAll() {
