@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface AuditCheckListFBRepository extends CrudRepository<AuditCheckListFB, Integer> {
-    @Query("SELECT * FROM fbchecklist WHERE category = :category")
+    @Query("SELECT * FROM FBCheckList WHERE category = :category")
     List<AuditCheckListFB> getQuestionByCategory(@Param("category") String category);
 }

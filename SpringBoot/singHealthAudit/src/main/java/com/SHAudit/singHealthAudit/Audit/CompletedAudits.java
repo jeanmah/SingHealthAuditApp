@@ -11,7 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import java.sql.Date;
 
-@Table("completed_audits")
+@Table("Completed_Audits")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class CompletedAudits {
     @Id

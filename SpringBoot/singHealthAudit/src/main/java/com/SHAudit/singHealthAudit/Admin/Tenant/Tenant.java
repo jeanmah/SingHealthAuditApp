@@ -3,7 +3,7 @@ package com.SHAudit.singHealthAudit.Admin.Tenant;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("tenant")
+@Table("Tenant")
 public class Tenant {
     @Id
     private int acc_id;

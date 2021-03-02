@@ -2,7 +2,7 @@ package com.SHAudit.singHealthAudit.Audit;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("fbchecklist")
+@Table("FBCheckList")
 public class AuditCheckListFB {
     @Id
     private int fb_qn_id;

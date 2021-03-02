@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 
 import javax.persistence.Column;
 
-@Table("auditors")
+@Table("Auditors")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 
 public class Auditor {

@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ManagerRepository extends CrudRepository<Manager, Integer> {
 
-    @Query("SELECT acc_id FROM managers WHERE branch_id= :branch_id")
+    @Query("SELECT acc_id FROM Managers WHERE branch_id= :branch_id")
     int getManagerIdFromBranchId(@Param("branch_id") String branch_id);
 
 }

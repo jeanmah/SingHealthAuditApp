@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 
-@Table("accounts")
+@Table("Accounts")
 public class Account implements UserDetails {
     @Id
     private int account_id;
