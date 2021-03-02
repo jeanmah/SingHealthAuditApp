@@ -1,7 +1,7 @@
 package com.SHAudit.singHealthAudit.jwt;
 
-import com.SHAudit.singHealthAudit.mySQLAccount.Account;
-import com.SHAudit.singHealthAudit.mySQLAccount.AccountRepository;
+import com.SHAudit.singHealthAudit.Admin.mySQLAccount.Account;
+import com.SHAudit.singHealthAudit.Admin.mySQLAccount.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-@EnableJpaRepositories("com.SHAudit.singHealthAudit.mySQLAccount.AccountRepository")
+@EnableJpaRepositories("com.SHAudit.singHealthAudit.Admin.mySQLAccount.AccountRepository")
 @Service
 public class AppUserDetailsService implements UserDetailsService{
     @Autowired
@@ -26,25 +26,27 @@ public class AppUserDetailsService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        List<Account> accountList;
+        Account account;
+        logger.warn("LOADUSERBYUSERAME");
+
         try{
-            accountList = accountRepository.findByUserId(Integer.valueOf(s));
+            account = accountRepository.findByUsername(s);
         } catch(NumberFormatException e){
+            logger.warn("The username {} doesn't exist", s);
             throw new UsernameNotFoundException(String.format("The username %s doesn't exist", s));
         }
 
-        if(accountList == null || accountList.size() ==0) {
+        if(account == null) {
             logger.warn("USERNAME NOT FOUND IN DATABASE");
             throw new UsernameNotFoundException(String.format("The username %s doesn't exist", s));
         }
 
-        Account account = accountList.get(0);
         logger.warn(String.format("USERNAME %s FOUND IN DATABASE",s));
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(account.getRole_id()));
 
-        UserDetails userDetails = new User(account.getUser_id(), account.getPassword(), authorities);
+        UserDetails userDetails = new User(account.getUsername(), account.getPassword(), authorities);
 
         return userDetails;
     }

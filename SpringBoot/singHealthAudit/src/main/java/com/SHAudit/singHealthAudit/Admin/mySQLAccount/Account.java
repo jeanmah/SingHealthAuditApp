@@ -1,6 +1,5 @@
-package com.SHAudit.singHealthAudit.mySQLAccount;
+package com.SHAudit.singHealthAudit.Admin.mySQLAccount;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,12 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-@Table("Account")
-public class Account {
+
+@Table("accounts")
+public class Account implements UserDetails {
     @Id
-    private int acc_id;
+    private int account_id;
     private int employee_id;
-    private String user_id;
+    private String username;
     private String password;
     private String first_name;
     private String last_name;
@@ -22,12 +22,12 @@ public class Account {
     private String role_id;
     private String branch_id;
 
-    public int getAcc_id() {
-        return acc_id;
+    public int getAccount_id() {
+        return account_id;
     }
 
-    public void setAcc_id(int acc_id) {
-        this.acc_id = acc_id;
+    public void setAccount_id(int account_id) {
+        this.account_id = account_id;
     }
 
     public int getEmployee_id() {
@@ -38,12 +38,10 @@ public class Account {
         this.employee_id = employee_id;
     }
 
-    public String getUser_id() {
-        return user_id;
-    }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
 
@@ -99,7 +97,37 @@ public class Account {
         this.branch_id = branch_id;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }
