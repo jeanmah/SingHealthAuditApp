@@ -13,11 +13,14 @@ public abstract class Entry {
     private int qn_id;
     private Date date;
     private Time time;
+
+    @Nullable
+    private int severity; //for now this is 0-nothing, 1-low, 2-med, 3-high
     @Nullable
     private String remarks;
     @Nullable
-    private BufferedImage evidence;
-
+    //private BufferedImage evidence;
+    private String evidence;
     public int getEntry_id() {
         return entry_id;
     }
@@ -58,11 +61,19 @@ public abstract class Entry {
         this.remarks = remarks;
     }
 
-    public BufferedImage getEvidence() {
+    public String getEvidence() {
         return evidence;
     }
 
-    public void setEvidence(BufferedImage evidence) {
+    public void setEvidence(String evidence) {
         this.evidence = evidence;
+    }
+
+    public int getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(int severity) {
+        this.severity = severity;
     }
 }

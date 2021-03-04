@@ -10,4 +10,12 @@ public class Close_Report extends Report{
         super(report_id, overall_score, overall_status, open_date, entries);
         this.close_date = close_date;
     }
+
+    public Date getClose_date() {
+        return close_date;
+    }
+
+    public void setClose_date(Date close_date) {
+        this.close_date = close_date;
+    }
 }

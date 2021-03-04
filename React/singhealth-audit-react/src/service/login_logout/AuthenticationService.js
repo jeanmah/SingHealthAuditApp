@@ -32,8 +32,9 @@ class AuthenticationService {
 
 
     logout() {
-        sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
         sessionStorage.removeItem(SESSION_TOKEN);
+        sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+        window.location.reload();
     }
 
     isUserLoggedIn() {

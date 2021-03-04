@@ -1,5 +1,6 @@
 package com.SHAudit.singHealthAudit.jwt;
 
+import com.SHAudit.singHealthAudit.Admin.mySQLAccount.AccountRepository;
 import com.SHAudit.singHealthAudit.JWTWebSecurityConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,9 @@ public class JWTAuthenticationRestController {
     @Autowired
     private UserDetailsService appUserDetailsService;
 
+    @Autowired
+    private AccountRepository accountRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -50,8 +54,9 @@ public class JWTAuthenticationRestController {
         final UserDetails userDetails = appUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
+        final String accountType = accountRepository.getRoleFromUsername(authenticationRequest.getUsername());
         logger.warn(String.format("Token created %s", token));
-        return ResponseEntity.ok(new JWTTokenResponse(token));
+        return ResponseEntity.ok(new JWTTokenResponse(token,accountType));
     }
 
     @RequestMapping(value = "${com.SHAudit.singHealthAudit.jwt.refresh.token.uri}", method = RequestMethod.GET)
@@ -63,7 +68,8 @@ public class JWTAuthenticationRestController {
 
         if (jwtTokenUtil.canTokenBeRefreshed(token)) {
             String refreshedToken = jwtTokenUtil.refreshToken(token);
-            return ResponseEntity.ok(new JWTTokenResponse(refreshedToken));
+            String accountType = accountRepository.getRoleFromUsername(user.getUsername());
+            return ResponseEntity.ok(new JWTTokenResponse(refreshedToken,accountType));
         } else {
             return ResponseEntity.badRequest().body(null);
         }

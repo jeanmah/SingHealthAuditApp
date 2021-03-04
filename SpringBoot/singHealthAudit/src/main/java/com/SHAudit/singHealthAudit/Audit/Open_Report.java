@@ -11,4 +11,12 @@ public class Open_Report extends Report{
         super(report_id, overall_score, overall_status, open_date, entries);
         this.last_update_date = last_update_date;
     }
+
+    public Date getLast_update_date() {
+        return last_update_date;
+    }
+
+    public void setLast_update_date(Date last_update_date) {
+        this.last_update_date = last_update_date;
+    }
 }

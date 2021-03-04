@@ -32,7 +32,13 @@ class LoginComponent extends Component {
         .executeJwtAuthenticationService(this.state.username, this.state.password)
         .then((response) => {
             AuthenticationService.registerSuccessfulLoginForJwt(this.state.username, response.data.token)
-            this.props.history.push(`/home/a`)
+            if(response.data.accountType == "Auditor"){
+                this.props.history.push(`/home/a`)
+            } else if(response.data.accountType == "Tenant"){
+                this.props.history.push(`/home/t`)
+            } else if (response.data.accountType=="Manager"){
+                this.props.history.push(`/home/m`)
+            }
         }).catch(() => {
             this.setState({ showSuccessMessage: false })
             this.setState({ hasLoginFailed: true })

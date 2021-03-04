@@ -13,6 +13,8 @@ public class Tenant {
     private int past_audits;
     private String branch_id;
 
+    private String store_addr;
+
     public int getAcc_id() {
         return acc_id;
     }
@@ -43,5 +45,13 @@ public class Tenant {
 
     public void setBranch_id(String branch_id) {
         this.branch_id = branch_id;
+    }
+
+    public String getStore_addr() {
+        return store_addr;
+    }
+
+    public void setStore_addr(String store_addr) {
+        this.store_addr = store_addr;
     }
 }

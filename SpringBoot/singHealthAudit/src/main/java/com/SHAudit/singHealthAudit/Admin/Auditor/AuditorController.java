@@ -59,6 +59,7 @@ public class AuditorController {
             tenantInfo.put("employee_id",tenantAccount.getEmployee_id());
             tenantInfo.put("first_name",tenantAccount.getFirst_name());
             tenantInfo.put("last_name",tenantAccount.getLast_name());
+            tenantInfo.put("store_addr", t.getStore_addr());
             tenantInfo.put("FB_NFB",t.getType_id());
 
             outputJArray.add(tenantInfo);

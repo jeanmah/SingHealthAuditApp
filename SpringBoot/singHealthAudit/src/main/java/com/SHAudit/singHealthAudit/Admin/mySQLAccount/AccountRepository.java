@@ -14,4 +14,7 @@ public interface AccountRepository extends CrudRepository<Account, Integer> {
 
     @Query("SELECT * FROM Accounts WHERE account_id = :account_id LIMIT 1")
     Account findByAccId(@Param("account_id") int account_id);
+
+    @Query("SELECT role_id FROM Accounts WHERE username= :username")
+    String getRoleFromUsername(@Param("username") String username);
 }

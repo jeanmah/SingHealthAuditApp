@@ -17,4 +17,44 @@ public abstract class Report {
         this.open_date = open_date;
         this.entries = entries;
     }
+
+    public int getReport_id() {
+        return report_id;
+    }
+
+    public void setReport_id(int report_id) {
+        this.report_id = report_id;
+    }
+
+    public int getOverall_score() {
+        return overall_score;
+    }
+
+    public void setOverall_score(int overall_score) {
+        this.overall_score = overall_score;
+    }
+
+    public boolean isOverall_status() {
+        return overall_status;
+    }
+
+    public void setOverall_status(boolean overall_status) {
+        this.overall_status = overall_status;
+    }
+
+    public Date getOpen_date() {
+        return open_date;
+    }
+
+    public void setOpen_date(Date open_date) {
+        this.open_date = open_date;
+    }
+
+    public List<Entry> getEntries() {
+        return entries;
+    }
+
+    public void setEntries(List<Entry> entries) {
+        this.entries = entries;
+    }
 }

@@ -42,7 +42,8 @@ class AuditorTenantComponent extends Component {
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>FirstName</th>
+                                <th>Name</th>
+                                <th>Store Address</th>
                                 <th>FB/NFB</th>
                             </tr>
                         </thead>
@@ -51,6 +52,7 @@ class AuditorTenantComponent extends Component {
                                 <tr key={this.state.tenant.acc_id}>
                                     <td>{this.state.tenant.employee_id}</td>
                                     <td>{this.state.tenant.first_name} {this.state.tenant.last_name}</td>
+                                    <td>{this.state.tenant.store_addr}</td>
                                     <td>{this.state.tenant.FB_NFB}</td>
                                 </tr>
                         

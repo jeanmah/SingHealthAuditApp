@@ -39,9 +39,10 @@ public class CustomAuditorEntryDeserializer extends StdDeserializer<AuditorEntry
         JsonNode passFailNode = node.get("passFail");
         auditorEntry.setStatus(passFailNode.asBoolean());
         //check if should store remarks and evidence
-        if(auditorEntry.getStatus()){
+        if(!auditorEntry.getStatus()){
             JsonNode remarksNode = node.get("remarks");
             auditorEntry.setRemarks(remarksNode.asText());
+            auditorEntry.setSeverity(node.get("severity").asInt());
         }
 
         return auditorEntry;

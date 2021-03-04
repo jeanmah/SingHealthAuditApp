@@ -11,4 +11,11 @@ import java.util.List;
 public interface AuditCheckListNFBRepository extends CrudRepository<AuditCheckListNFB, Integer> {
     @Query("SELECT * from NFBCheckList where category = :category")
     List<AuditCheckListNFB> getQuestionByCategory(@Param("category") String category);
+
+    @Query("SELECT category FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
+    String getCategoryByQnID(@Param("fb_qn_id") int category);
+
+    @Query("SELECT weight FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
+    double getWeightByQnID(@Param("nfb_qn_id") int category);
+
 }

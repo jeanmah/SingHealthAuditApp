@@ -3,22 +3,22 @@ import HomeService from '../../service/home_pages/HomeService';
 
 import { Link } from 'react-router-dom';
 
-class AuditorHomeComponent extends Component {
+class ManagerHomeComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
             idkwhatyet: null,
             message: null
         }
-        this.refreshAuditorHome = this.refreshAuditorHome.bind(this);
+        this.refreshManagerHome = this.refreshManagerHome.bind(this);
     }
 
     componentDidMount() {
-        this.refreshAuditorHome();
+        this.refreshManagerHome();
     }
 
-    refreshAuditorHome() {
-        HomeService.loadHomePage('a')
+    refreshManagerHome() {
+        HomeService.loadHomePage('m')
             .then(
                 response => {
                     console.log(response.data);
@@ -33,15 +33,14 @@ class AuditorHomeComponent extends Component {
         console.log('render')
         return (
             <div className="container">
-                <h3>Auditor Home Page</h3>
+                <h3>Manager Home Page</h3>
                 <div className="container">
             
-                    <p>Welcom {this.state.idkwhatyet}</p>
-                    <Link to="/a/alltenants" id="alltenantsButton" className="btn btn-primary">All tenants</Link>
+                    <p>Welcome {this.state.idkwhatyet}</p>
                 </div>
             </div>
         )
     }
 }
 
-export default AuditorHomeComponent
+export default ManagerHomeComponent

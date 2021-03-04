@@ -13,6 +13,7 @@ import java.sql.Date;
 @Table("Open_Audits")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class OpenAudits {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int report_id;
@@ -27,16 +28,17 @@ public class OpenAudits {
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private String report_data;
-    @Type(type = "org.hibernate.type.NumericBooleanType")
-    private boolean	need_auditor;
-    @Type(type = "org.hibernate.type.NumericBooleanType")
-    private boolean need_tenant;
-    @Type(type = "org.hibernate.type.NumericBooleanType")
-    private boolean need_manager;
+
+    //@Type(type = "org.hibernate.type.NumericBooleanType")
+    private int	need_auditor;
+    //@Type(type = "org.hibernate.type.NumericBooleanType")
+    private int need_tenant;
+    //@Type(type = "org.hibernate.type.NumericBooleanType")
+    private int need_manager;
 
     public OpenAudits(int tenant_id, int auditor_id, int manager_id, Date start_date, Date last_update_date,
                       String overall_remarks, int overall_score, String report_data,
-                      boolean need_auditor, boolean need_tenant) {
+                      int need_auditor, int need_tenant) {
         this.tenant_id = tenant_id;
         this.auditor_id = auditor_id;
         this.manager_id = manager_id;
@@ -48,6 +50,8 @@ public class OpenAudits {
         this.need_auditor = need_auditor;
         this.need_tenant = need_tenant;
     }
+
+
 
     public int getTenant_id() {
         return tenant_id;
@@ -105,19 +109,43 @@ public class OpenAudits {
         this.report_data = report_data;
     }
 
-    public boolean isNeed_auditor() {
+    public int isNeed_auditor() {
         return need_auditor;
     }
 
-    public void setNeed_auditor(boolean need_auditor) {
+    public void setNeed_auditor(int need_auditor) {
         this.need_auditor = need_auditor;
     }
 
-    public boolean isNeed_tenant() {
+    public int isNeed_tenant() {
         return need_tenant;
     }
 
-    public void setNeed_tenant(boolean need_tenant) {
+    public void setNeed_tenant(int need_tenant) {
         this.need_tenant = need_tenant;
+    }
+
+    public int getReport_id() {
+        return report_id;
+    }
+
+    public void setReport_id(int report_id) {
+        this.report_id = report_id;
+    }
+
+    public int getManager_id() {
+        return manager_id;
+    }
+
+    public void setManager_id(int manager_id) {
+        this.manager_id = manager_id;
+    }
+
+    public int isNeed_manager() {
+        return need_manager;
+    }
+
+    public void setNeed_manager(int need_manager) {
+        this.need_manager = need_manager;
     }
 }
