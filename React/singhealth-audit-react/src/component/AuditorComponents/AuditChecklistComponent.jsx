@@ -61,9 +61,9 @@ class AuditChecklistComponent extends Component {
                                         <label>{question.requirement}</label>
                                         <label>{question.sub_requirement}</label>
                                         <input type="radio" id={question.nfb_qn_id + "true"} name = {question.nfb_qn_id + "radioB"} value="true"/>
-                                        <label for={question.nfb_qn_id + "true"}>true</label>
+                                        <label htmlFor={question.nfb_qn_id + "true"}>true</label>
                                         <input type="radio" id={question.nfb_qn_id + "false"}  name = {question.nfb_qn_id + "radioB"} value="false"/>
-                                        <label for={question.nfb_qn_id + "false"}>false</label>
+                                        <label htmlFor={question.nfb_qn_id + "false"}>false</label>
                                     </div>
                                 )                           
                             )
