@@ -1,5 +1,9 @@
 package com.c2g4.SingHealthWebApp.Admin.Repositories;
 
-public class BranchRepo {
+import org.springframework.data.repository.CrudRepository;
+
+import com.c2g4.SingHealthWebApp.Admin.Models.BranchModel;
+
+public interface BranchRepo extends CrudRepository<BranchModel, Integer> {
 
 }

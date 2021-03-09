@@ -1,5 +1,26 @@
 package com.c2g4.SingHealthWebApp.Admin.Models;
 
-public class ManagerModel {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
+@Table("Managers")
+public class ManagerModel {
+    @Id
+    private int acc_id;
+    private String branch_id;
+    
+	public int getAcc_id() {
+		return acc_id;
+	}
+	public void setAcc_id(int acc_id) {
+		this.acc_id = acc_id;
+	}
+	public String getBranch_id() {
+		return branch_id;
+	}
+	public void setBranch_id(String branch_id) {
+		this.branch_id = branch_id;
+	}
+    
+    
 }
