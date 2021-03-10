@@ -2,7 +2,10 @@ package com.c2g4.SingHealthWebApp.Admin.Models;
 
 import java.sql.Date;
 
+import org.springframework.data.annotation.AccessType;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,7 +14,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Table("Completed_Audits")
-public class CompletedAuditModel {
+@AccessType(AccessType.Type.PROPERTY)
+public class CompletedAuditModel implements AuditModel{
 	
 	@Id
     private int report_id;
@@ -22,6 +26,7 @@ public class CompletedAuditModel {
     private Date end_date;
     private String overall_remarks;
     private double overall_score;
+    @Transient
     private JsonNode report_data;
     
 	public CompletedAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
@@ -148,14 +153,17 @@ public class CompletedAuditModel {
 		this.overall_score = overall_score;
 	}
 
+	@Transient
 	public JsonNode getReport_data() {
 		return report_data;
 	}
 
+	@Transient
 	public void setReport_data(JsonNode report_data) {
 		this.report_data = report_data;
 	}
 	
+	@Transient
 	public void setReport_data(String report_data) {
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
@@ -168,7 +176,30 @@ public class CompletedAuditModel {
 			e.printStackTrace();
 		}
 	}
-    
-    
+	
+	@Column(value="report_data")
+	public String getReport_data_for_MySql() {
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			return objectmapper.writeValueAsString(report_data);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
+	@Column(value="report_data")
+	public void setReport_data_for_MySql(String JsonString) {
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			this.report_data = objectmapper.readTree(JsonString);
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}  
 }

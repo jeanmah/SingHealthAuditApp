@@ -20,7 +20,7 @@ public abstract class ReportEntry {
 	  @Nullable
 	  //Why is this stored as a string? - Jia Wei
 	  //private BufferedImage evidence;
-	  private String evidence;
+	  private String imgstring;
 	  
 	  public int getEntry_id() {
 	      return entry_id;
@@ -63,11 +63,11 @@ public abstract class ReportEntry {
 	  }
 	
 	  public String getEvidence() {
-	      return evidence;
+	      return imgstring;
 	  }
 	
-	  public void setEvidence(String evidence) {
-	      this.evidence = evidence;
+	  public void setEvidence(String base64img) {
+	      this.imgstring = base64img;
 	  }
 	
 	  public int getSeverity() {

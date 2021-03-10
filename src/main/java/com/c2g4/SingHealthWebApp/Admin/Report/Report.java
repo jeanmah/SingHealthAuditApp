@@ -5,27 +5,18 @@ import java.util.List;
 
 public abstract class Report {
 	
-    protected int report_id;
     protected int overall_score;
     protected boolean overall_status;
     protected Date open_date;
     protected List<ReportEntry> entries;
     
-	public Report(int report_id, int overall_score, boolean overall_status, Date open_date, List<ReportEntry> entries) {
-		super();
-		this.report_id = report_id;
+	public Report(int overall_score, boolean overall_status, Date open_date, List<ReportEntry> entries) {
 		this.overall_score = overall_score;
 		this.overall_status = overall_status;
 		this.open_date = open_date;
 		this.entries = entries;
 	}
 	
-	public int getReport_id() {
-		return report_id;
-	}
-	public void setReport_id(int report_id) {
-		this.report_id = report_id;
-	}
 	public int getOverall_score() {
 		return overall_score;
 	}

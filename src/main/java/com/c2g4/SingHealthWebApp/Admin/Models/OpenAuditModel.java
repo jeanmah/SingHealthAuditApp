@@ -2,7 +2,10 @@ package com.c2g4.SingHealthWebApp.Admin.Models;
 
 import java.sql.Date;
 
+import org.springframework.data.annotation.AccessType;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,7 +14,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Table("Open_Audits")
-public class OpenAuditModel {
+@AccessType(AccessType.Type.PROPERTY)
+public class OpenAuditModel implements AuditModel {
 	
     @Id
     private int report_id;
@@ -22,6 +26,7 @@ public class OpenAuditModel {
     private Date last_update_date;
     private String overall_remarks;
     private int overall_score;
+    @Transient
     private JsonNode report_data;
     private int need_auditor;
     private int need_tenant;
@@ -30,7 +35,6 @@ public class OpenAuditModel {
 	public OpenAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
 			Date last_update_date, String overall_remarks, int overall_score, JsonNode report_data, int need_auditor,
 			int need_tenant, int need_manager) {
-		super();
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
 		this.auditor_id = auditor_id;
@@ -48,7 +52,6 @@ public class OpenAuditModel {
 	public OpenAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
 			Date last_update_date, String overall_remarks, int overall_score, String report_data, int need_auditor,
 			int need_tenant, int need_manager) {
-		super();
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
 		this.auditor_id = auditor_id;
@@ -71,32 +74,7 @@ public class OpenAuditModel {
 		this.need_tenant = need_tenant;
 		this.need_manager = need_manager;
 	}
-	
-	//This is to make line 229 in AuditCheckListcontroller Cooperate
-	//This needs to be looked at - Jia Wei
-    public OpenAuditModel(int tenant_id, int auditor_id, int manager_id, Date start_date, Date last_update_date,
-            String overall_remarks, int overall_score, String report_data,
-            int need_auditor, int need_tenant) {
-		this.tenant_id = tenant_id;
-		this.auditor_id = auditor_id;
-		this.manager_id = manager_id;
-		this.start_date = start_date;
-		this.last_update_date = last_update_date;
-		this.overall_remarks = overall_remarks;
-		this.overall_score = overall_score;
-		ObjectMapper objectmapper = new ObjectMapper();
-		try {
-			this.report_data = objectmapper.readTree(report_data);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.need_auditor = need_auditor;
-		this.need_tenant = need_tenant;
-    }
+
 
 	public int getReport_id() {
 		return report_id;
@@ -162,12 +140,40 @@ public class OpenAuditModel {
 		this.overall_score = overall_score;
 	}
 
+	@Transient
 	public JsonNode getReport_data() {
 		return report_data;
 	}
 
+	@Transient
 	public void setReport_data(JsonNode report_data) {
 		this.report_data = report_data;
+	}
+	
+	@Column(value="report_data")
+	public String getReport_data_for_MySql() {
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			return objectmapper.writeValueAsString(report_data);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Column(value="report_data")
+	public void setReport_data_for_MySql(String JsonString) {
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			this.report_data = objectmapper.readTree(JsonString);
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public int getNeed_auditor() {

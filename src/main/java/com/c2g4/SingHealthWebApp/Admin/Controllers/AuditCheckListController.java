@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditModelBuilder;
 import com.c2g4.SingHealthWebApp.Admin.Models.CompletedAuditModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
 import com.c2g4.SingHealthWebApp.Admin.Report.AuditorReportEntry;
@@ -158,12 +159,11 @@ public class AuditCheckListController {
             @RequestParam(value = "files", required = true) MultipartFile[] images,
             @RequestPart(value = "filledChecklist", required = true) String filledChecklist,
             @AuthenticationPrincipal UserDetails auditorUser, 
-            @PathVariable("tenantId") int tenantId,
+            @PathVariable("tenantId") int tenant_id,
             @PathVariable("checklistType") String checklistType)  {
         AccountModel auditorAccount = accountRepo.findByUsername(auditorUser.getUsername());
-        int auditorId = auditorAccount.getAccount_id();
+        int auditor_id = auditorAccount.getAccount_id();
         
-        //Ask hannah what's wrong with the default deserialiser
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(AuditorReportEntry.class, new CustomAuditorEntryDeserializer());
@@ -177,32 +177,6 @@ public class AuditCheckListController {
             logger.warn("JSON PROCESSING EXCEPTION {} POST",checklistType);
             return ResponseEntity.badRequest().body(null);
         }
-//
-//        int imageCounter = 0;
-//        //TODO: figure out if this conversion is gonna screw things up
-//        for(Entry auditorEntry: auditorEntryList){
-//            AuditorEntry auditorEntryAE = (AuditorEntry) auditorEntry;
-//            if(!auditorEntryAE.getStatus()){
-//                MultipartFile uploadedImage = images[imageCounter];
-//                if(uploadedImage == null) {
-//                    logger.warn("UPLOADED IMAGE NUM {} NULL FBCHECKLIST POST",imageCounter);
-//                    return ResponseEntity.badRequest().body(null);
-//                }
-//                BufferedImage img;
-//                try {
-//                    logger.warn("UPLOADED IMAGE NAME {} FBCHECKLIST POST",uploadedImage.getOriginalFilename());
-//
-//                    String base64img = Base64.getEncoder().encodeToString(uploadedImage.getBytes());
-//                    auditorEntry.setEvidence(base64img);
-//                    imageCounter++;
-//
-//
-//                } catch (IOException e) {
-//                    logger.warn("UPLOADED IMAGE NUM {} CANNOT OPEN FILE FBCHECKLIST POST",imageCounter);
-//                    return ResponseEntity.badRequest().body(null);
-//                }
-//            }
-//        }
         //TODO: implement method to calculate score
         String retNonCompliances;
         double auditScore;
@@ -217,36 +191,43 @@ public class AuditCheckListController {
         java.util.Date utilCurrentDate = Calendar.getInstance().getTime();
         Date sqlCurrentDate = new Date(utilCurrentDate.getTime());
 
-        int manager_id = auditorRepo.getManagerIDfromAuditorID(auditorId);
+        int manager_id = auditorRepo.getManagerIDfromAuditorID(auditor_id);
 
         if(auditScore<100){
-            Report open_report = new OpenReport(0, (int)auditScore, false, sqlCurrentDate,
+            Report openreport = new OpenReport((int)auditScore, false, sqlCurrentDate,
                     auditorEntryList, sqlCurrentDate);
             try {
-
                 logger.info("doing objectmapping report fbchecklist");
-                String report = objectMapper.writeValueAsString(open_report);
+                String report = objectMapper.writeValueAsString(openreport);
                 logger.info("finish objectmapping report fbchecklist");
-
-
-                OpenAuditModel openAudits = new OpenAuditModel(tenantId, auditorId, manager_id, sqlCurrentDate,
-                        sqlCurrentDate, "what to put here", (int)auditScore, report, 1, 1);
-                openAuditRepo.save(openAudits);
+                
+                AuditModelBuilder builder = new AuditModelBuilder();
+                builder.setReportId(0).setUserIDs(tenant_id, auditor_id, manager_id)
+                .setOverallRemarks("Idk").setOverallScore((int)auditScore).setReportData(report)
+                .setNeed(1,1,1);
+                
+                OpenAuditModel openAudit = (OpenAuditModel) builder.build();
+                openAuditRepo.save(openAudit);
 
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
                 logger.warn("OpenAudits saving to mysql fail FBCHECKLIST POST");
                 return ResponseEntity.badRequest().body(null);
             }
-            int openReportId = openAuditRepo.getReportIdFromTenantId(tenantId);
-            tenantRepo.updateLatestAuditByTenantId(tenantId, openReportId);
+            //int openReportId = openAuditRepo.getReportIdFromTenantId(tenantId);
+            //tenantRepo.updateLatestAuditByTenantId(tenantId, openReportId);
 
         } else {
-            ClosedReport close_report = new ClosedReport( 0, (int)auditScore, true,
-                    sqlCurrentDate, auditorEntryList, sqlCurrentDate);
+        	//The first date should not be sqlCurrentDat
+            ClosedReport closereport = new ClosedReport((int)auditScore, true, sqlCurrentDate, auditorEntryList,
+            		sqlCurrentDate);
             try {
-                CompletedAuditModel completedAudits = new CompletedAuditModel(tenantId, auditorId, manager_id, sqlCurrentDate, sqlCurrentDate,
-                    "Overallremarks", (int)auditScore,  objectMapper.writeValueAsString(close_report));
+            	AuditModelBuilder builder = new AuditModelBuilder();
+            	builder.setReportId(0).setUserIDs(tenant_id, auditor_id, manager_id)
+            	.setOverallRemarks("Idk").setOverallScore((int)auditScore)
+            	.setReportData(objectMapper.writeValueAsString(closereport));
+            	
+                CompletedAuditModel completedAudits = (CompletedAuditModel) builder.build();
                 completedAuditRepo.save(completedAudits);
 
             } catch (JsonProcessingException e) {
