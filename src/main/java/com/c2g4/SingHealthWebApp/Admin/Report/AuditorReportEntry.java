@@ -4,8 +4,8 @@ public class AuditorReportEntry extends ReportEntry{
 	
     private Component_Status status;
 
-    public boolean getStatus() {
-        return status.isStatus();
+    public Component_Status getStatus() {
+        return status;
     }
 
     public void setStatus(boolean statusBool) {

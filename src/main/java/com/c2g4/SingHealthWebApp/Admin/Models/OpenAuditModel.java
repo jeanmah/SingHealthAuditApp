@@ -28,13 +28,13 @@ public class OpenAuditModel implements AuditModel {
     private int overall_score;
     @Transient
     private JsonNode report_data;
-    private int need_auditor;
     private int need_tenant;
+    private int need_auditor;
     private int need_manager;
     
 	public OpenAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
-			Date last_update_date, String overall_remarks, int overall_score, JsonNode report_data, int need_auditor,
-			int need_tenant, int need_manager) {
+			Date last_update_date, String overall_remarks, int overall_score, JsonNode report_data, int need_tenant,
+			int need_auditor, int need_manager) {
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
 		this.auditor_id = auditor_id;
@@ -44,14 +44,14 @@ public class OpenAuditModel implements AuditModel {
 		this.overall_remarks = overall_remarks;
 		this.overall_score = overall_score;
 		this.report_data = report_data;
-		this.need_auditor = need_auditor;
 		this.need_tenant = need_tenant;
+		this.need_auditor = need_auditor;
 		this.need_manager = need_manager;
 	}
     
 	public OpenAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
-			Date last_update_date, String overall_remarks, int overall_score, String report_data, int need_auditor,
-			int need_tenant, int need_manager) {
+			Date last_update_date, String overall_remarks, int overall_score, String report_data, int need_tenant,
+			int need_auditor, int need_manager) {
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
 		this.auditor_id = auditor_id;
@@ -70,8 +70,8 @@ public class OpenAuditModel implements AuditModel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.need_auditor = need_auditor;
 		this.need_tenant = need_tenant;
+		this.need_auditor = need_auditor;
 		this.need_manager = need_manager;
 	}
 

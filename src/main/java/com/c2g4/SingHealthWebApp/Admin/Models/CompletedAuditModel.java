@@ -25,12 +25,12 @@ public class CompletedAuditModel implements AuditModel{
     private Date start_date;
     private Date end_date;
     private String overall_remarks;
-    private double overall_score;
+    private int overall_score;
     @Transient
     private JsonNode report_data;
     
 	public CompletedAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
-			Date end_date, String overall_remarks, double overall_score, JsonNode report_data) {
+			Date end_date, String overall_remarks, int overall_score, JsonNode report_data) {
 		super();
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
@@ -44,7 +44,7 @@ public class CompletedAuditModel implements AuditModel{
 	}
 	
 	public CompletedAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
-			Date end_date, String overall_remarks, double overall_score, String report_data) {
+			Date end_date, String overall_remarks, int overall_score, String report_data) {
 		super();
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
@@ -65,29 +65,6 @@ public class CompletedAuditModel implements AuditModel{
 			e.printStackTrace();
 		}
 	}
-	
-	//This constructor is for line 248 in the auditchecklistcontroller
-	//Need to look at this again!
-    public CompletedAuditModel(int tenant_id, int auditor_id, int manager_id, Date start_date, Date end_date,
-            String overall_remarks, double overall_score, String report_data) {
-		this.tenant_id = tenant_id;
-		this.auditor_id = auditor_id;
-		this.manager_id = manager_id;
-		this.start_date = start_date;
-		this.end_date = end_date;
-		this.overall_remarks = overall_remarks;
-		this.overall_score = overall_score;
-		ObjectMapper objectmapper = new ObjectMapper();
-		try {
-			this.report_data = objectmapper.readTree(report_data);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
 
 	public int getReport_id() {
 		return report_id;
@@ -145,11 +122,11 @@ public class CompletedAuditModel implements AuditModel{
 		this.overall_remarks = overall_remarks;
 	}
 
-	public double getOverall_score() {
+	public int getOverall_score() {
 		return overall_score;
 	}
 
-	public void setOverall_score(double overall_score) {
+	public void setOverall_score(int overall_score) {
 		this.overall_score = overall_score;
 	}
 

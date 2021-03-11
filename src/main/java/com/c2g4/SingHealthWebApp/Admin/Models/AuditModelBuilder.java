@@ -14,22 +14,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AuditModelBuilder {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
+    //Handy-dandy little fact: If CrudRepo.save is ran with the ID set as 0, the CrudRepo auto
+    //increments the ID.
+    //If it is ran with the ID set to something non-existent, it will throw an error.
+    //This also means that there is no way for us to set a custom report_id
+    
+    //IDs
     private int report_id;
     private int tenant_id;
     private int auditor_id;
     private int manager_id;
+    //Dates
     private Date start_date;
     private Date last_update_date;
     private Date end_date;
-    private String overall_remarks;
+    //Results, Status and Data
     private int overall_score;
+    private String overall_remarks;
     private JsonNode report_data;
-    private int need_auditor;
+    //Follow-up (if necessary)
     private int need_tenant;
+    private int need_auditor;
     private int need_manager;
     
     //0 means open, 1 means completed
-    private int report_type;
+    private int overall_status;
 	
     //init default values
 	public AuditModelBuilder() {
@@ -44,16 +53,15 @@ public class AuditModelBuilder {
 		this.overall_remarks = "Nil";
 		this.overall_score = -1;
 		this.report_data = null;
-		this.need_auditor = 0;
 		this.need_tenant = 0;
+		this.need_auditor = 0;
 		this.need_manager = 0;
 		
 		//Attributes specific to one of the classes
 		this.last_update_date = sqlCurrentDate;
 		this.end_date = sqlCurrentDate;
 		
-		//Attributes specific to the Builder
-		this.report_type = 0;
+		this.overall_status = 0;
 	}
 	
 	//Builder
@@ -71,12 +79,6 @@ public class AuditModelBuilder {
 			logger.error("Auditor_id not set!");
 			throw new IllegalArgumentException();
 		}
-		if (this.report_type == 0 && this.start_date.equals(last_update_date)) {
-			logger.warn("Start date and last_update date are the same, is this a new open report?");
-		}
-		if (this.report_type == 1 && this.start_date.equals(end_date)) {
-			logger.warn("Start date and end date are the same, are we sure this is correct?");
-		}
 		if (this.overall_score == -1) {
 			logger.error("overall_score not set!");
 			throw new IllegalArgumentException();
@@ -85,17 +87,17 @@ public class AuditModelBuilder {
 			logger.error("There is no report data!");
 			throw new IllegalArgumentException();
 		}
-		if (this.report_type == 0 && (this.need_auditor + this.need_tenant + this.need_manager < 1)) {
+		if (this.overall_status == 0 && (this.need_auditor + this.need_tenant + this.need_manager < 1)) {
 			logger.error("This report is open but no 'need_user' bit has been set!");
 			throw new IllegalArgumentException();
 		}
 		
 		AuditModel audit = null;
-		switch(this.report_type) {
+		switch(this.overall_status) {
 		case 0:
 			audit = new OpenAuditModel(this.report_id, this.tenant_id, this.auditor_id,
 					this.manager_id, this.start_date, this.last_update_date, this.overall_remarks,
-					this.overall_score, this.report_data, this.need_auditor, this.need_tenant,
+					this.overall_score, this.report_data, this.need_tenant, this.need_auditor,
 					this.need_manager);
 			break;
 		case 1:
@@ -124,7 +126,7 @@ public class AuditModelBuilder {
 			e.printStackTrace();
 		}
 		this.need_auditor = 1;
-		this.report_type = 0;
+		this.overall_status = 0;
 		return this;
 	}
 	
@@ -144,13 +146,13 @@ public class AuditModelBuilder {
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-		this.report_type = 1;
+		this.overall_status = 1;
 		return this;
 	}
 	
 	//Getters and Setters for the builder class specifically
 	public String getReportType() {
-		switch(this.report_type) {
+		switch(this.overall_status) {
 		case 0:
 			return "Open Audit";
 		case 1:
@@ -160,12 +162,12 @@ public class AuditModelBuilder {
 	}
 	
 	public AuditModelBuilder setTypeIsOpenAudit() {
-		this.report_type = 0;
+		this.overall_status = 0;
 		return this;
 	}
 	
 	public AuditModelBuilder setTypeIsCompletedAudit() {
-		this.report_type = 1;
+		this.overall_status = 1;
 		return this;
 	}
 	
@@ -219,6 +221,15 @@ public class AuditModelBuilder {
 
 	public Date getLastUpdateDate() {
 		return last_update_date;
+	}
+
+	public Date getEnd_date() {
+		return end_date;
+	}
+
+	public AuditModelBuilder setEnd_date(Date end_date) {
+		this.end_date = end_date;
+		return this;
 	}
 
 	public AuditModelBuilder setLastUpdateDate(Date last_update_date) {

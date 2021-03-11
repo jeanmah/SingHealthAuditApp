@@ -15,4 +15,5 @@ public interface OpenAuditRepo extends CrudRepository<OpenAuditModel, Long> {
     //by right there should only be one open report per tenant
     @Query("SELECT report_id FROM Open_Audits WHERE tenant_id= :tenant_id LIMIT 1")
     int getReportIdFromTenantId(@Param("tenant_id") int tenant_id);
+    
 }
