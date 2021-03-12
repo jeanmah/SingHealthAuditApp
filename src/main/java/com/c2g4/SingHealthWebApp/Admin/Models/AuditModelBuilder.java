@@ -11,6 +11,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * AuditModelBuilder is the builder class for AuditModel
+ * Using this class directly is not recommended, I recommend using ReportBuilder
+ * @author LunarFox
+ *
+ */
 public class AuditModelBuilder {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -65,6 +71,12 @@ public class AuditModelBuilder {
 	}
 	
 	//Builder
+	/**
+	 * Builds and returns a Report Object from the parameters contained in the builder object.
+	 * 
+	 * @return AuditModel Object
+	 */
+
 	public AuditModel build() {
 		//Check for errors
 		if (this.report_id == -1) {
@@ -110,6 +122,10 @@ public class AuditModelBuilder {
 	}
 	
 	//Set builder to init for an OpenAuditModel for testing
+	/**
+	 * Sets the parameters in the builder to testing values
+	 * @return AuditModelBuilder
+	 */
 	public AuditModelBuilder initTestOpenAudit() {
 		setReportId(0);
 		setTenantId(1);
@@ -131,6 +147,10 @@ public class AuditModelBuilder {
 	}
 	
 	//Set builder to init for a CompletedAuditModel for  testing
+	/**
+	 * Sets the parameters in the builder to testing values
+	 * @return AuditModelBuilder
+	 */
 	public AuditModelBuilder initTestCompletedAudit() {
 		setReportId(0);
 		setTenantId(1);

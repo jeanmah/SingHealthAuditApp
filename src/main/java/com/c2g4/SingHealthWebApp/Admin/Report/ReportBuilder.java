@@ -22,6 +22,13 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
+/**
+ * ReportBuilder serves as a builder for the ReportObject as well as provides utility functions
+ * for the handling of ReportObjects.
+ * @author LunarFox
+ *
+ */
 public class ReportBuilder {
 	//These to repos cannot be autowired from here, idk why it doesn't work
 	//The workaround is to pass the auditRepo when calling the relevant methods
@@ -115,6 +122,12 @@ public class ReportBuilder {
     	this.overall_status = 1;
     }
     
+    /**
+     * Builds and returns a Report Object from the parameters contained in the ReportBuilder.
+     * 
+     * @return Either an OpenReport or a CloseReport object
+     */
+    
     public Report build() {
 		//Check for errors
 		if (this.report_id == -1) {
@@ -161,6 +174,12 @@ public class ReportBuilder {
     }
     
     //Methods for creating, modifying and loading reports
+    /**
+     * Returns a ReportBuilder for creating a custom Report Object.
+     * @param openAuditRepo repo object for interfacing with the database
+     * @param completedAuditRepo repo object for interfacing with the database
+     * @return ReportBuilder object with default values.
+     */
     public static ReportBuilder getReportBuilder(OpenAuditRepo openAuditRepo, CompletedAuditRepo completedAuditRepo) {
     	ReportBuilder builder = new ReportBuilder();
     	builder.setOpenAuditRepo(openAuditRepo);
@@ -168,6 +187,12 @@ public class ReportBuilder {
     	return builder;
     }
     
+    /**
+     * Returns a ReportBuilder for creating a new Report.
+     * @param openAuditRepo repo object for interfacing with the database
+     * @param completedAuditRepo repo object for interfacing with the database
+     * @return ReportBuilder object with values set for creating a new OpenReport.
+     */
     public static ReportBuilder getNewReportBuilder(OpenAuditRepo openAuditRepo, CompletedAuditRepo completedAuditRepo) {
     	ReportBuilder builder = new ReportBuilder();
     	builder.setReport_id(0);
@@ -176,7 +201,12 @@ public class ReportBuilder {
     	builder.setCompletedAuditRepo(completedAuditRepo);
     	return builder;
     }
-    
+
+    /**
+     * Closes an openreport into a closedreport.
+     * @param report object to be converted into a closedreport
+     * @return ClosedReport generated from the openreport object
+     */
     public ClosedReport closeReport(OpenReport report) {
     	ReportBuilder builder = new ReportBuilder();
     	builder.setReport_id(report.getReport_id())
@@ -189,16 +219,33 @@ public class ReportBuilder {
     
     //TODO Implement a way to reopen a closedReport if necessary
     
+    /**
+     * Checks if an openreport by the given id exists in the database
+     * @param report_id ID of the report
+     * @return True if the report exists in the database and false otherwise
+     */
     public boolean checkOpenReportExists(int report_id) {
     	return openAuditRepo.existsById((long)report_id);
     }
     
     //TODO Go track down why the above requires long but the below requires int
     //I've checked the db, the repos, the model, and the builder, idk why it's like this
+    /**
+     * Checks if a closedreport by the given id exists in the database
+     * @param report_id ID of the report
+     * @return True if the report exists in the database and false otherwise
+     */
     public boolean checkClosedReportExists(int report_id) {
     	return completedAuditRepo.existsById(report_id);
     }
     
+    /**
+     * Returns the openreport by the given id from the database if it exists.
+     * This method actually obtains an AuditModel from the db and converts it into
+     * a Report object for returning.
+     * @param report_id ID of the report
+     * @return OpenReport of the given id
+     */
     public OpenReport loadOpenReport(int report_id) {
     	OpenAuditModel auditModel = openAuditRepo.getOpenAuditById(report_id);
     	if (auditModel == null) {
@@ -211,6 +258,13 @@ public class ReportBuilder {
     	return (OpenReport) builder.build();
     }
     
+    /**
+     * Returns the closedreport by the given id from the database if it exists.
+     * This method actually obtains an AuditModel from the db and converts it into
+     * a Report object for returning.
+     * @param report_id ID of the report
+     * @return ClosedReport of the given id
+     */
     public ClosedReport loadClosedReport(int report_id) {
     	CompletedAuditModel auditModel = completedAuditRepo.getCompletedAuditById(report_id);
     	if (auditModel == null) {
@@ -268,6 +322,13 @@ public class ReportBuilder {
         return true;
     }
     
+    /**
+     * Saves a given report object into the database, regardless of its subclass.
+     * This method abstracts away the need to convert the report into an AuditModel which is the
+     * representation of the report in the database.
+     * @param report object to be saved
+     * @return True if the save was successfull, and false otherwise.
+     */
     public boolean saveReport (Report report) {
     	if(report.getClass().equals(OpenReport.class)) {
     		return saveOpenReport((OpenReport)report);
@@ -445,6 +506,15 @@ public class ReportBuilder {
 	}
 	
 	//Start of logic for processing Report entries
+	/**
+	 * 
+	 * @param report
+	 * @param auditCheckListFBRepo
+	 * @param auditCheckListNFBRepo
+	 * @param images
+	 * @param category
+	 * @return
+	 */
 	public double markReport(Report report, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
 			MultipartFile[] images, String category) {
 		return markEntries(report.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, images, category);

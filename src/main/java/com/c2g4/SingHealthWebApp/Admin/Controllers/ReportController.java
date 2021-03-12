@@ -114,7 +114,6 @@ public class ReportController {
         }
         
         int manager_id = auditorRepo.getManagerIDfromAuditorID(auditor_id);
-        
     	ReportBuilder builder = ReportBuilder.getNewReportBuilder(openAuditRepo, completedAuditRepo);
     	builder.setUserIDs(tenant_id, auditor_id, manager_id)
     	.setEntries(auditorEntryList);
