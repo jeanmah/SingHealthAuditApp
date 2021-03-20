@@ -41,10 +41,7 @@ function Audits({ homeAudits }) {
               </Link>
             ) : (
               <Link to={`/tenant/${tenantid}`}>
-                <div
-                  className="homeaudit-grid-unresolved"
-                  ref={homeAuditGridRef}
-                >
+                <div className="homeaudit-grid-unresolved" ref={homeAuditGridRef}>
                   <div className="tenantName-gridItem">{tenantName}</div>
                   <div className="btn-homeToTenant">
                     <FaAngleRight />

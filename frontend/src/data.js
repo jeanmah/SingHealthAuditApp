@@ -206,3 +206,59 @@ export const institutions = [
     imageUrl: "../images/ndcs.png",
   },
 ];
+
+export const checklistTypes = ["FB Checklist", "Non-FB Checklist", "SM Checklist"];
+
+export const fbChecklist = [
+  {
+    id: "fb-title",
+    category: "A",
+    text: "FB-A-Title"
+  },
+  {
+    id: "question-1",
+    category: "A",
+    text: "FB-A-Question-1"
+  },
+  {
+    id: "question-2",
+    category: "A",
+    text: "FB-A-Question-2"
+  },
+  {
+    id: "question-3",
+    category: "A",
+    text: "FB-A-Question-3"
+  },
+  {
+    id: "question-4",
+    category: "A",
+    text: "FB-A-Question-4"
+  },
+
+  {
+    id: "title",
+    category: "B",
+    text: "FB-B-Title"
+  },
+  {
+    id: "question-1",
+    category: "B",
+    text: "FB-B-Question-1"
+  },
+  {
+    id: "question-2",
+    category: "B",
+    text: "FB-B-Question-2"
+  },
+  {
+    id: "question-3",
+    category: "B",
+    text: "FB-B-Question-3"
+  },
+  {
+    id: "question-4",
+    category: "B",
+    text: "FB-B-Question-4"
+  },
+];
