@@ -23,10 +23,10 @@ function App() {
         <Route exact path="/institutions">
           <Institutions />
         </Route>
-        <Route exact path="/institution/:id">
+        <Route exact path="/institution/:institutionid">
           <Institution />
         </Route>
-        <Route exact path="/tenant/:id">
+        <Route exact path="/tenant/:tenantid">
           <Tenant />
         </Route>
         <Route path="*">
