@@ -47,7 +47,6 @@ public class TenantController_OLD {
 
         if(openAudit==null){
             response.put("openAudits","no audits");
-
             return ResponseEntity.ok(response);
         }
         List<OpenAuditModel> openAuditsList = new ArrayList<>();

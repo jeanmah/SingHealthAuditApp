@@ -225,7 +225,7 @@ public class ReportBuilder {
      * @return True if the report exists in the database and false otherwise
      */
     public boolean checkOpenReportExists(int report_id) {
-    	return openAuditRepo.existsById((long)report_id);
+    	return openAuditRepo.existsById(report_id);
     }
     
     //TODO Go track down why the above requires long but the below requires int

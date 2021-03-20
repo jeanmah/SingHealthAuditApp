@@ -2,6 +2,7 @@ package com.c2g4.SingHealthWebApp.Admin.Repositories;
 
 import java.util.List;
 
+import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -27,4 +28,7 @@ public interface TenantRepo extends CrudRepository<TenantModel, Integer> {
     @Modifying
     @Query("UPDATE Tenant t SET t.latest_audit = :latest_audit WHERE t.acc_id = :acc_id")
     void updateLatestAuditByTenantId(@Param("acc_id") int acc_id, @Param("latest_audit") int latest_audit);
+
+    @Query("SELECT * FROM Tenant")
+    List<TenantModel> getAllTenants();
 }

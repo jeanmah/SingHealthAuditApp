@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
 
 @Repository
-public interface OpenAuditRepo extends CrudRepository<OpenAuditModel, Long> {
+public interface OpenAuditRepo extends CrudRepository<OpenAuditModel, Integer> {
     @Query("SELECT * FROM Open_Audits WHERE report_id = :report_id LIMIT 1")
     OpenAuditModel getOpenAuditById(@Param("report_id") int report_id);
 

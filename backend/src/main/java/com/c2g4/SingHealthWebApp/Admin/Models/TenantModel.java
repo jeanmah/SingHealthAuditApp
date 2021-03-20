@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("Tenant")
-public class TenantModel {
+public class TenantModel implements typeAccountModel{
     @Id
     private int acc_id;
     private String type_id;
@@ -13,7 +13,8 @@ public class TenantModel {
     private int past_audits;
     private String branch_id;
     private String store_addr;
-    
+
+    @Override
 	public int getAcc_id() {
 		return acc_id;
 	}
