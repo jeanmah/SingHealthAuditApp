@@ -85,6 +85,73 @@ export const audits = [
   },
 ];
 
+export const tenants = [
+  {
+    tenantid: "1",
+    tenantName: "Kopitiam",
+    timeRemaining: 30,
+    status: "unresolved",
+    date: "-",
+    institution: "1",
+  },
+  {
+    tenantid: "2",
+    tenantName: "1983",
+    timeRemaining: 2,
+    status: "unresolved",
+    date: "-",
+    institution: "2",
+  },
+  {
+    tenantid: "3",
+    tenantName: "7-Eleven",
+    timeRemaining: 10,
+    status: "unresolved",
+    date: "-",
+    institution: "3",
+  },
+  {
+    tenantid: "4",
+    tenantName: "Kcuts",
+    timeRemaining: 0,
+    status: "resolved",
+    date: "12-02-20",
+    institution: "4",
+  },
+  {
+    tenantid: "5",
+    tenantName: "Kaki Makan",
+    timeRemaining: 0,
+    status: "resolved",
+    date: "27-02-20",
+    institution: "5",
+  },
+  {
+    tenantid: "6",
+    tenantName: "7-Eleven",
+    timeRemaining: 0,
+    status: "resolved",
+    date: "13-01-20",
+    institution: "6",
+  },
+  {
+    tenantid: "7",
+    tenantName: "myNonna's",
+    timeRemaining: 2,
+    status: "unresolved",
+    date: "-",
+    institution: "1",
+  },
+  {
+    tenantid: "8",
+    tenantName: "Comics Connection",
+    timeRemaining: 10,
+    status: "unresolved",
+    date: "-",
+    institution: "2",
+  },
+];
+
 export const categories = ["all", "unresolved", "resolved"];
 
 export const auditors = [

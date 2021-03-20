@@ -6,7 +6,7 @@ Variables
 :root {
   /*colours*/
   --clr-orange: #f15a22;
-  --clr-lightorange: #f1592257;
+  --clr-lightorange: #ff8f2657;
   --clr-lightgreen: rgba(73, 255, 73, 0.521);
   --clr-grey: #2f2f2f;
   --clr-background: rgb(218, 218, 218);
@@ -238,7 +238,7 @@ Home
   display: grid;
   grid-template-columns: 100px max-content;
   justify-content: space-around;
-  background: var(--clr-lightgreen);
+  background: var(--clr-offwhite);
   padding: 2rem 2rem;
   border: 1px solid var(--clr-lightblack);
   font-size: 1rem;
@@ -294,8 +294,8 @@ Institutions
   transform: scale(1.1, 1.1);
 }
 .hospital-logo {
-  width: 321.6px;
-  height: 100px;
+  width: 225.12px;
+  height: 70px;
 }
 .institutions-btn {
   display: flex;
@@ -308,4 +308,54 @@ Institutions
   font-size: 1.4rem;
   color: var(--clr-grey);
   margin-left: 4rem;
+}
+/*
+=============== 
+Institution
+===============
+*/
+.institution-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  padding: 2rem 2rem;
+  background: var(--clr-white);
+  border: 3px solid var(--clr-grey);
+}
+.institution-logo {
+  width: 321.6px;
+  height: 100px;
+}
+.institution-tenant-resolved {
+  display: grid;
+  grid-template-columns: 100px max-content;
+  justify-content: space-around;
+  background: var(--clr-offwhite);
+  padding: 2rem 2rem;
+  border: 1px solid var(--clr-lightblack);
+  font-size: 1rem;
+  transition: var(--transition);
+  color: var(--clr-grey);
+}
+.institution-tenant-resolved:hover {
+  transform: scale(1.1, 1.1);
+}
+.institution-tenant-unresolved {
+  display: grid;
+  grid-template-columns: 100px max-content;
+  justify-content: space-around;
+  background: var(--clr-lightorange);
+  padding: 2rem 2rem;
+  border: 1px solid var(--clr-lightblack);
+  font-size: 1rem;
+  transition: var(--transition);
+  color: var(--clr-grey);
+}
+.institution-tenant-unresolved:hover {
+  transform: scale(1.1, 1.1);
+}
+.institution-tenantbtn {
+  font-size: 1.4rem;
+  color: var(--clr-grey);
 }
