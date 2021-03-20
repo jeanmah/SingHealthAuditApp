@@ -550,7 +550,7 @@ public class ReportBuilder {
                 try {
                     logger.warn("UPLOADED IMAGE NAME {} FBCHECKLIST POST",uploadedImage.getOriginalFilename());
                     String base64img = Base64.getEncoder().encodeToString(uploadedImage.getBytes());
-                    reportEntry.setEvidence(base64img);
+                    reportEntry.addImage(base64img);
                     imageCounter++;
                 } catch (IOException e) {
                     logger.warn("UPLOADED IMAGE NUM {} CANNOT OPEN FILE CHECKLIST POST",imageCounter);

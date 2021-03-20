@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @CrossOrigin("http://localhost:3000")
 @RestController
-public class AuditorController {
+public class AuditorController_OLD {
 	
     @Autowired
     private TenantRepo tenantRepo;

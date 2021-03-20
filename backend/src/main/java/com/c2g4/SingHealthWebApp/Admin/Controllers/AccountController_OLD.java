@@ -16,7 +16,7 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
-public class AccountController {
+public class AccountController_OLD {
     @Autowired
     private AccountRepo accountRepo;
 
