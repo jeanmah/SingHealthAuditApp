@@ -32,6 +32,8 @@ public class OpenAuditModel extends AuditModel {
     private int need_auditor;
     private int need_manager;
     
+    public OpenAuditModel() {}
+    
 	public OpenAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
 			Date last_update_date, String overall_remarks, int overall_score, JsonNode report_data, int need_tenant,
 			int need_auditor, int need_manager) {

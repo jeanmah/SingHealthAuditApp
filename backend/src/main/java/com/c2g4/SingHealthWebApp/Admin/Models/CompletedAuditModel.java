@@ -29,6 +29,8 @@ public class CompletedAuditModel extends AuditModel{
     @Transient
     private JsonNode report_data;
     
+    public CompletedAuditModel() {}
+    
 	public CompletedAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
 			Date end_date, String overall_remarks, int overall_score, JsonNode report_data) {
 		super();

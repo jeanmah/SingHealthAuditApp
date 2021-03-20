@@ -17,8 +17,13 @@ import com.c2g4.SingHealthWebApp.Admin.Models.CompletedAuditModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListFBRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListNFBRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.CompletedAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
+import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -225,11 +230,9 @@ public class ReportBuilder {
      * @return True if the report exists in the database and false otherwise
      */
     public boolean checkOpenReportExists(int report_id) {
-    	return openAuditRepo.existsById((long)report_id);
+    	return openAuditRepo.existsById(report_id);
     }
     
-    //TODO Go track down why the above requires long but the below requires int
-    //I've checked the db, the repos, the model, and the builder, idk why it's like this
     /**
      * Checks if a closedreport by the given id exists in the database
      * @param report_id ID of the report
@@ -287,7 +290,8 @@ public class ReportBuilder {
     	AuditModelBuilder builder = new AuditModelBuilder();
         builder.setReportId(report.getReport_id()).setUserIDs(report.getTenant_id(), report.getAuditor_id()
         		, report.getManager_id()).setOverallRemarks(report.getOverall_remarks()).setOverallScore(report.getOverall_score())
-        .setReportData(objectmapper.valueToTree(report)).setNeed(1,1,1)
+        .setReportData(objectmapper.valueToTree(report))
+        .setNeed(report.getNeed_tenant(),report.getNeed_auditor(),report.getNeed_manager())
         .setStartDate(report.getOpen_date()).setLastUpdateDate(report.getLast_update_date())
         .setTypeIsOpenAudit();
         
@@ -322,6 +326,12 @@ public class ReportBuilder {
         return true;
     }
     
+    private void updateLatestReportIds(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
+    	int report_id = openAuditRepo.getReportIdFromTenantId(tenant_id);
+    	tenantRepo.updateLatestAuditByTenantId(report.getTenant_id(), report_id);
+    	//update the rest
+    }
+    
     /**
      * Saves a given report object into the database, regardless of its subclass.
      * This method abstracts away the need to convert the report into an AuditModel which is the
@@ -329,15 +339,20 @@ public class ReportBuilder {
      * @param report object to be saved
      * @return True if the save was successfull, and false otherwise.
      */
-    public boolean saveReport (Report report) {
+    public boolean saveReport (Report report, TenantRepo tenantRepo, 
+    		AuditorRepo auditorRepo, ManagerRepo managerRepo) {
+    	boolean success = false;
     	if(report.getClass().equals(OpenReport.class)) {
-    		return saveOpenReport((OpenReport)report);
+    		success = saveOpenReport((OpenReport) report);
     	}else if(report.getClass().equals(ClosedReport.class)) {
-    		return saveClosedReport((ClosedReport)report);
+    		success = saveClosedReport((ClosedReport) report);
     	}else {
     		logger.warn("Report is of an invalid type. Unable to save.");
-    		return false;
     	}
+    	if (success) {
+    		updateLatestReportIds(report, tenantRepo, auditorRepo, managerRepo);
+    	}
+    	return success;
     }
     
     //getters and setters
@@ -505,6 +520,63 @@ public class ReportBuilder {
 		return this;
 	}
 	
+	//New Marker that does not handle images
+	public double markReport(Report report, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+			String category) {
+		return markEntries(report.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, category);
+	}
+	
+	public double markEntries(AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+			String category) {
+		return markEntries(this.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, category);
+	}
+	
+	public double markEntries(List<ReportEntry> entries, AuditCheckListFBRepo auditCheckListFBRepo,
+			AuditCheckListNFBRepo auditCheckListNFBRepo, String report_type){
+		
+        HashMap<String,ChecklistCategoryScores> checklistCategoryScoresHashMap = new HashMap<>();
+        AuditCheckListRepo repo = null;
+        if(report_type.matches(ResourceString.FB_KEY)) {
+        	repo = auditCheckListFBRepo;
+        }else if (report_type.matches(ResourceString.NFB_KEY)) {
+        	repo = auditCheckListNFBRepo;
+        }else if(report_type.matches(ResourceString.SMA_KEY)) {
+        	//todo
+        }
+        
+        if(repo == null) {
+        	logger.error("Unknown report type!");
+        	return -1;
+        }
+        
+        
+        //TODO: figure out if this conversion is gonna screw things up
+        for(ReportEntry entry: entries){
+            String qnCategory = repo.getCategoryByQnID(entry.getQn_id());
+            double qnWeight = repo.getWeightByQnID(entry.getQn_id());
+            
+            if(entry.getStatus() == Component_Status.FAIL){               
+                //Update Score
+                if(checklistCategoryScoresHashMap.containsKey(qnCategory)){
+                    checklistCategoryScoresHashMap.get(qnCategory).insertWrong();
+                }else{
+                    ChecklistCategoryScores checklistCategoryScores = new ChecklistCategoryScores(qnCategory,qnWeight,1,1);
+                    checklistCategoryScoresHashMap.put(qnCategory,checklistCategoryScores);
+                }
+            }else{
+                if(checklistCategoryScoresHashMap.containsKey(qnCategory)){
+                    checklistCategoryScoresHashMap.get(qnCategory).insertCorrect();
+                }else{
+                    ChecklistCategoryScores checklistCategoryScores = new ChecklistCategoryScores(qnCategory,qnWeight,1,0);
+                    checklistCategoryScoresHashMap.put(qnCategory,checklistCategoryScores);
+                }
+            }
+        }
+        String str_score = String.valueOf(calculateScore(checklistCategoryScoresHashMap));
+        return Double.parseDouble(str_score) *100.0;
+    }
+	
+	
 	//Start of logic for processing Report entries
 	/**
 	 * 
@@ -515,30 +587,28 @@ public class ReportBuilder {
 	 * @param category
 	 * @return
 	 */
-	public double markReport(Report report, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+	public double markReport_OLD(Report report, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
 			MultipartFile[] images, String category) {
-		return markEntries(report.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, images, category);
+		return markEntries_OLD(report.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, images, category);
 	}
 	
-	public double markEntries(AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+	public double markEntries_OLD(AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
 			MultipartFile[] images, String category) {
-		return markEntries(this.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, images, category);
+		return markEntries_OLD(this.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, images, category);
 	}
 	
-	public double markEntries(List<ReportEntry> entries, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+	public double markEntries_OLD(List<ReportEntry> entries, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
 			MultipartFile[] images, String category) {
         HashMap<String,ChecklistCategoryScores> checklistCategoryScoresHashMap = new HashMap<>();
         int imageCounter = 0;
         
         //TODO: figure out if this conversion is gonna screw things up
-        for(ReportEntry reportEntry: entries){
-            AuditorReportEntry auditorReportEntry = (AuditorReportEntry) reportEntry;
-
+        for(ReportEntry entry: entries){
             String qnCategory = category.equals("fbchecklist") ?
-                    auditCheckListFBRepo.getCategoryByQnID(reportEntry.getQn_id())
-                    : auditCheckListNFBRepo.getCategoryByQnID(reportEntry.getQn_id());
+                    auditCheckListFBRepo.getCategoryByQnID(entry.getQn_id())
+                    : auditCheckListNFBRepo.getCategoryByQnID(entry.getQn_id());
 
-            if(auditorReportEntry.getStatus() == Component_Status.FAIL){
+            if(entry.getStatus() == Component_Status.FAIL){
                 MultipartFile uploadedImage = images[imageCounter];
                 //No img checking
                 if(uploadedImage == null) {
@@ -550,7 +620,7 @@ public class ReportBuilder {
                 try {
                     logger.warn("UPLOADED IMAGE NAME {} FBCHECKLIST POST",uploadedImage.getOriginalFilename());
                     String base64img = Base64.getEncoder().encodeToString(uploadedImage.getBytes());
-                    reportEntry.addImage(base64img);
+                    entry.addImage(base64img);
                     imageCounter++;
                 } catch (IOException e) {
                     logger.warn("UPLOADED IMAGE NUM {} CANNOT OPEN FILE CHECKLIST POST",imageCounter);
@@ -562,8 +632,8 @@ public class ReportBuilder {
                     checklistCategoryScoresHashMap.get(qnCategory).insertWrong();
                 } else{
                     double weight = category.equals("fbchecklist") ?
-                            auditCheckListFBRepo.getWeightByQnID(reportEntry.getQn_id())
-                            : auditCheckListNFBRepo.getWeightByQnID(reportEntry.getQn_id());
+                            auditCheckListFBRepo.getWeightByQnID(entry.getQn_id())
+                            : auditCheckListNFBRepo.getWeightByQnID(entry.getQn_id());
                     ChecklistCategoryScores checklistCategoryScores = new ChecklistCategoryScores(qnCategory,weight,1,1);
                     checklistCategoryScoresHashMap.put(qnCategory,checklistCategoryScores);
                 }
@@ -573,8 +643,8 @@ public class ReportBuilder {
                     checklistCategoryScoresHashMap.get(qnCategory).insertCorrect();
                 } else{
                     double weight = category.equals("fbchecklist") ?
-                            auditCheckListFBRepo.getWeightByQnID(reportEntry.getQn_id())
-                            : auditCheckListNFBRepo.getWeightByQnID(reportEntry.getQn_id());
+                            auditCheckListFBRepo.getWeightByQnID(entry.getQn_id())
+                            : auditCheckListNFBRepo.getWeightByQnID(entry.getQn_id());
                     ChecklistCategoryScores checklistCategoryScores = new ChecklistCategoryScores(qnCategory,weight,1,0);
                     checklistCategoryScoresHashMap.put(qnCategory,checklistCategoryScores);
                 }

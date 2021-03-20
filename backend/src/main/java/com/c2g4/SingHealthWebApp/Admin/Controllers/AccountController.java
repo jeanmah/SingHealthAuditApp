@@ -1,5 +1,15 @@
 package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
@@ -13,18 +23,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
-public class AccountController_OLD {
+public class AccountController {
     @Autowired
     private AccountRepo accountRepo;
     @Autowired
@@ -36,18 +38,18 @@ public class AccountController_OLD {
 
     //- returns list of all users and their user_ids
     @GetMapping("/account/getAllUsers")
-    public ResponseEntity<?> getAllUsers(){
+    public void getAllUsers(){
 
     }
 
     //returns list of all users and their user_ids of a specific type
     @GetMapping("/account/getAllUsersofType")
-    public ResponseEntity<?> getAllUsersofType(String type){
+    public void getAllUsersofType(String type){
 
     }
 
     @GetMapping("/account/getAllUsersofBranch")
-    public ResponseEntity<?> getAllUsersofBranch(String branch){
+    public void getAllUsersofBranch(String branch){
 
     }
 
@@ -107,6 +109,7 @@ public class AccountController_OLD {
     @PostMapping("/account/postProfileUpdate")
     public ResponseEntity<?> postProfileUpdate(
             @RequestPart(value = "changes", required = true) String changes){
+				return null;
 
     }
 

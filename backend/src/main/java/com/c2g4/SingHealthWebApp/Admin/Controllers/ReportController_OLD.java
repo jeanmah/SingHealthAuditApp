@@ -118,7 +118,7 @@ public class ReportController_OLD {
     	builder.setUserIDs(tenant_id, auditor_id, manager_id)
     	.setEntries(auditorEntryList);
     	
-    	int auditScore = (int) builder.markEntries(auditCheckListFBRepo, auditCheckListNFBRepo, images, checklistType);
+    	int auditScore = (int) builder.markEntries_OLD(auditCheckListFBRepo, auditCheckListNFBRepo, images, checklistType);
     	if(auditScore == -1) {
     		return ResponseEntity.badRequest().body("UPLOADED IMAGE CANNOT OPEN FILE CHECKLIST POST");
     	}
@@ -128,13 +128,13 @@ public class ReportController_OLD {
         	OpenReport report = (OpenReport) builder.build();
         	if(!builder.saveReport(report)) {
                 return ResponseEntity.badRequest().body(null);
-        	};
+        	}
         } else {
         	builder.setOverall_remarks("Idk Closed?").setOverall_score(auditScore).setOverall_statusAsClosed();
         	ClosedReport report = (ClosedReport) builder.build();
         	if(!builder.saveReport(report)) {
                 return ResponseEntity.badRequest().body(null);
-        	};
+        	}
 
             //TODO: add completed audit to tenant
         }

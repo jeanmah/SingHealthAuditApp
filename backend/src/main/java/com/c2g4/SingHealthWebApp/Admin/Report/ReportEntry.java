@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.springframework.lang.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 //Entries are never modified or deleted, only added.
 //Entries with the same qn_id essentially "overrule" older entries with the same qn_id.
-public abstract class ReportEntry {
+public class ReportEntry {
 	  private int entry_id;
 	  private int qn_id;
 	  private Date date;
@@ -21,6 +23,8 @@ public abstract class ReportEntry {
 	  private String remarks;
 	  @Nullable
 	  private List<String> images;
+	  
+	  private Component_Status status;
 	  
 	  public int getEntry_id() {
 	      return entry_id;
@@ -84,4 +88,21 @@ public abstract class ReportEntry {
 	  public void setSeverity(int severity) {
 	      this.severity = severity;
 	  }
+	  
+	  public Component_Status getStatus() {
+	      return status;
+	  }
+	  @JsonSetter
+	  public void setStatus(String statusStr) {
+		  status = statusStr.matches("PASS") ? Component_Status.PASS : Component_Status.FAIL;
+	  }
+	
+	  public void setStatus(boolean statusBool) {
+	      status = statusBool? Component_Status.PASS : Component_Status.FAIL;
+	  }
+	  
+
 }
+
+
+
