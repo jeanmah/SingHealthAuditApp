@@ -17,6 +17,7 @@ public class AuditorModel {
 	private JsonNode outstanding_audit_ids;
 	private String branch_id;
 	private int mgr_id;
+
 	public int getAcc_id() {
 		return acc_id;
 	}
