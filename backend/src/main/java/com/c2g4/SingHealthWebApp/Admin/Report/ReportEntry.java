@@ -2,6 +2,7 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.lang.Nullable;
@@ -66,11 +67,13 @@ public abstract class ReportEntry {
 	  }
 	  
 	  public void setImages(List<String> images) {
-		  //todo
 		  this.images = images;
 	  }
 	
 	  public void addImage(String base64img) {
+		  if(this.images == null) {
+			  this.images = new ArrayList<String>();
+		  }
 		  this.images.add(base64img);
 	  }
 	
