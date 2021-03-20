@@ -22,7 +22,7 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
-public class TenantController {
+public class TenantController_OLD {
 
 	
     @Autowired

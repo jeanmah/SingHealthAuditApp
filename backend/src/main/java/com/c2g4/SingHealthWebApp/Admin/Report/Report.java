@@ -144,10 +144,6 @@ public abstract class Report {
 		this.overall_status = overall_status;
 	}
 
-	public static Logger getLogger() {
-		return logger;
-	}
-    
     
     
 

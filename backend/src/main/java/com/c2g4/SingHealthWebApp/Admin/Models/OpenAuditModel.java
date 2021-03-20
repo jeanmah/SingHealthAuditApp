@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Table("Open_Audits")
 @AccessType(AccessType.Type.PROPERTY)
-public class OpenAuditModel implements AuditModel {
+public class OpenAuditModel extends AuditModel {
 	
     @Id
     private int report_id;

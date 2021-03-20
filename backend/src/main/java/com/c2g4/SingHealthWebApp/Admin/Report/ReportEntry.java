@@ -2,13 +2,14 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.List;
 
 import org.springframework.lang.Nullable;
 
 //Entries are never modified or deleted, only added.
 //Entries with the same qn_id essentially "overrule" older entries with the same qn_id.
 public abstract class ReportEntry {
-	  private int entry_id; //do we really need an entry id?
+	  private int entry_id;
 	  private int qn_id;
 	  private Date date;
 	  private Time time;
@@ -18,9 +19,7 @@ public abstract class ReportEntry {
 	  @Nullable
 	  private String remarks;
 	  @Nullable
-	  //Why is this stored as a string? - Jia Wei
-	  //private BufferedImage evidence;
-	  private String imgstring;
+	  private List<String> images;
 	  
 	  public int getEntry_id() {
 	      return entry_id;
@@ -61,13 +60,18 @@ public abstract class ReportEntry {
 	  public void setRemarks(String remarks) {
 	      this.remarks = remarks;
 	  }
-	
-	  public String getEvidence() {
-	      return imgstring;
+	  
+	  public List<String> getImages(){
+		  return images;
+	  }
+	  
+	  public void setImages(List<String> images) {
+		  //todo
+		  this.images = images;
 	  }
 	
-	  public void setEvidence(String base64img) {
-	      this.imgstring = base64img;
+	  public void addImage(String base64img) {
+		  this.images.add(base64img);
 	  }
 	
 	  public int getSeverity() {

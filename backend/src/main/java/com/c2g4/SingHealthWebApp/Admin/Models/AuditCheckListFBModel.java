@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("FBCheckList")
-public class AuditCheckListFBModel {
+public class AuditCheckListFBModel extends AuditCheckListModel{
     @Id
     private int fb_qn_id;
     private String category;

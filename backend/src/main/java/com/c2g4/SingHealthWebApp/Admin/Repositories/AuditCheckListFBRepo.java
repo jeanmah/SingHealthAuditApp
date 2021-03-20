@@ -8,9 +8,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 
 @Repository
 public interface AuditCheckListFBRepo extends CrudRepository<AuditCheckListFBModel, Integer> {
+    @Query("SELECT * FROM FBCheckList")
+    List<AuditCheckListFBModel> getAllQuestions();
+    
+    @Query("SELECT * FROM FBCheckList WHERE qn_id =:qn_id")
+    AuditCheckListNFBModel getQuestion(@Param("qn_id") int qn_id);
+	
     @Query("SELECT * FROM FBCheckList WHERE category = :category")
     List<AuditCheckListFBModel> getQuestionByCategory(@Param("category") String category);
     

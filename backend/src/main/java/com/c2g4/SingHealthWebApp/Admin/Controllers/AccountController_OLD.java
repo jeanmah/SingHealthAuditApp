@@ -24,7 +24,7 @@ import java.util.List;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
-public class AccountController {
+public class AccountController_OLD {
     @Autowired
     private AccountRepo accountRepo;
     @Autowired
