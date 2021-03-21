@@ -1,5 +1,6 @@
 package com.c2g4.SingHealthWebApp.Admin.Repositories;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -24,5 +25,15 @@ public interface AccountRepo extends CrudRepository<AccountModel, Integer>{
     @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id")
     List<AccountModel> getAllAccountsByBranchId(@Param("branch_id") String branch_id);
 
+    @Modifying
+    @Query("UPDATE Accounts acc SET acc.password = :password WHERE acc.account_id = :account_id")
+    void changePasswordByAccId(@Param("account_id") int account_id, @Param("password") String password);
+
+    @Modifying
+    @Query("UPDATE Accounts a SET a.username = :username, a.first_name = :first_name, " +
+            "a.last_name = :last_name, a.email = :email, a.hp = :hp WHERE a.account_id = :account_id")
+    void changeAccountFields(@Param("account_id") int account_id, @Param("username") String username,
+                             @Param("first_name") String first_name, @Param("last_name") String last_name,
+                             @Param("email") String email, @Param("hp") String hp);
 
 }
