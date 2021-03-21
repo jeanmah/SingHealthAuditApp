@@ -13,7 +13,7 @@ import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 @Repository
 public interface AuditorRepo extends CrudRepository<AuditorModel, Integer>{
 	@Query("SELECT * FROM Auditors")
-	Collection<AuditorModel> getAll();
+	Collection<AuditorModel> getAllAuditors();
 
 	@Query("SELECT * FROM Auditors WHERE acc_id = :acc_id LIMIT 1")
 	AuditorModel getAuditorById(@Param("acc_id") int acc_id);

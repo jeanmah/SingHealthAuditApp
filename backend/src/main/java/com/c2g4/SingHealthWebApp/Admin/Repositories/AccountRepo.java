@@ -6,6 +6,8 @@ import org.springframework.data.repository.query.Param;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 
+import java.util.List;
+
 public interface AccountRepo extends CrudRepository<AccountModel, Integer>{
     @Query("SELECT * FROM Accounts WHERE username = :username LIMIT 1")
     AccountModel findByUsername(@Param("username") String username);
@@ -15,6 +17,12 @@ public interface AccountRepo extends CrudRepository<AccountModel, Integer>{
 
     @Query("SELECT role_id FROM Accounts WHERE username= :username")
     String getRoleFromUsername(@Param("username") String username);
+
+    @Query("SELECT * FROM Accounts")
+    List<AccountModel> getAllAccounts();
+
+    @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id")
+    List<AccountModel> getAllAccountsByBranchId(@Param("branch_id") String branch_id);
 
 
 }
