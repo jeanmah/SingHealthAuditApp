@@ -22,6 +22,9 @@ public interface AccountRepo extends CrudRepository<AccountModel, Integer>{
     @Query("SELECT * FROM Accounts")
     List<AccountModel> getAllAccounts();
 
+    @Query("SELECT account_id FROM Accounts WHERE first_name= :first_name AND last_name=:last_name")
+    int getAccIdFromNames(@Param("first_name") String first_name, @Param("last_name") String last_name);
+
     @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id")
     List<AccountModel> getAllAccountsByBranchId(@Param("branch_id") String branch_id);
 
