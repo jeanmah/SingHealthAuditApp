@@ -9,6 +9,8 @@ import Error from "./pages/Error";
 import Institutions from "./pages/Institutions";
 import Institution from "./pages/Institution";
 import FbChecklist from "./pages/FbChecklist";
+import AuthenticatedRoute from "./components/testJwt/AuthenticatedRoute";
+import LoginComponent from "./components/testJwt/Login";
 // import FbCategoryB from "./pages/fbChecklistPages/FbCategoryB";
 // import FbCategoryC from "./pages/fbChecklistPages/FbCategoryC";
 // import FbCategoryD from "./pages/fbChecklistPages/FbCategoryD";
@@ -21,9 +23,12 @@ function App() {
       <ContextProvider>
         <Navbar />
         <Switch>
-          <Route exact path="/">
-            <Home />
+          <Route exact path="/login">
+            <LoginComponent />
           </Route>
+          <AuthenticatedRoute exact path="/home">
+            <Home />
+          </AuthenticatedRoute>
           <Route exact path="/account">
             <Account />
           </Route>

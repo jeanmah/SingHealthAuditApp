@@ -652,21 +652,18 @@ export const fbChecklist = [
     category: "A",
     text:
       "Shop is open and ready to service patients/visitors according to operating hours.",
-    checked: false,
     modalOpen: false,
   },
   {
     id: "2",
     category: "A",
     text: "Staff Attendance: adequate staff for peak and non-peak hours.",
-    checked: false,
     modalOpen: false,
   },
   {
     id: "3",
     category: "A",
     text: "At least one (1) clearly assigned person in-charge on site.",
-    checked: false,
     modalOpen: false,
   },
   {
@@ -674,35 +671,30 @@ export const fbChecklist = [
     category: "A",
     text:
       "Staff who are unfit for work due to illness should not report to work).",
-    checked: false,
     modalOpen: false,
   },
   {
     id: "5",
     category: "B",
     text: "FB-B-Question-1",
-    checked: false,
     modalOpen: false,
   },
   {
     id: "6",
     category: "B",
     text: "FB-B-Question-2",
-    checked: false,
     modalOpen: false,
   },
   {
     id: "7",
     category: "B",
     text: "FB-B-Question-3",
-    checked: false,
     modalOpen: false,
   },
   {
     id: "8",
     category: "B",
     text: "FB-B-Question-4",
-    checked: false,
     modalOpen: false,
   },
 ];

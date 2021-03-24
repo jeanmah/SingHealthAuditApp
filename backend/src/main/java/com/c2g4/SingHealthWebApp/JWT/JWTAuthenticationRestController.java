@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 
 @RestController
-@CrossOrigin(origins= "http://localhost:3000")
+@CrossOrigin(origins= {"http://localhost:3000","http://localhost:3002" })
 public class JWTAuthenticationRestController {
 
     @Value("${com.c2g4.singHealthAudit.jwt.http.request.header}")
