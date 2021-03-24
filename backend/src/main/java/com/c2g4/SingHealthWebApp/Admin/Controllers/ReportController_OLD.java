@@ -1,5 +1,6 @@
 package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
+/*
 
 import java.util.List;
 
@@ -68,8 +69,8 @@ public class ReportController_OLD {
     public ResponseEntity<?> getFBCheckListCategoryQuestions(@PathVariable("category") String category) {
         List<AuditCheckListFBModel> questions = auditCheckListFBRepo.getQuestionByCategory(category);
         if (questions == null || questions.size() == 0) {
-        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
         return ResponseEntity.ok(questions);
     }
 
@@ -93,12 +94,12 @@ public class ReportController_OLD {
     public ResponseEntity<?> submitFBChecklist(
             @RequestParam(value = "files", required = true) MultipartFile[] images,
             @RequestPart(value = "filledChecklist", required = true) String filledChecklist,
-            @AuthenticationPrincipal UserDetails auditorUser, 
+            @AuthenticationPrincipal UserDetails auditorUser,
             @PathVariable("tenantId") int tenant_id,
             @PathVariable("checklistType") String checklistType)  {
         AccountModel auditorAccount = accountRepo.findByUsername(auditorUser.getUsername());
         int auditor_id = auditorAccount.getAccount_id();
-        
+
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(AuditorReportEntry.class, new CustomAuditorEntryDeserializer());
@@ -112,29 +113,29 @@ public class ReportController_OLD {
             logger.warn("JSON PROCESSING EXCEPTION {} POST",checklistType);
             return ResponseEntity.badRequest().body(null);
         }
-        
+
         int manager_id = auditorRepo.getManagerIDfromAuditorID(auditor_id);
-    	ReportBuilder builder = ReportBuilder.getNewReportBuilder(openAuditRepo, completedAuditRepo);
-    	builder.setUserIDs(tenant_id, auditor_id, manager_id)
-    	.setEntries(auditorEntryList);
-    	
-    	int auditScore = (int) builder.markEntries(auditCheckListFBRepo, auditCheckListNFBRepo, images, checklistType);
-    	if(auditScore == -1) {
-    		return ResponseEntity.badRequest().body("UPLOADED IMAGE CANNOT OPEN FILE CHECKLIST POST");
-    	}
+        ReportBuilder builder = ReportBuilder.getNewReportBuilder(openAuditRepo, completedAuditRepo);
+        builder.setUserIDs(tenant_id, auditor_id, manager_id)
+                .setEntries(auditorEntryList);
+
+        int auditScore = (int) builder.markEntries_OLD(auditCheckListFBRepo, auditCheckListNFBRepo, images, checklistType);
+        if(auditScore == -1) {
+            return ResponseEntity.badRequest().body("UPLOADED IMAGE CANNOT OPEN FILE CHECKLIST POST");
+        }
 
         if(auditScore<100){
-        	builder.setOverall_remarks("Idk Open?").setOverall_score(auditScore).setNeed(1, 1, 0);
-        	OpenReport report = (OpenReport) builder.build();
-        	if(!builder.saveReport(report)) {
+            builder.setOverall_remarks("Idk Open?").setOverall_score(auditScore).setNeed(1, 1, 0);
+            OpenReport report = (OpenReport) builder.build();
+            if(!builder.saveReport(report)) {
                 return ResponseEntity.badRequest().body(null);
-        	};
+            }
         } else {
-        	builder.setOverall_remarks("Idk Closed?").setOverall_score(auditScore).setOverall_statusAsClosed();
-        	ClosedReport report = (ClosedReport) builder.build();
-        	if(!builder.saveReport(report)) {
+            builder.setOverall_remarks("Idk Closed?").setOverall_score(auditScore).setOverall_statusAsClosed();
+            ClosedReport report = (ClosedReport) builder.build();
+            if(!builder.saveReport(report)) {
                 return ResponseEntity.badRequest().body(null);
-        	};
+            }
 
             //TODO: add completed audit to tenant
         }
@@ -148,3 +149,5 @@ public class ReportController_OLD {
     }
 
 }
+
+ */

@@ -2,13 +2,18 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 //Entries are never modified or deleted, only added.
 //Entries with the same qn_id essentially "overrule" older entries with the same qn_id.
-public abstract class ReportEntry {
+@Component
+public class ReportEntry {
 	  private int entry_id;
 	  private int qn_id;
 	  private Date date;
@@ -20,6 +25,8 @@ public abstract class ReportEntry {
 	  private String remarks;
 	  @Nullable
 	  private List<String> images;
+	  
+	  private Component_Status status;
 	  
 	  public int getEntry_id() {
 	      return entry_id;
@@ -66,11 +73,13 @@ public abstract class ReportEntry {
 	  }
 	  
 	  public void setImages(List<String> images) {
-		  //todo
 		  this.images = images;
 	  }
 	
 	  public void addImage(String base64img) {
+		  if(this.images == null) {
+			  this.images = new ArrayList<String>();
+		  }
 		  this.images.add(base64img);
 	  }
 	
@@ -81,4 +90,21 @@ public abstract class ReportEntry {
 	  public void setSeverity(int severity) {
 	      this.severity = severity;
 	  }
+	  
+	  public Component_Status getStatus() {
+	      return status;
+	  }
+	  @JsonSetter
+	  public void setStatus(String statusStr) {
+		  status = statusStr.matches("PASS") ? Component_Status.PASS : Component_Status.FAIL;
+	  }
+	
+	  public void setStatus(boolean statusBool) {
+	      status = statusBool? Component_Status.PASS : Component_Status.FAIL;
+	  }
+	  
+
 }
+
+
+

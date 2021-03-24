@@ -4,11 +4,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("Managers")
-public class ManagerModel {
+public class ManagerModel implements typeAccountModel{
     @Id
     private int acc_id;
     private String branch_id;
-    
+
+	@Override
 	public int getAcc_id() {
 		return acc_id;
 	}
