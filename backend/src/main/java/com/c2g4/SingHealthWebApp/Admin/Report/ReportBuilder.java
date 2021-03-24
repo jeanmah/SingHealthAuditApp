@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class ReportBuilder {
     private int overall_score;
     private String overall_remarks;
     private List<ReportEntry> entries;
+    private String report_type;
     //Follow-up (if necessary)
     private int need_tenant;
     private int need_auditor;
@@ -72,6 +74,7 @@ public class ReportBuilder {
 		this.manager_id = -1;
 		this.open_date = sqlCurrentDate;
 		this.overall_remarks = "Nil";
+		this.report_type = "-1";
 		this.overall_score = -1;
 		this.entries = new ArrayList<>();
 		this.need_tenant = 0;
@@ -95,6 +98,7 @@ public class ReportBuilder {
     	this.manager_id = auditModel.getManager_id();
     	this.open_date = auditModel.getStart_date();
     	this.overall_remarks = auditModel.getOverall_remarks();
+    	this.report_type = auditModel.getReport_type();
     	this.overall_score = auditModel.getOverall_score();
     	try {
 			this.entries = objectmapper.treeToValue(auditModel.getReport_data(), OpenReport.class).getEntries();
@@ -109,6 +113,31 @@ public class ReportBuilder {
     	this.overall_status = 0;
     }
     
+    private ReportBuilder(Report report) {
+    	this.report_id = report.getReport_id();
+    	this.tenant_id = report.getTenant_id();
+    	this.auditor_id = report.getAuditor_id();
+    	this.manager_id = report.getManager_id();
+    	this.open_date = report.getOpen_date();
+    	this.overall_remarks = report.getOverall_remarks();
+    	this.report_type = report.getReport_type();
+    	this.overall_score = report.getOverall_score();
+    	this.entries = report.getEntries();
+    	
+    	if(this.report_type.matches(ResourceString.REPORT_STATUS_OPEN)) {
+    		OpenReport openReport = (OpenReport) report;
+        	this.need_auditor = openReport.getNeed_auditor();
+        	this.need_tenant = openReport.getNeed_tenant();
+        	this.need_manager = openReport.getNeed_manager();
+        	this.last_update_date = openReport.getLast_update_date();
+        	this.overall_status = 0;
+    	}else if (this.report_type.matches(ResourceString.REPORT_STATUS_CLOSED)) {
+    		ClosedReport closedReport = (ClosedReport) report;
+    		this.close_date = closedReport.getClose_date();
+    		this.overall_status = 1;
+    	}
+    	    }
+    
     private ReportBuilder(CompletedAuditModel auditModel) {
     	this.report_id = auditModel.getReport_id();
     	this.tenant_id = auditModel.getTenant_id();
@@ -116,6 +145,7 @@ public class ReportBuilder {
     	this.manager_id = auditModel.getManager_id();
     	this.open_date = auditModel.getStart_date();
     	this.overall_remarks = auditModel.getOverall_remarks();
+    	this.report_type = auditModel.getReport_type();
     	this.overall_score = auditModel.getOverall_score();
     	try {
 			this.entries = objectmapper.treeToValue(auditModel.getReport_data(), OpenReport.class).getEntries();
@@ -145,6 +175,10 @@ public class ReportBuilder {
 		}
 		if (this.auditor_id == -1) {
 			logger.error("Auditor_id not set!");
+			throw new IllegalArgumentException();
+		}
+		if (this.report_type.matches("-1")) {
+			logger.error("Report type not set!");
 			throw new IllegalArgumentException();
 		}
 		if (this.overall_score == -1) {
@@ -206,7 +240,45 @@ public class ReportBuilder {
     	builder.setCompletedAuditRepo(completedAuditRepo);
     	return builder;
     }
-
+    
+    /**
+     * Returns a ReportBuilder with values loaded from an existing report
+     * @param openAuditRepo repo object for interfacing with the database
+     * @param completedAuditRepo repo object for interfacing with the database
+     * @param report report to be loaded
+     * @return ReportBuilder object with values loaded from an existing report.
+     */
+    public static ReportBuilder getLoadedReportBuilder(OpenAuditRepo openAuditRepo, CompletedAuditRepo completedAuditRepo,
+    		Report report) {
+    	ReportBuilder builder = new ReportBuilder(report);
+    	builder.setOpenAuditRepo(openAuditRepo);
+    	builder.setCompletedAuditRepo(completedAuditRepo);
+    	return builder;
+    }
+    
+    /**
+     * Returns a ReportBuilder with values loaded from an existing report
+     * @param openAuditRepo repo object for interfacing with the database
+     * @param completedAuditRepo repo object for interfacing with the database
+     * @param report_id report_id of the report
+     * @return ReportBuilder object with values loaded from an existing report.
+     */
+    public static ReportBuilder getLoadedReportBuilder(OpenAuditRepo openAuditRepo, CompletedAuditRepo completedAuditRepo,
+    		int report_id) {
+    	ReportBuilder builder = new ReportBuilder();
+    	if(builder.checkOpenReportExists(report_id)) {
+    		builder = new ReportBuilder(builder.loadOpenReport(report_id));
+    	}else if (builder.checkClosedReportExists(report_id)) {
+    		builder = new ReportBuilder(builder.loadClosedReport(report_id));
+    	}else {
+    		logger.warn("Report with given ID does not exist!");
+    		return null;
+    	}
+    	builder.setOpenAuditRepo(openAuditRepo);
+    	builder.setCompletedAuditRepo(completedAuditRepo);
+    	return builder;
+    }
+    
     /**
      * Closes an openreport into a closedreport.
      * @param report object to be converted into a closedreport
@@ -217,6 +289,7 @@ public class ReportBuilder {
     	builder.setReport_id(report.getReport_id())
     	.setUserIDs(report.getTenant_id(), report.getAuditor_id(), report.getManager_id())
     	.setOpen_date(report.getOpen_date()).setOverall_remarks(report.getOverall_remarks())
+    	.setReportType(report.getReport_type())
     	.setOverall_score(report.getOverall_score()).setEntries(report.getEntries());
     	ClosedReport closedreport = (ClosedReport)builder.build();
     	return closedreport;
@@ -289,7 +362,8 @@ public class ReportBuilder {
 		
     	AuditModelBuilder builder = new AuditModelBuilder();
         builder.setReportId(report.getReport_id()).setUserIDs(report.getTenant_id(), report.getAuditor_id()
-        		, report.getManager_id()).setOverallRemarks(report.getOverall_remarks()).setOverallScore(report.getOverall_score())
+        		, report.getManager_id()).setOverallRemarks(report.getOverall_remarks())
+        .setReport_type(report.getReport_type()).setOverallScore(report.getOverall_score())
         .setReportData(objectmapper.valueToTree(report))
         .setNeed(report.getNeed_tenant(),report.getNeed_auditor(),report.getNeed_manager())
         .setStartDate(report.getOpen_date()).setLastUpdateDate(report.getLast_update_date())
@@ -312,7 +386,8 @@ public class ReportBuilder {
 		
     	AuditModelBuilder builder = new AuditModelBuilder();
         builder.setReportId(report.getReport_id()).setUserIDs(report.getTenant_id(), report.getAuditor_id()
-        		, report.getManager_id()).setOverallRemarks(report.getOverall_remarks()).setOverallScore(report.getOverall_score())
+        		, report.getManager_id()).setOverallRemarks(report.getOverall_remarks())
+        .setReport_type(report.getReport_type()).setOverallScore(report.getOverall_score())
         .setReportData(objectmapper.valueToTree(report)).setNeed(1,1,1)
         .setStartDate(report.getOpen_date()).setEnd_date(report.getClose_date())
         .setTypeIsCompletedAudit();
@@ -355,6 +430,7 @@ public class ReportBuilder {
     	return success;
     }
     
+   
     //getters and setters
 	public int getReport_id() {
 		return report_id;
@@ -436,6 +512,22 @@ public class ReportBuilder {
 		this.overall_remarks = overall_remarks;
 		return this;
 	}
+	
+	public ReportBuilder setReportType(String report_type) {
+		if(report_type.matches(ResourceString.FB_KEY) || 
+				report_type.matches(ResourceString.NFB_KEY) ||
+				report_type.matches(ResourceString.SMA_KEY)) {
+			this.report_type = report_type;
+			return this;
+		}else {
+			logger.error("Invalid report type!");
+			return null;
+		}
+	}
+	
+	public String getReportType() {
+		return this.report_type;
+	}
 
 	public List<ReportEntry> getEntries() {
 		return entries;
@@ -443,6 +535,15 @@ public class ReportBuilder {
 
 	public ReportBuilder setEntries(List<ReportEntry> entries) {
 		this.entries = entries;
+        for(int i = 0; i < this.entries.size(); i++) {
+        	this.entries.get(i).setEntry_id(i);
+        }
+		return this;
+	}
+	
+	public ReportBuilder addEntry(ReportEntry entry) {
+		this.entries.add(entry);
+		entry.setEntry_id(this.entries.size()-1);
 		return this;
 	}
 
@@ -521,20 +622,18 @@ public class ReportBuilder {
 	}
 	
 	//New Marker that does not handle images
-	public double markReport(Report report, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+	public double markExternalReport(Report report, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
 			String category) {
 		return markEntries(report.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, category);
 	}
 	
-	public double markEntries(AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
-			String category) {
-		return markEntries(this.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, category);
+	public double markReport(AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo) {
+		return markEntries(this.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, this.getReportType());
 	}
 	
-	public double markEntries(List<ReportEntry> entries, AuditCheckListFBRepo auditCheckListFBRepo,
+	private double markEntries(List<ReportEntry> entries, AuditCheckListFBRepo auditCheckListFBRepo,
 			AuditCheckListNFBRepo auditCheckListNFBRepo, String report_type){
-		
-        HashMap<String,ChecklistCategoryScores> checklistCategoryScoresHashMap = new HashMap<>();
+		        HashMap<String,ChecklistCategoryScores> checklistCategoryScoresHashMap = new HashMap<>();
         AuditCheckListRepo repo = null;
         if(report_type.matches(ResourceString.FB_KEY)) {
         	repo = auditCheckListFBRepo;
@@ -543,15 +642,18 @@ public class ReportBuilder {
         }else if(report_type.matches(ResourceString.SMA_KEY)) {
         	//todo
         }
-        
-        if(repo == null) {
+                if(repo == null) {
         	logger.error("Unknown report type!");
         	return -1;
         }
-        
-        
-        //TODO: figure out if this conversion is gonna screw things up
+        List<Integer> checked_qns = new ArrayList<>();
+       	Collections.reverse(entries);
         for(ReportEntry entry: entries){
+        	if(!checked_qns.contains(entry.getQn_id())) {
+        		checked_qns.add(entry.getQn_id());
+        	}else {
+        		continue;
+        	}
             String qnCategory = repo.getCategoryByQnID(entry.getQn_id());
             double qnWeight = repo.getWeightByQnID(entry.getQn_id());
             
@@ -573,6 +675,7 @@ public class ReportBuilder {
             }
         }
         String str_score = String.valueOf(calculateScore(checklistCategoryScoresHashMap));
+        setOverall_score((int) (Double.parseDouble(str_score) *100.0));
         return Double.parseDouble(str_score) *100.0;
     }
 	

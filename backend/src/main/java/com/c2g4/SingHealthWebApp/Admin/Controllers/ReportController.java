@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 import com.c2g4.SingHealthWebApp.Admin.Report.ClosedReport;
+import com.c2g4.SingHealthWebApp.Admin.Report.Component_Status;
 import com.c2g4.SingHealthWebApp.Admin.Report.CustomReportEntryDeserializer;
 import com.c2g4.SingHealthWebApp.Admin.Report.OpenReport;
 import com.c2g4.SingHealthWebApp.Admin.Report.Report;
@@ -35,8 +38,11 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
@@ -130,30 +136,94 @@ public class ReportController {
             return ResponseEntity.badRequest().body(null);
         }
         
-        for(int i = 0; i < entryList.size(); i++) {
-        	entryList.get(i).setEntry_id(i);
-        }
-        
         ReportBuilder builder = ReportBuilder.getNewReportBuilder(openAuditRepo, completedAuditRepo);
         builder.setUserIDs(tenant_id, auditor_id, manager_id).setEntries(entryList);
+        builder.setReportType(report_type);
         
-        int auditScore = (int) builder.markEntries(auditCheckListFBRepo, auditCheckListNFBRepo, report_type);
+        int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo);
     	if(auditScore == -1) {return ResponseEntity.badRequest().body("Report type does not exist");}
     	
         if(auditScore<100){
-        	builder.setOverall_remarks(remarks).setOverall_score(auditScore).setNeed(1, 0, 0);
+        	builder.setOverall_remarks(remarks).setNeed(1, 0, 0);
         	OpenReport report = (OpenReport) builder.build();
         	if(!builder.saveReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
         } else {
-        	builder.setOverall_remarks(remarks).setOverall_score(auditScore).setOverall_statusAsClosed();
+        	builder.setOverall_remarks(remarks).setOverall_statusAsClosed();
         	ClosedReport report = (ClosedReport) builder.build();
         	if(!builder.saveReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
         }
         logger.info("Report Submission Upload Completed.");
+    	return ResponseEntity.ok(auditScore);
+	}
+	
+	@PostMapping("report/postReportUpdate")
+	public ResponseEntity<?> postReportUpdate(
+			@RequestParam(value = "report_id", required = true) int report_id,
+            @RequestPart(value = "entry", required = true) String strEntry,
+            @RequestParam(value = "remarks", required = true) String remarks,
+            @RequestParam(value = "group_update", required = false, defaultValue = "false") boolean group_update){
+		logger.info("Update of report of id " + report_id + " requested.");
+		ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(ReportEntry.class, new CustomReportEntryDeserializer());
+        objectMapper.registerModule(module);
+        JavaType customClassCollection = objectMapper.getTypeFactory()
+        		.constructCollectionType(List.class, ReportEntry.class);
+		List<ReportEntry> entries = new ArrayList<>();
+		if(group_update) {
+	        try {
+	            List<ReportEntry> tentries = objectMapper.readValue(strEntry, customClassCollection);
+	            entries = new ArrayList<>(tentries);
+	        } catch (JsonProcessingException e) {
+	            logger.warn("JSON PROCESSING EXCEPTION {} POST");
+	            return ResponseEntity.badRequest().body(null);
+	        }
+		}else {
+			try {
+				ReportEntry entry = objectMapper.readValue(strEntry, ReportEntry.class);
+				entries.add(entry);
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+				return ResponseEntity.badRequest().body("Entry malformed!");
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+				return ResponseEntity.badRequest().body("Entry malformed!");
+			}	
+		}
+
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo,
+				completedAuditRepo, report_id);
+		
+		if(builder == null) {
+			return ResponseEntity.badRequest().body("Report not found.");
+		}
+		if(builder.getReportType().matches(ResourceString.REPORT_STATUS_CLOSED)) {
+			return ResponseEntity.badRequest().body("Error! This report is already closed.");
+		}
+		
+		for(ReportEntry entry:entries) {
+			builder.addEntry(entry);
+		}
+
+		int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo);
+        if(auditScore<100){
+        	builder.setOverall_remarks(remarks).setNeed(1, 0, 0);
+        	OpenReport updated_report = (OpenReport) builder.build();
+        	if(!builder.saveReport(updated_report, tenantRepo, auditorRepo, managerRepo)) {
+                return ResponseEntity.badRequest().body(null);
+        	}
+        } else {
+        	builder.setOverall_remarks(remarks).setOverall_statusAsClosed();
+        	ClosedReport updated_report = (ClosedReport) builder.build();
+        	if(!builder.saveReport(updated_report, tenantRepo, auditorRepo, managerRepo)) {
+                return ResponseEntity.badRequest().body(null);
+        	}
+        }
+        logger.info("Report update completed.");
     	return ResponseEntity.ok(auditScore);
 	}
 	
@@ -172,6 +242,8 @@ public class ReportController {
 		}
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
+			//I've left it here just to catch bad reports
+			@SuppressWarnings("unused")
 			String reportJSON = objectmapper.writeValueAsString(report);
 			return ResponseEntity.ok(report);
 		} catch (JsonProcessingException e) {
@@ -179,6 +251,140 @@ public class ReportController {
 			return ResponseEntity.unprocessableEntity().build();
 		}
 	}
+	
+	//Is this really necessary? It seems enveloped by the method above
+	@GetMapping("/report/getReportStatistics")
+	public ResponseEntity<?> getReportStatistics(@RequestParam(required=true) int report_id){
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode jNode = objectMapper.createObjectNode();
+		
+		//Get failed entries
+		List<Integer> failed_entry_ids = new ArrayList<>();
+		for(ReportEntry entry:builder.getEntries()) {
+			if(entry.getStatus()==Component_Status.FAIL) {
+				failed_entry_ids.add(entry.getEntry_id());
+			}
+		}
+		
+		try {
+			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Get score
+		jNode.put("Score", builder.getOverall_score());
+		
+		JsonNode statistics = jNode;
+		
+		return ResponseEntity.ok(statistics);
+		
+	}
+	
+	@GetMapping("/report/getReportEntry")
+	public ResponseEntity<?> getReportEntry(
+			@RequestParam(required=true) int report_id, 
+			@RequestParam(required=true) int entry_id){
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+		ReportEntry entry = builder.getEntries().get(entry_id);
+		
+		return ResponseEntity.ok(entry);
+	}
+	
+	@GetMapping("report/getReportIDs")
+	public ResponseEntity<?> getReportIDs(
+			@RequestParam(required=false, defaultValue="-1") String username,
+			@RequestParam(required=false, defaultValue="-1") int user_id,
+			@RequestParam(required=false, defaultValue="ALL") String type
+			){
+		//error checking
+		if(user_id == -1 && username.matches("-1")) {
+			return ResponseEntity.badRequest().body("No user specified!");
+		}
+		AccountModel user = null;
+		if(!username.matches("-1")) {//username provided
+			user = accountRepo.findByUsername(username);
+			int found_user_id = user.getAccount_id();
+			if(user_id == -1) {
+				user_id = found_user_id;
+			}
+			if(user_id != found_user_id) {
+				return ResponseEntity.badRequest().body("Username and user_id do not match!");
+			}
+		}else {//username not provided
+			user = accountRepo.findByAccId(user_id);
+		}
+		
+		if(user == null) {
+			return ResponseEntity.badRequest().body("User not found!");
+		}
+		
+		//From here onwards, user_id can be relied upon
+		String user_role = user.getRole_id();
+		JsonNode report_ids = null;
+		if(user_role.matches(ResourceString.TENANT_ROLE_KEY)) {
+			report_ids = getTenantReportIds(user_id, type);
+		}else if(user_role.matches(ResourceString.AUDITOR_ROLE_KEY)) {
+			report_ids = getAuditorReportIds(user_id, type);
+		}else if(user_role.matches(ResourceString.MANAGER_ROLE_KEY)) {
+			//TODO
+		}else {
+			return ResponseEntity.unprocessableEntity().body(ResourceString.UNEXPECTED_ERR_MSG);
+		}
+		
+		return ResponseEntity.ok(report_ids);
+	}
+	
+	private JsonNode getTenantReportIds(int tenant_id, String type) {
+		TenantModel tenant = tenantRepo.getTenantById(tenant_id);
+		ObjectMapper objectmapper = new ObjectMapper();
+		ObjectNode report_ids = objectmapper.createObjectNode();
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
+				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
+			report_ids.put(type, tenant.getPast_audits());
+		}
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
+				|| type.matches(ResourceString.GETREPORT_FILTER_LATEST)) {
+			report_ids.put(type, tenant.getLatest_audit());
+		}
+		return report_ids;
+	}
+	
+	private JsonNode getAuditorReportIds(int auditor_id, String type) {
+		AuditorModel auditor = auditorRepo.getAuditorById(auditor_id);
+		ObjectMapper objectmapper = new ObjectMapper();
+		ObjectNode report_ids = objectmapper.createObjectNode();
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
+				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
+			report_ids.put(type, auditor.getCompleted_audits());
+		}
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
+				|| type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
+			report_ids.put(type, auditor.getOutstanding_audit_ids());
+		}
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
+				|| type.matches(ResourceString.GETREPORT_FILTER_APPEALED)) {
+			report_ids.put(type, auditor.getAppealed_audits());
+		}
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
+				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
+			//TODO
+		}
+		return report_ids;
+	}
+
+	
+	
+	
+	
 	
 	
 	

@@ -6,6 +6,7 @@ import java.util.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,6 +38,7 @@ public class AuditModelBuilder {
     //Results, Status and Data
     private int overall_score;
     private String overall_remarks;
+	private String report_type;
     private JsonNode report_data;
     //Follow-up (if necessary)
     private int need_tenant;
@@ -57,6 +59,7 @@ public class AuditModelBuilder {
 		this.manager_id = -1;
 		this.start_date = sqlCurrentDate;
 		this.overall_remarks = "Nil";
+		this.report_type = "-1";
 		this.overall_score = -1;
 		this.report_data = null;
 		this.need_tenant = 0;
@@ -95,6 +98,10 @@ public class AuditModelBuilder {
 			logger.error("overall_score not set!");
 			throw new IllegalArgumentException();
 		}
+		if (this.report_type.matches("-1")) {
+			logger.error("report_type not set!");
+			throw new IllegalArgumentException();
+		}
 		if (this.report_data == null) {
 			logger.error("There is no report data!");
 			throw new IllegalArgumentException();
@@ -109,13 +116,13 @@ public class AuditModelBuilder {
 		case 0:
 			audit = new OpenAuditModel(this.report_id, this.tenant_id, this.auditor_id,
 					this.manager_id, this.start_date, this.last_update_date, this.overall_remarks,
-					this.overall_score, this.report_data, this.need_tenant, this.need_auditor,
-					this.need_manager);
+					this.report_type, this.overall_score, this.report_data, 
+					this.need_tenant, this.need_auditor,this.need_manager);
 			break;
 		case 1:
 			audit = new CompletedAuditModel(this.report_id, this.tenant_id, this.auditor_id,
 					this.manager_id, this.start_date, this.end_date, this.overall_remarks,
-					this.overall_score, this.report_data);
+					this.report_type, this.overall_score, this.report_data);
 			break;
 		}
 		return audit;
@@ -157,6 +164,7 @@ public class AuditModelBuilder {
 		setAuditorId(2);
 		setManagerId(3);
 		setOverallRemarks("Test CompletedAuditModel");
+		setReport_type(ResourceString.FB_KEY);
 		setOverallScore(4);
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
@@ -260,6 +268,15 @@ public class AuditModelBuilder {
 	public String getOverallRemarks() {
 		return overall_remarks;
 	}
+	
+	public String getReport_type() {
+		return report_type;
+	}
+
+	public AuditModelBuilder setReport_type(String report_type) {
+		this.report_type = report_type;
+		return this;
+	}
 
 	public AuditModelBuilder setOverallRemarks(String overall_remarks) {
 		this.overall_remarks = overall_remarks;
@@ -338,6 +355,8 @@ public class AuditModelBuilder {
 		this.need_manager = need_manager;
 		return this;
 	}
+
+
 	
 	
 
