@@ -312,7 +312,7 @@ public class AccountControllerTest {
         tenantModel.setAudit_score(10);
         tenantModel.setType_id("FB");
         tenantModel.setLatest_audit(0);
-        tenantModel.setPast_audits(0);
+        tenantModel.setPast_audits(null);
         tenantModel.setBranch_id("A");
         tenantModel.setStore_addr("#01-02");
         tenantModels.add(tenantModel);
