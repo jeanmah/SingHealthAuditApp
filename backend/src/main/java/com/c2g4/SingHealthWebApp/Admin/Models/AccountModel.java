@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Table("Accounts")
-public class AccountModel implements UserDetails {
+public class AccountModel {
 
 	@Id
 	private int account_id;
@@ -33,14 +33,12 @@ public class AccountModel implements UserDetails {
 	public void setEmployee_id(int employee_id) {
 		this.employee_id = employee_id;
 	}
-	@Override
 	public String getUsername() {
 		return username;
 	}
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	@Override
 	public String getPassword() {
 		return password;
 	}
@@ -83,32 +81,4 @@ public class AccountModel implements UserDetails {
 	public void setBranch_id(String branch_id) {
 		this.branch_id = branch_id;
 	}
-	
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	@Override
-	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	@Override
-	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-    
 }

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @Table("Auditors")
 
-public class AuditorModel {
+public class AuditorModel implements typeAccountModel{
 	
 	@Id
 	private int acc_id;
@@ -18,6 +18,7 @@ public class AuditorModel {
 	private String branch_id;
 	private int mgr_id;
 
+	@Override
 	public int getAcc_id() {
 		return acc_id;
 	}
