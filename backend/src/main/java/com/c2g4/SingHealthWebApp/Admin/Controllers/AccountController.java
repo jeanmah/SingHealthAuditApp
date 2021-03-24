@@ -129,6 +129,7 @@ public class AccountController {
                 if (!roleType.equals(TENANT))
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
                 String branchId = callerAccount.getBranch_id();
+                logger.info("BRANCH ID: {}",branchId);
                 return getTenantsFromBranch(branchId);
             case MANAGER:
                 List<typeAccountModel> typeAccountModels;
@@ -166,6 +167,7 @@ public class AccountController {
     private ResponseEntity<?> getTenantsFromBranch(String branch_id){
         List<TenantModel> tenantModels = tenantRepo.getAllTenantsByBranchId(branch_id);
         if(tenantModels == null) return ResponseEntity.badRequest().body(null);
+        logger.info("TENANT SIZE {}", tenantModels.size());
         return userArrayJson(new ArrayList<typeAccountModel>(tenantModels));
     }
 
@@ -182,6 +184,7 @@ public class AccountController {
     private ResponseEntity<?> userArrayJson(List<typeAccountModel> models){
         ArrayNode output = objectMapper.createArrayNode();
         for(typeAccountModel model:models){
+            logger.info("reached");
             String accJsonString = getAccount(model.getAcc_id());
             if(accJsonString == null) return ResponseEntity.badRequest().body(null);
             ObjectNode accountNode,typeNode;
@@ -203,7 +206,7 @@ public class AccountController {
     /**
      * gets in depth user details of a certain user if the callerUser is authorized,
      * all users can call themselves,
-     * a tenant cannot use this function, auditors can only get tenants from their branch,
+     * a tenant cannot use this function otherwise, auditors can only get tenants from their branch,
      * managers are fully authorized
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param user_id an Optional int of the userId to query, must be present if firstName and lastName is not present
@@ -345,7 +348,7 @@ public class AccountController {
                 if(requestedAccountNode.get("role_id").asText().equals(TENANT)){
                     //check if tenant is under the same branch
                     return requestedAccountNode.get("branch_id").asText().equals(callerAccount.getBranch_id());
-                } else if(requestedAccountNode.get("role_id").asText().equals(MANAGER)) return false;
+                }
                 break;
             case MANAGER:
                 return true;

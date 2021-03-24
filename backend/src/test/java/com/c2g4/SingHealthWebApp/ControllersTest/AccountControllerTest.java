@@ -5,6 +5,7 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
+import org.apache.catalina.Manager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,9 +63,9 @@ public class AccountControllerTest {
 
     @Before
     public void before() {
-        AccountModel managerAccount = createAccount(MANAGER,"Marcus","Ho");
-        AccountModel auditorAccount = createAccount(AUDITOR,"Hannah","Mah");
-        AccountModel tenantAccount = createAccount(TENANT,"Gregory","Mah");
+        AccountModel managerAccount = createAccount(MANAGER,"Marcus","Ho","HQ");
+        AccountModel auditorAccount = createAccount(AUDITOR,"Hannah","Mah","branch_A");
+        AccountModel tenantAccount = createAccount(TENANT,"Gregory","Mah","branch_A");
         given(accountRepo.findByUsername(MANAGERUSENAME)).willReturn(managerAccount);
         given(accountRepo.findByUsername(AUDITORUSENAME)).willReturn(auditorAccount);
         given(accountRepo.findByUsername(TENANTUSENAME)).willReturn(tenantAccount);
@@ -193,12 +194,12 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(content().json("[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
                         "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\"," +
-                        "\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":0,\"store_addr\":\"#01-02\"}," +
+                        "\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}," +
                         "{\"employee_id\":123,\"username\":\"Marydoh\",\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\"," +
                         "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":1,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
-                        "\"past_audits\":0,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                        "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
                         "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":2," +
-                        "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":0,\"store_addr\":\"#01-02\"}]"));
+                        "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}]"));
 
     }
 
@@ -215,13 +216,13 @@ public class AccountControllerTest {
     }
 
     @Test
-    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
-    public void getAllUsersofTypeTenantAsAuditor()
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllUsersofTypeAuditorAsManagerWithResults()
             throws Exception {
-        ArrayList<TenantModel> tenantModels = new ArrayList<>();
+        ArrayList<AuditorModel> auditorModels = new ArrayList<>();
         ArrayList<AccountModel> accountModels = new ArrayList<>();
-        createArbitraryTenants(tenantModels, accountModels);
-        given(tenantRepo.getAllTenants()).willReturn(tenantModels);
+        createArbitraryAuditors(auditorModels, accountModels);
+        given(auditorRepo.getAllAuditors()).willReturn(auditorModels);
         given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
         given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
         given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
@@ -233,19 +234,20 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(content().json("[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
                         "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\"," +
-                        "\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":0,\"store_addr\":\"#01-02\"}," +
+                        "\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}," +
                         "{\"employee_id\":123,\"username\":\"Marydoh\",\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\"," +
                         "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":1,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
-                        "\"past_audits\":0,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                        "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
                         "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":2," +
-                        "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":0,\"store_addr\":\"#01-02\"}]"));
+                        "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}]"));
+
     }
 
     @Test
-    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
-    public void getAllUsersofTypeTenantAsAuditorNoResults()
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllUsersofTypeAuditorAsManagerNoResults()
             throws Exception {
-        given(tenantRepo.getAllTenantsByBranchId("A")).willReturn(null);
+        given(auditorRepo.getAllAuditors()).willReturn(null);
         given(accountRepo.getAllAccountsByBranchId("A")).willReturn(null);
         mvc.perform(get("/account/getAllUsersofType")
                 .param("roleType", TENANT)
@@ -254,19 +256,149 @@ public class AccountControllerTest {
     }
 
     @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllUsersofTypeManagerAsManagerWithResults()
+            throws Exception {
+        ArrayList<ManagerModel> managerModels = new ArrayList<>();
+        ArrayList<AccountModel> accountModels = new ArrayList<>();
+        createArbitraryManagers(managerModels, accountModels);
+        given(managerRepo.getAllManagers()).willReturn(managerModels);
+        given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
+        given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
+        given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
+
+        mvc.perform(get("/account/getAllUsersofType")
+                .param("roleType", TENANT)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(content().json("[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
+                        "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\"," +
+                        "\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}," +
+                        "{\"employee_id\":123,\"username\":\"Marydoh\",\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\"," +
+                        "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":1,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
+                        "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                        "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":2," +
+                        "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}]"));
+
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllUsersofTypeManagerAsManagerNoResults()
+            throws Exception {
+        given(managerRepo.getAllManagers()).willReturn(null);
+        given(accountRepo.getAllAccountsByBranchId("A")).willReturn(null);
+        mvc.perform(get("/account/getAllUsersofType")
+                .param("roleType", TENANT)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
+    public void getAllUsersofTypeTenantAsAuditor()
+            throws Exception {
+        ArrayList<TenantModel> tenantModels = new ArrayList<>();
+        ArrayList<AccountModel> accountModels = new ArrayList<>();
+        createArbitraryTenants(tenantModels, accountModels);
+        System.out.println("number of tenants" + tenantModels.size());
+        given(tenantRepo.getAllTenantsByBranchId("branch_A")).willReturn(tenantModels);
+        given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
+        given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
+        given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
+
+        mvc.perform(get("/account/getAllUsersofType")
+                .param("roleType", TENANT)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(content().json("[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
+                        "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\"," +
+                        "\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}," +
+                        "{\"employee_id\":123,\"username\":\"Marydoh\",\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\"," +
+                        "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":1,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
+                        "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                        "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"A\",\"acc_id\":2," +
+                        "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}]"));
+    }
+
+    @Test
+    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
+    public void getAllUsersofTypeTenantAsAuditorNoResults()
+            throws Exception {
+        given(tenantRepo.getAllTenantsByBranchId("branch_A")).willReturn(null);
+        mvc.perform(get("/account/getAllUsersofType")
+                .param("roleType", TENANT)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
+    public void getAllUsersofTypeNotTenantAsAuditorNoResults()
+            throws Exception {
+        mvc.perform(get("/account/getAllUsersofType")
+                .param("roleType", AUDITOR)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @Test
     @WithMockUser(username = TENANTUSENAME, password = KNOWN_USER_PASSWORD, roles = { TENANT })
     public void getAllUsersofTypeAsTenant()
             throws Exception {
         mvc.perform(get("/account/getAllUsersofType")
-                .param("roleType", "A")
+                .param("roleType", TENANT)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
     }
+
+    //TODO: getUserProfile
+    //manager - manager, auditor, tenant, self
+    //auditor - not tenant, tenant same branch, tenant not same branch self
+    //tenant - not self, self
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getUserProfileAsManagerUserIDWithResults()
+            throws Exception {
+        mvc.perform(get("/account/getUserProfile")
+                .param("roleType", AUDITOR)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getUserProfileAsManagerUserIDNoResults()
+            throws Exception {
+        mvc.perform(get("/account/getUserProfile")
+                .param("roleType", AUDITOR)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    //TODO: postPasswordUpdate
+    //TODO: postProfileUpdate
+
 
     private void createArbitraryTenants(ArrayList<TenantModel> tenantModels, ArrayList<AccountModel> accountModels){
         createTenant("John","doh",tenantModels,accountModels);
         createTenant("Mary","doh",tenantModels,accountModels);
         createTenant("Paul","doh",tenantModels,accountModels);
+    }
+
+    private void createArbitraryAuditors(ArrayList<AuditorModel> auditorModels, ArrayList<AccountModel> accountModels){
+        createAuditor("John","doh",auditorModels,accountModels);
+        createAuditor("Mary","doh",auditorModels,accountModels);
+        createAuditor("Paul","doh",auditorModels,accountModels);
+    }
+
+    private void createArbitraryManagers(ArrayList<ManagerModel> managerModels, ArrayList<AccountModel> accountModels){
+        createManager("John","doh",managerModels,accountModels);
+        createManager("Mary","doh",managerModels,accountModels);
+        createManager("Paul","doh",managerModels,accountModels);
     }
 
 
@@ -329,6 +461,13 @@ public class AccountControllerTest {
         auditorModel.setMgr_id(0);
         auditorModels.add(auditorModel);
         accountModels.add(createAccount(AUDITOR,first_name,last_name));
+    }
+
+    private void createManager(String first_name, String last_name, ArrayList<ManagerModel> auditorModels, ArrayList<AccountModel> accountModels){
+        ManagerModel managerModel = new ManagerModel();
+        managerModel.setAcc_id(auditorModels.size());
+        managerModel.setBranch_id("A");
+        accountModels.add(createAccount(MANAGER,first_name,last_name));
     }
 
     private static class sampleAccounts{
