@@ -20,20 +20,20 @@ function Institution() {
 
   return (
     <>
-      {selectedInstitution.map((institution) => {
+      {selectedInstitution.map((institution, index) => {
         const { id, name, imageUrl } = institution;
         return (
-          <section className="institution-header">
+          <section key={id} className="institution-header">
             <img src={imageUrl} className="institution-logo" alt="logo"></img>
           </section>
         );
       })}
-      {selectedTenants.map((tenant) => {
+      {selectedTenants.map((tenant, index) => {
         const { tenantid, tenantName, status } = tenant;
         return (
           <>
             {tenant.status === "resolved" ? (
-              <Link to={`/tenant/${tenantid}`}>
+              <Link key={tenantid} to={`/tenant/${tenantid}`}>
                 <section className="institution-tenant-resolved">
                   <div>{tenantName}</div>
                   <div className="institution-tenantbtn">
@@ -42,7 +42,7 @@ function Institution() {
                 </section>
               </Link>
             ) : (
-              <Link to={`/tenant/${tenantid}`}>
+              <Link key={tenantid} to={`/tenant/${tenantid}`}>
                 <section className="institution-tenant-unresolved">
                   <div>{tenantName}</div>
                   <div className="institution-tenantbtn">

@@ -11,45 +11,23 @@ function Audits({ homeAudits }) {
     <div>
       {homeAudits.map((audit, index) => {
         const { tenantid, tenantName, timeRemaining, status, date } = audit;
-        
+
         return (
-          <>
-            {/* {" "}
-            {audit.status === "resolved" ? (
-              <div className="homeaudit-grid-resolved" ref={homeAuditGridRef}>
-                <div className="tenantName-gridItem">{tenantName}</div>
-                <Link className="btn-homeToTenant" to={`/tenant/${tenantid}`}>
-                  <FaAngleRight />
-                </Link>
+          <Link to={`/tenant/${tenantid}`}>
+            <div
+              className={`${
+                audit.status === "resolved"
+                  ? "homeaudit-grid-resolved"
+                  : "homeaudit-grid-unresolved"
+              }`}
+              ref={homeAuditGridRef}
+            >
+              <div className="tenantName-gridItem">{tenantName}</div>
+              <div className="btn-homeToTenant">
+                <FaAngleRight />
               </div>
-            ) : (
-              <div className="homeaudit-grid-unresolved" ref={homeAuditGridRef}>
-                <div className="tenantName-gridItem">{tenantName}</div>
-                <Link className="btn-homeToTenant" to={`/tenant/${tenantid}`}>
-                  <FaAngleRight />
-                </Link>
-              </div>
-            )} */}{" "}
-            {audit.status === "resolved" ? (
-              <Link to={`/tenant/${tenantid}`}>
-                <div className="homeaudit-grid-resolved" ref={homeAuditGridRef}>
-                  <div className="tenantName-gridItem">{tenantName}</div>
-                  <div className="btn-homeToTenant">
-                    <FaAngleRight />
-                  </div>
-                </div>
-              </Link>
-            ) : (
-              <Link to={`/tenant/${tenantid}`}>
-                <div className="homeaudit-grid-unresolved" ref={homeAuditGridRef}>
-                  <div className="tenantName-gridItem">{tenantName}</div>
-                  <div className="btn-homeToTenant">
-                    <FaAngleRight />
-                  </div>
-                </div>
-              </Link>
-            )}
-          </>
+            </div>
+          </Link>
         );
       })}
     </div>

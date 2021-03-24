@@ -12,10 +12,10 @@ import { FaAngleRight } from "react-icons/fa";
 function Institutions() {
   return (
     <div className="institutions-head">
-      {institutions.map((institution) => {
+      {institutions.map((institution, index) => {
         const { id, name, tenantNames, imageUrl } = institution;
         return (
-          <Link to={`/institution/${id}`}>
+          <Link key={index} to={`/institution/${id}`}>
             <article key={id} className="institutions-institution">
               <img src={imageUrl} className="hospital-logo"></img>
               <header className="institutions-btn">
