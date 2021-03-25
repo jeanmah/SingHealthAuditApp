@@ -1,11 +1,15 @@
 package com.c2g4.SingHealthWebApp.ControllersTest;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.*;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
-import org.apache.catalina.Manager;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,16 +24,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.BDDMockito.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

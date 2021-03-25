@@ -5,8 +5,12 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * Object Model/Representation of an entry of the SQL Auditors Table
+ * @author LunarFox
+ *
+ */
 @Table("Auditors")
-
 public class AuditorModel implements typeAccountModel{
 	
 	@Id

@@ -3,6 +3,12 @@ package com.c2g4.SingHealthWebApp.Admin.Models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+
+/**
+ * Object Model/Representation of an entry of the SQL Branch Table
+ * @author LunarFox
+ *
+ */
 @Table("branches")
 public class BranchModel {
     @Id

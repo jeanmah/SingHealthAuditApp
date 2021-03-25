@@ -13,6 +13,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Object Model/Representation of an entry of the SQL CompletedAudits Table
+ * @author LunarFox
+ *
+ */
 @Table("Completed_Audits")
 @AccessType(AccessType.Type.PROPERTY)
 public class CompletedAuditModel extends AuditModel{

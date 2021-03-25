@@ -133,6 +133,7 @@ public class ReportController {
             entryList = objectMapper.readValue(checklist, customClassCollection);
         } catch (JsonProcessingException e) {
             logger.warn("JSON PROCESSING EXCEPTION {} POST",report_type);
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
         
@@ -221,6 +222,8 @@ public class ReportController {
         	ClosedReport updated_report = (ClosedReport) builder.build();
         	if(!builder.saveReport(updated_report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
+        	}else {
+        		builder.deleteOpenReport(report_id);
         	}
         }
         logger.info("Report update completed.");

@@ -6,6 +6,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Abstract parent class for Reports
+ * @author LunarFox
+ *
+ */
 public abstract class Report {
     private static final Logger logger = LoggerFactory.getLogger(Report.class);
 
@@ -33,7 +38,7 @@ public abstract class Report {
     }
     
 	public Report(int report_id, int tenant_id, int auditor_id, int manager_id, Date open_date, int overall_score,
-			String overall_remarks, List<ReportEntry> entries, int need_tenant, int need_auditor, int need_manager,
+			String overall_remarks, String report_type, List<ReportEntry> entries, int need_tenant, int need_auditor, int need_manager,
 			int overall_status) {
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
@@ -42,6 +47,7 @@ public abstract class Report {
 		this.open_date = open_date;
 		this.overall_score = overall_score;
 		this.overall_remarks = overall_remarks;
+		this.report_type = report_type;
 		this.entries = entries;
 		this.need_tenant = need_tenant;
 		this.need_auditor = need_auditor;
