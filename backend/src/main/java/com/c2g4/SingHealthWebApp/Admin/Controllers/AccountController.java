@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,20 +31,30 @@ public class AccountController {
     @Autowired
     private ManagerRepo managerRepo;
 
+    private static final String MANAGER = "Manager";
+    private static final String AUDITOR = "Auditor";
+    private static final String TENANT = "Tenant";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     /**
      * only authorized for a manager, returns a list of all users.
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
-     * @return a JsonArray of users with keys {acc_id, first_name, last_name},
+     * @return a JsonArray of users with keys {acc_id, first_name, last_name, role_id},
      * if the callerUser is not a manager, returns HttpStatus UNAUTHORIZED with body "Unauthorized",
      * if any other errors occur along the way, return http BAD_REQUEST
      */
     @GetMapping("/account/getAllUsers")
     public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal UserDetails callerUser){
-        AccountModel callerAccount = accountRepo.findByUsername(callerUser.getUsername());
-        if (callerAccount ==null) return ResponseEntity.badRequest().body(null);
-        if(!callerAccount.getRole_id().equals("Manager")){
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) {
+            logger.warn("CALLER ACCOUNT NULL");
+            return ResponseEntity.badRequest().body(null);
+        }
+        if(!callerAccount.getRole_id().equals(MANAGER)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
         List<AccountModel> allAccounts = accountRepo.getAllAccounts();
@@ -56,18 +68,17 @@ public class AccountController {
      * only authorized for a manager, returns a list of all users from a branch
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param branch_id a String of the branch to query from
-     * @return a JsonArray of users with keys {acc_id, first_name, last_name},
+     * @return a JsonArray of users with keys {acc_id, first_name, last_name, role_id},
      * if the callerUser is not a manager, returns HttpStatus UNAUTHORIZED with body "Unauthorized",
      * if any other errors occur along the way, return http BAD_REQUEST
      */
     @GetMapping("/account/getAllUsersofBranch")
     public ResponseEntity<?> getAllUsersofBranch(@AuthenticationPrincipal UserDetails callerUser, @RequestParam String branch_id){
-        AccountModel callerAccount = accountRepo.findByUsername(callerUser.getUsername());
-        if (callerAccount ==null) return ResponseEntity.badRequest().body(null);
-        if(!callerAccount.getRole_id().equals("Manager")){
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if(!callerAccount.getRole_id().equals(MANAGER)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
-
         List<AccountModel> allAccountsByBranchId = accountRepo.getAllAccountsByBranchId(branch_id);
         if(allAccountsByBranchId == null) return ResponseEntity.badRequest().body(null);
         ArrayNode output = getBasicAccFieldsArray(allAccountsByBranchId);
@@ -86,6 +97,7 @@ public class AccountController {
             account.put("acc_id", accountModel.getAccount_id());
             account.put("first_name", accountModel.getFirst_name());
             account.put("last_name", accountModel.getLast_name());
+            account.put("role_id",accountModel.getRole_id());
             output.add(account);
         }
         return output;
@@ -107,33 +119,42 @@ public class AccountController {
      */
     @GetMapping("/account/getAllUsersofType")
     public ResponseEntity<?> getAllUsersofType(@AuthenticationPrincipal UserDetails callerUser,@RequestParam String roleType){
-        AccountModel callerAccount = accountRepo.findByUsername(callerUser.getUsername());
-        if (callerAccount ==null) return ResponseEntity.badRequest().body(null);
-        if(callerAccount.getRole_id().equals("Tenant")){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        } else if(callerAccount.getRole_id().equals("Auditor")){
-            //Auditors can only get tenants from the same branch
-            if(!roleType.equals("Tenant")) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-            String branchId = callerAccount.getBranch_id();
-            return getTenantsFromBranch(branchId);
-        } else if(callerAccount.getRole_id().equals("Manager")){
-            List<typeAccountModel> typeAccountModels;
-            switch (roleType) {
-                case "Tenant":
-                    typeAccountModels = new ArrayList<typeAccountModel>(tenantRepo.getAllTenants());
-                    break;
-                case "Auditor":
-                    typeAccountModels = new ArrayList<typeAccountModel>(auditorRepo.getAllAuditors());
-                    break;
-                case "Manager":
-                    typeAccountModels = new ArrayList<typeAccountModel>(managerRepo.getAllManagers());
-                    break;
-                default:
-                    return ResponseEntity.badRequest().body(null);
-            }
-            return userArrayJson(typeAccountModels);
-        } else{
-            return ResponseEntity.badRequest().body(null);
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        switch (callerAccount.getRole_id()) {
+            case TENANT:
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            case AUDITOR:
+                //Auditors can only get tenants from the same branch
+                if (!roleType.equals(TENANT))
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+                String branchId = callerAccount.getBranch_id();
+                logger.info("BRANCH ID: {}",branchId);
+                return getTenantsFromBranch(branchId);
+            case MANAGER:
+                List<typeAccountModel> typeAccountModels;
+                switch (roleType) {
+                    case TENANT:
+                        List<TenantModel> tenantModels = tenantRepo.getAllTenants();
+                        if(tenantModels==null) return ResponseEntity.badRequest().body(null);
+                        typeAccountModels = new ArrayList<>(tenantModels);
+                        break;
+                    case AUDITOR:
+                        List<AuditorModel> auditorModels = auditorRepo.getAllAuditors();
+                        if(auditorModels==null) return ResponseEntity.badRequest().body(null);
+                        typeAccountModels = new ArrayList<>(auditorModels);
+                        break;
+                    case MANAGER:
+                        List<ManagerModel> managerModels = managerRepo.getAllManagers();
+                        if(managerModels==null) return ResponseEntity.badRequest().body(null);
+                        typeAccountModels = new ArrayList<>(managerModels);
+                        break;
+                    default:
+                        return ResponseEntity.badRequest().body(null);
+                }
+                return userArrayJson(typeAccountModels);
+            default:
+                return ResponseEntity.badRequest().body(null);
         }
     }
 
@@ -145,7 +166,8 @@ public class AccountController {
      */
     private ResponseEntity<?> getTenantsFromBranch(String branch_id){
         List<TenantModel> tenantModels = tenantRepo.getAllTenantsByBranchId(branch_id);
-        if(tenantModels == null) return null;
+        if(tenantModels == null) return ResponseEntity.badRequest().body(null);
+        logger.info("TENANT SIZE {}", tenantModels.size());
         return userArrayJson(new ArrayList<typeAccountModel>(tenantModels));
     }
 
@@ -153,7 +175,7 @@ public class AccountController {
      * takes a list of models and finds the corresponding account entry, merges the model
      * and account entry into a JsonNode and returns an array of such JsonNodes
      * @param models a list of either TenantModel, AuditorModel or ManagerModel
-     * @return a JsonArray of users with keys {account_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
+     * @return a JsonArray of users with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
      * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
@@ -162,13 +184,15 @@ public class AccountController {
     private ResponseEntity<?> userArrayJson(List<typeAccountModel> models){
         ArrayNode output = objectMapper.createArrayNode();
         for(typeAccountModel model:models){
+            logger.info("reached");
             String accJsonString = getAccount(model.getAcc_id());
             if(accJsonString == null) return ResponseEntity.badRequest().body(null);
             ObjectNode accountNode,typeNode;
             try {
                 accountNode = (ObjectNode) objectMapper.readTree(accJsonString);
                 typeNode = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(model));
-                typeNode.remove("acc_id");
+                accountNode.remove("account_id");
+                accountNode.remove("password");
 
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
@@ -182,7 +206,7 @@ public class AccountController {
     /**
      * gets in depth user details of a certain user if the callerUser is authorized,
      * all users can call themselves,
-     * a tenant cannot use this function, auditors can only get tenants from their branch,
+     * a tenant cannot use this function otherwise, auditors can only get tenants from their branch,
      * managers are fully authorized
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param user_id an Optional int of the userId to query, must be present if firstName and lastName is not present
@@ -205,8 +229,8 @@ public class AccountController {
             return ResponseEntity.badRequest().body(null);
 
         //check who is calling
-        AccountModel callerAccount = accountRepo.findByUsername(callerUser.getUsername());
-        if (callerAccount ==null) return ResponseEntity.badRequest().body(null);
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
         int userID;
         if(user_id.isPresent()){
             userID = user_id.get();
@@ -230,13 +254,13 @@ public class AccountController {
         String roleType = accountNode.get("role_id").asText();
         String specificTypeJsonString;
         switch (roleType) {
-            case "Tenant":
+            case TENANT:
                 specificTypeJsonString = getTenant(userID);
                 break;
-            case "Auditor":
+            case AUDITOR:
                 specificTypeJsonString = getAuditor(userID);
                 break;
-            case "Manager":
+            case MANAGER:
                 specificTypeJsonString = getManager(userID);
                 break;
             default:
@@ -269,8 +293,8 @@ public class AccountController {
     @PostMapping("/account/postProfileUpdate")
     public ResponseEntity<?> postProfileUpdate(@AuthenticationPrincipal UserDetails callerUser,
                                                @RequestPart(value = "changes") String changes){
-        AccountModel callerAccount = accountRepo.findByUsername(callerUser.getUsername());
-        if (callerAccount ==null) return ResponseEntity.badRequest().body(null);
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
         try {
 
             ObjectNode changesNode = objectMapper.readValue(changes, ObjectNode.class);
@@ -299,8 +323,8 @@ public class AccountController {
      */
     @PostMapping("/account/postPasswordUpdate")
     public ResponseEntity<?> postPasswordUpdate(@AuthenticationPrincipal UserDetails callerUser, @RequestPart(value = "new_password") String new_password){
-        AccountModel callerAccount = accountRepo.findByUsername(callerUser.getUsername());
-        if (callerAccount ==null) return ResponseEntity.badRequest().body(null);
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(new_password);
         accountRepo.changePasswordByAccId(callerAccount.getAccount_id(),encodedPassword);
@@ -320,13 +344,13 @@ public class AccountController {
     private boolean checkValidAccessLevel(AccountModel callerAccount,ObjectNode requestedAccountNode, int user_id){
         if (user_id==callerAccount.getAccount_id()) return true;
         switch (callerAccount.getRole_id()) {
-            case "Auditor":
-                if(requestedAccountNode.get("role_id").asText().equals("Tenant")){
+            case AUDITOR:
+                if(requestedAccountNode.get("role_id").asText().equals(TENANT)){
                     //check if tenant is under the same branch
                     return requestedAccountNode.get("branch_id").asText().equals(callerAccount.getBranch_id());
-                } else if(requestedAccountNode.get("role_id").asText().equals("Manager")) return false;
+                }
                 break;
-            case "Manager":
+            case MANAGER:
                 return true;
             default:
                 return false;
@@ -394,5 +418,14 @@ public class AccountController {
         }
     }
 
+    /**
+     * converts a UserDetails object into an AccountModel object
+     * @param callerUser a UserDetail object
+     * @return a corresponding AccountModel object
+     */
+    private AccountModel convertUserDetailsToAccount(UserDetails callerUser){
+        logger.info("CALLER USER USERNAME {}",callerUser.getUsername());
+        return accountRepo.findByUsername(callerUser.getUsername());
+    }
 
 }
