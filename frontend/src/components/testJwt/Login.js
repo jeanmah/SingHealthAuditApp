@@ -28,13 +28,14 @@ class LoginComponent extends Component {
       this.state.password
     )
       .then((response) => {
+        console.log(response.data);
         AuthenticationService.registerSuccessfulLoginForJwt(
           this.state.username,
           response.data.token
         );
         console.log(response.data.accountType);
         if (response.data.accountType == "Auditor") {
-          this.props.history.push(`/home`);
+          this.props.history.push(`/home/a`);
         } else if (response.data.accountType == "Tenant") {
           this.props.history.push(`/home/t`);
         } else if (response.data.accountType == "Manager") {

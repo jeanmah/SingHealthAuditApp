@@ -14,8 +14,6 @@ export const ContextProvider = (props) => {
   const [institutionsState, setInstitutionstate] = useState(institutions);
   //state of comments in modal
   const [comment, setComment] = useState("");
-  //state of modal questionid
-
   //function to update tenantsState
   const updateFbChecklistChecked = (tenantId, questionId) => {
     //find object with specific tenantId

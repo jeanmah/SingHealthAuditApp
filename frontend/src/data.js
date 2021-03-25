@@ -3,7 +3,7 @@ import React from "react";
 export const navLinks = [
   {
     id: 1,
-    url: "/home",
+    url: "/home/a",
     text: "Home",
   },
   {

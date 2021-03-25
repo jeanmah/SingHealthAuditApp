@@ -21,10 +21,9 @@ function App() {
   return (
     <Router>
       <ContextProvider>
-        <Navbar />
         <Switch>
           <Route exact path="/" exact component={LoginComponent} />
-          <AuthenticatedRoute exact path="/home" exact component={Home} />
+          <AuthenticatedRoute exact path="/home/a" exact component={Home} />
           <AuthenticatedRoute exact path="/account" exact component={Account} />
           <AuthenticatedRoute
             exact
