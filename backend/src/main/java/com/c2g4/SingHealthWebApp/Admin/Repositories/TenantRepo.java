@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 
+/**
+ * Repository of SQL queries to interact with the Tenant Table
+ * @author LunarFox
+ *
+ */
 @Repository
 public interface TenantRepo extends CrudRepository<TenantModel, Integer> {
     @Query("SELECT * FROM Tenant WHERE branch_id = :branch_id")

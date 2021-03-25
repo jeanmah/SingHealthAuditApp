@@ -5,6 +5,11 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * Object Model/Representation of an entry of the SQL Tenants Table
+ * @author LunarFox
+ *
+ */
 @Table("Tenant")
 public class TenantModel implements typeAccountModel{
     @Id

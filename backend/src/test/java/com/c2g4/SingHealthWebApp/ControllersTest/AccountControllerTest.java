@@ -1,48 +1,41 @@
 package com.c2g4.SingHealthWebApp.ControllersTest;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.*;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mysql.cj.xdevapi.JsonString;
-import org.apache.catalina.Manager;
 import org.json.JSONObject;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.FormHttpMessageWriter;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
-import static org.hamcrest.Matchers.*;
-import static org.mockito.BDDMockito.*;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 
+/**
+ * Repository of SQL queries to interact with the AuditCheckListFB Table
+ * @author LunarFox
+ *
+ */
 @Repository
 public interface AuditCheckListFBRepo extends CrudRepository<AuditCheckListFBModel, Integer>, AuditCheckListRepo{
     @Query("SELECT * FROM FBCheckList")
