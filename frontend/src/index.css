@@ -359,3 +359,52 @@ Institution
   font-size: 1.4rem;
   color: var(--clr-grey);
 }
+/*
+=============== 
+Modal
+===============
+*/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.show-modal {
+  display: flex;
+  z-index: 100;
+}
+.modal-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background: var(--clr-offwhite);
+  width: 90vw;
+  height: 30vh;
+  max-width: var(--fixed-width);
+  position: relative;
+}
+.modal-commentbox {
+  box-sizing: border-box;
+  resize: none;
+  width: 80%;
+  height: 50%;
+  padding: 12px 12px;
+}
+.modal-closebtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  background: transparent;
+  border-color: transparent;
+  color: var(--clr-grey);
+  cursor: pointer;
+}

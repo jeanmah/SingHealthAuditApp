@@ -3,17 +3,20 @@ package com.c2g4.SingHealthWebApp.Admin.Models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 @Table("Tenant")
-public class TenantModel {
+public class TenantModel implements typeAccountModel{
     @Id
     private int acc_id;
     private String type_id;
     private int audit_score;
     private int latest_audit;
-    private int past_audits;
+    private JsonNode past_audits;
     private String branch_id;
     private String store_addr;
-    
+
+    @Override
 	public int getAcc_id() {
 		return acc_id;
 	}
@@ -38,10 +41,10 @@ public class TenantModel {
 	public void setLatest_audit(int latest_audit) {
 		this.latest_audit = latest_audit;
 	}
-	public int getPast_audits() {
+	public JsonNode getPast_audits() {
 		return past_audits;
 	}
-	public void setPast_audits(int past_audits) {
+	public void setPast_audits(JsonNode past_audits) {
 		this.past_audits = past_audits;
 	}
 	public String getBranch_id() {

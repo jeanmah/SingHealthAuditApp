@@ -19,6 +19,7 @@ public abstract class Report {
     //Results, Status and Data
     private int overall_score;
     private String overall_remarks;
+    private String report_type;
     private List<ReportEntry> entries;
     //Follow-up (if necessary)
     private int need_tenant;
@@ -112,6 +113,10 @@ public abstract class Report {
 		this.entries = entries;
 	}
 
+	public void addEntry(ReportEntry entry) {
+		this.entries.add(entry);
+	}
+	
 	public int getNeed_tenant() {
 		return need_tenant;
 	}
@@ -142,6 +147,14 @@ public abstract class Report {
 
 	public void setOverall_status(int overall_status) {
 		this.overall_status = overall_status;
+	}
+
+	public String getReport_type() {
+		return report_type;
+	}
+
+	public void setReport_type(String report_type) {
+		this.report_type = report_type;
 	}
 
     

@@ -8,51 +8,51 @@ import Tenant from "./pages/Tenant";
 import Error from "./pages/Error";
 import Institutions from "./pages/Institutions";
 import Institution from "./pages/Institution";
-import FbCategoryA from "./pages/fbChecklistPages/FbCategoryA";
-import FbCategoryB from "./pages/fbChecklistPages/FbCategoryB";
-import FbCategoryC from "./pages/fbChecklistPages/FbCategoryC";
-import FbCategoryD from "./pages/fbChecklistPages/FbCategoryD";
-import FbCategoryE from "./pages/fbChecklistPages/FbCategoryE";
+import FbChecklist from "./pages/FbChecklist";
+import AuthenticatedRoute from "./components/testJwt/AuthenticatedRoute";
+import LoginComponent from "./components/testJwt/Login";
+// import FbCategoryB from "./pages/fbChecklistPages/FbCategoryB";
+// import FbCategoryC from "./pages/fbChecklistPages/FbCategoryC";
+// import FbCategoryD from "./pages/fbChecklistPages/FbCategoryD";
+// import FbCategoryE from "./pages/fbChecklistPages/FbCategoryE";
+import { ContextProvider } from "./Context";
 
 function App() {
   return (
     <Router>
-      <Navbar />
-      <Switch>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Route exact path="/account">
-          <Account />
-        </Route>
-        <Route exact path="/institutions">
-          <Institutions />
-        </Route>
-        <Route exact path="/institution/:institutionid">
-          <Institution />
-        </Route>
-        <Route exact path="/tenant/:tenantid">
-          <Tenant />
-        </Route>
-        <Route exact path="/fbCategoryA">
-          <FbCategoryA />
-        </Route>
-        <Route exact path="/fbCategoryB">
-          <FbCategoryB />
-        </Route>
-        <Route exact path="/fbCategoryC">
-          <FbCategoryC />
-        </Route>
-        <Route exact path="/fbCategoryD">
-          <FbCategoryD />
-        </Route>
-        <Route exact path="/fbCategoryE">
-          <FbCategoryE />
-        </Route>
-        <Route path="*">
-          <Error />
-        </Route>
-      </Switch>
+      <ContextProvider>
+        <Navbar />
+        <Switch>
+          <Route exact path="/" exact component={LoginComponent} />
+          <AuthenticatedRoute exact path="/home" exact component={Home} />
+          <AuthenticatedRoute exact path="/account" exact component={Account} />
+          <AuthenticatedRoute
+            exact
+            path="/institutions"
+            exact
+            component={Institutions}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/institution/:institutionid"
+            exact
+            component={Institution}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/:tenantId"
+            exact
+            component={Tenant}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/fbChecklist/:tenantId"
+            exact
+            component={FbChecklist}
+          />
+          <AuthenticatedRoute exact path="/error" exact component={Error} />
+        </Switch>
+      </ContextProvider>
     </Router>
   );
 }

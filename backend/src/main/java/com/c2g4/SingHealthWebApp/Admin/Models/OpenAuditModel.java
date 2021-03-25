@@ -25,6 +25,7 @@ public class OpenAuditModel extends AuditModel {
     private Date start_date;
     private Date last_update_date;
     private String overall_remarks;
+    private String report_type;
     private int overall_score;
     @Transient
     private JsonNode report_data;
@@ -32,8 +33,10 @@ public class OpenAuditModel extends AuditModel {
     private int need_auditor;
     private int need_manager;
     
+    public OpenAuditModel() {}
+    
 	public OpenAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
-			Date last_update_date, String overall_remarks, int overall_score, JsonNode report_data, int need_tenant,
+			Date last_update_date, String overall_remarks, String report_type, int overall_score, JsonNode report_data, int need_tenant,
 			int need_auditor, int need_manager) {
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
@@ -42,6 +45,7 @@ public class OpenAuditModel extends AuditModel {
 		this.start_date = start_date;
 		this.last_update_date = last_update_date;
 		this.overall_remarks = overall_remarks;
+		this.report_type = report_type;
 		this.overall_score = overall_score;
 		this.report_data = report_data;
 		this.need_tenant = need_tenant;
@@ -50,7 +54,7 @@ public class OpenAuditModel extends AuditModel {
 	}
     
 	public OpenAuditModel(int report_id, int tenant_id, int auditor_id, int manager_id, Date start_date,
-			Date last_update_date, String overall_remarks, int overall_score, String report_data, int need_tenant,
+			Date last_update_date, String overall_remarks, String report_type, int overall_score, String report_data, int need_tenant,
 			int need_auditor, int need_manager) {
 		this.report_id = report_id;
 		this.tenant_id = tenant_id;
@@ -59,6 +63,7 @@ public class OpenAuditModel extends AuditModel {
 		this.start_date = start_date;
 		this.last_update_date = last_update_date;
 		this.overall_remarks = overall_remarks;
+		this.report_type = report_type;
 		this.overall_score = overall_score;
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
@@ -198,6 +203,14 @@ public class OpenAuditModel extends AuditModel {
 
 	public void setNeed_manager(int need_manager) {
 		this.need_manager = need_manager;
+	}
+
+	public String getReport_type() {
+		return report_type;
+	}
+
+	public void setReport_type(String report_type) {
+		this.report_type = report_type;
 	}
 	
 	

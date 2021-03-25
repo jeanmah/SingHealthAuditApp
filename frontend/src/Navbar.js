@@ -37,10 +37,10 @@ function Navbar() {
         </div>
         <div className="links-container" ref={linksContainerRef}>
           <ul className="links" ref={linksRef}>
-            {navLinks.map((link) => {
+            {navLinks.map((link, index) => {
               const { id, url, text } = link;
               return (
-                <li>
+                <li key={index}>
                   <Link to={url}>{text}</Link>
                 </li>
               );
