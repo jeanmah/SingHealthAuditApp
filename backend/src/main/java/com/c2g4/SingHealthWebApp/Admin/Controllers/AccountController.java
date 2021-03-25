@@ -161,7 +161,7 @@ public class AccountController {
     /**
      * gets all the tenants from a particular Branch
      * @param branch_id a String of the branch to query from
-     * @return a JsonArray of Tenants with keys {account_id, employee_id, username,first_name,last_name,email,hp,
+     * @return a JsonArray of Tenants with keys {acc_id, employee_id, username,first_name,last_name,email,hp,
      * role_id,branch_id,type_id,audit_score,latest_audit,past_audits,store_addr}
      */
     private ResponseEntity<?> getTenantsFromBranch(String branch_id){
@@ -212,7 +212,7 @@ public class AccountController {
      * @param user_id an Optional int of the userId to query, must be present if firstName and lastName is not present
      * @param firstName an Optional String of the first name to query, must be present is user_id is not present
      * @param lastName an Optional String of the last name to query, must be present is user_id is not present
-     * @return a JsonNode of requested user with keys {account_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
+     * @return a JsonNode of requested user with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
      * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
@@ -244,6 +244,8 @@ public class AccountController {
         ObjectNode accountNode;
         try {
             accountNode = (ObjectNode) objectMapper.readTree(accJsonString);
+            accountNode.remove("account_id");
+            accountNode.remove("password");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
@@ -274,7 +276,6 @@ public class AccountController {
         ObjectNode typeNode;
         try {
             typeNode = (ObjectNode) objectMapper.readTree(specificTypeJsonString);
-            typeNode.remove("acc_id");
         } catch (JsonProcessingException e) {
             return ResponseEntity.badRequest().body(null);
         }
@@ -287,7 +288,7 @@ public class AccountController {
     /**
      * updates the profile of the callerUser, does not change the password
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
-     * @param changes a String which is a Json of keys {username, first_name, last_name, email, hp}
+     * @param changes a String in the POST body which is a Json of keys {username, first_name, last_name, email, hp}
      * @return http ok if ok and bad request if bad request
      */
     @PostMapping("/account/postProfileUpdate")
@@ -298,9 +299,7 @@ public class AccountController {
         try {
 
             ObjectNode changesNode = objectMapper.readValue(changes, ObjectNode.class);
-            if(changesNode.has("username") && changesNode.has("first_name") &&
-                    changesNode.has("last_name") &&changesNode.has("email") &&
-                    changesNode.has("hp")) {
+            if(checkProfileUpdateValidBody(changesNode)) {
                 accountRepo.changeAccountFields(callerAccount.getAccount_id(),
                         changesNode.get("username").asText(), changesNode.get("first_name").asText(),
                         changesNode.get("last_name").asText(), changesNode.get("email").asText(),
@@ -316,6 +315,23 @@ public class AccountController {
     }
 
     /**
+     * checks if the profile update body has all the parameters required
+     * @param changesNode an ObjectNode containing the body of postProfileUpdate
+     * @return true if all fields are available and valid, false otherwise
+     */
+    private boolean checkProfileUpdateValidBody(ObjectNode changesNode){
+        if(changesNode.isNull()) return false;
+        boolean hasAllFields = changesNode.has("username") && changesNode.has("first_name") &&
+                changesNode.has("last_name") &&changesNode.has("email") &&
+                changesNode.has("hp");
+        if(!hasAllFields) return false;
+
+        //check if fields not null
+        return !(changesNode.get("username").isNull() || changesNode.get("first_name").isNull()
+                || changesNode.get("last_name").isNull() || changesNode.get("email").isNull() || changesNode.get("hp").isNull());
+    }
+
+    /**
      * encryptes the new password and updates the database
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param new_password String of the new password
@@ -325,6 +341,7 @@ public class AccountController {
     public ResponseEntity<?> postPasswordUpdate(@AuthenticationPrincipal UserDetails callerUser, @RequestPart(value = "new_password") String new_password){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if(new_password==null ||new_password.isEmpty()) return ResponseEntity.badRequest().body(null);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(new_password);
         accountRepo.changePasswordByAccId(callerAccount.getAccount_id(),encodedPassword);
@@ -347,6 +364,7 @@ public class AccountController {
             case AUDITOR:
                 if(requestedAccountNode.get("role_id").asText().equals(TENANT)){
                     //check if tenant is under the same branch
+                    logger.info("Auditor branch id {}, requested branch id {}",callerAccount.getBranch_id(), requestedAccountNode.get("branch_id").asText());
                     return requestedAccountNode.get("branch_id").asText().equals(callerAccount.getBranch_id());
                 }
                 break;
