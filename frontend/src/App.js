@@ -23,26 +23,34 @@ function App() {
       <ContextProvider>
         <Navbar />
         <Switch>
-          <Route exact path="/login" exact component={LoginComponent} />
+          <Route exact path="/" exact component={LoginComponent} />
           <AuthenticatedRoute exact path="/home" exact component={Home} />
-          <Route exact path="/account">
-            <Account />
-          </Route>
-          <Route exact path="/institutions">
-            <Institutions />
-          </Route>
-          <Route exact path="/institution/:institutionid">
-            <Institution />
-          </Route>
-          <Route exact path="/tenant/:tenantId">
-            <Tenant />
-          </Route>
-          <Route exact path="/tenant/fbChecklist/:tenantId">
-            <FbChecklist />
-          </Route>
-          <Route path="*">
-            <Error />
-          </Route>
+          <AuthenticatedRoute exact path="/account" exact component={Account} />
+          <AuthenticatedRoute
+            exact
+            path="/institutions"
+            exact
+            component={Institutions}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/institution/:institutionid"
+            exact
+            component={Institution}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/:tenantId"
+            exact
+            component={Tenant}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/fbChecklist/:tenantId"
+            exact
+            component={FbChecklist}
+          />
+          <AuthenticatedRoute exact path="/error" exact component={Error} />
         </Switch>
       </ContextProvider>
     </Router>

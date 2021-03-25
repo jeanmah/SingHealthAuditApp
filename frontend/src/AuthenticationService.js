@@ -5,13 +5,6 @@ const API_URL = "http://localhost:8080";
 export const USER_NAME_SESSION_ATTRIBUTE_NAME = "authenticatedUser";
 export const SESSION_TOKEN = "SESSION_TOKEN";
 class AuthenticationService {
-  // executeJwtAuthenticationService(username, password) {
-  //   console.log(username);
-  //   return axios.post(`${API_URL}/authenticateP`, {
-  //     username,
-  //     password,
-  //   });
-  // }
   executeJwtAuthenticationService(username, password) {
     return axios.post(`${API_URL}/authenticateP`, {
       username,
