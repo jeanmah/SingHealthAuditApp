@@ -23,12 +23,8 @@ function App() {
       <ContextProvider>
         <Navbar />
         <Switch>
-          <Route exact path="/login">
-            <LoginComponent />
-          </Route>
-          <AuthenticatedRoute exact path="/home">
-            <Home />
-          </AuthenticatedRoute>
+          <Route exact path="/login" exact component={LoginComponent} />
+          <AuthenticatedRoute exact path="/home" exact component={Home} />
           <Route exact path="/account">
             <Account />
           </Route>

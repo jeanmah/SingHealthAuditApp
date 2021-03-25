@@ -13,7 +13,7 @@ function Audits({ homeAudits }) {
         const { tenantid, tenantName, timeRemaining, status, date } = audit;
 
         return (
-          <Link to={`/tenant/${tenantid}`}>
+          <Link key={index} to={`/tenant/${tenantid}`}>
             <div
               className={`${
                 audit.status === "resolved"
