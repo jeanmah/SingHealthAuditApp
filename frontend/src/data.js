@@ -3,7 +3,7 @@ import React from "react";
 export const navLinks = [
   {
     id: 1,
-    url: "/home",
+    url: "/home/a",
     text: "Home",
   },
   {
@@ -676,25 +676,25 @@ export const fbChecklist = [
   {
     id: "5",
     category: "B",
-    text: "FB-B-Question-1",
+    text: "Cleaning and maintenance records for equipment, ventilation and exhaust system.",
     modalOpen: false,
   },
   {
     id: "6",
     category: "B",
-    text: "FB-B-Question-2",
+    text: "Adequate and regular pest control.",
     modalOpen: false,
   },
   {
     id: "7",
     category: "B",
-    text: "FB-B-Question-3",
+    text: "Goods and equipment are within shop boundary.",
     modalOpen: false,
   },
   {
     id: "8",
     category: "B",
-    text: "FB-B-Question-4",
+    text: "Store display/ Shop front is neat and tidy.",
     modalOpen: false,
   },
 ];

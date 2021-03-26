@@ -2,6 +2,7 @@ import React from "react";
 import { institutions } from "../data";
 import { Link } from "react-router-dom";
 import { FaAngleRight } from "react-icons/fa";
+import Navbar from "../Navbar";
 // import CGH from "../images/cgh.png";
 // import KKH from "../images/kkh.png";
 // import SGH from "../images/sgh.png";
@@ -11,23 +12,26 @@ import { FaAngleRight } from "react-icons/fa";
 
 function Institutions() {
   return (
-    <div className="institutions-head">
-      {institutions.map((institution, index) => {
-        const { id, name, tenantNames, imageUrl } = institution;
-        return (
-          <Link key={index} to={`/institution/${id}`}>
-            <article key={id} className="institutions-institution">
-              <img src={imageUrl} className="hospital-logo"></img>
-              <header className="institutions-btn">
-                <span className="institutions-btnicon">
-                  <FaAngleRight />
-                </span>
-              </header>
-            </article>
-          </Link>
-        );
-      })}
-    </div>
+    <>
+      <Navbar />
+      <div className="institutions-head">
+        {institutions.map((institution, index) => {
+          const { id, name, tenantNames, imageUrl } = institution;
+          return (
+            <Link key={index} to={`/institution/${id}`}>
+              <article key={id} className="institutions-institution">
+                <img src={imageUrl} className="hospital-logo"></img>
+                <header className="institutions-btn">
+                  <span className="institutions-btnicon">
+                    <FaAngleRight />
+                  </span>
+                </header>
+              </article>
+            </Link>
+          );
+        })}
+      </div>
+    </>
   );
 }
 

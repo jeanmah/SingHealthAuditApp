@@ -3,6 +3,7 @@ import { tenants, institutions } from "../data";
 import { Link, useParams } from "react-router-dom";
 import { FaAngleRight } from "react-icons/fa";
 import institutionImage from "../images/institutionhome.png";
+import Navbar from "../Navbar";
 
 function Institution() {
   //obtain id which is indicated in the url
@@ -20,6 +21,7 @@ function Institution() {
 
   return (
     <>
+      <Navbar />
       {selectedInstitution.map((institution, index) => {
         const { id, name, imageUrl } = institution;
         return (

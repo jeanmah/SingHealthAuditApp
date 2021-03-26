@@ -6,7 +6,7 @@ export const USER_NAME_SESSION_ATTRIBUTE_NAME = "authenticatedUser";
 export const SESSION_TOKEN = "SESSION_TOKEN";
 class AuthenticationService {
   executeJwtAuthenticationService(username, password) {
-    return axios.post(`${API_URL}/authenticateP`, {
+    return axios.post(`${API_URL}/account/authenticateP`, {
       username,
       password,
     });

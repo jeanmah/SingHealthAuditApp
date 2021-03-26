@@ -3,6 +3,7 @@ import { audits } from "../data";
 import { Link } from "react-router-dom";
 import HomeCategories from "../components/HomeCategories";
 import Audits from "../components/Audits";
+import Navbar from "../Navbar";
 
 function Home() {
   //home audits displayed
@@ -19,9 +20,10 @@ function Home() {
       setHomeAudits(filteredAudits);
     }
   };
-  
+
   return (
     <main>
+      <Navbar />
       <div>
         <HomeCategories filterAudits={filterAudits} />
         <Audits homeAudits={homeAudits} />

@@ -28,13 +28,14 @@ class LoginComponent extends Component {
       this.state.password
     )
       .then((response) => {
+        console.log(response.data);
         AuthenticationService.registerSuccessfulLoginForJwt(
           this.state.username,
           response.data.token
         );
         console.log(response.data.accountType);
         if (response.data.accountType == "Auditor") {
-          this.props.history.push(`/home`);
+          this.props.history.push(`/home/a`);
         } else if (response.data.accountType == "Tenant") {
           this.props.history.push(`/home/t`);
         } else if (response.data.accountType == "Manager") {
@@ -50,7 +51,7 @@ class LoginComponent extends Component {
   render() {
     return (
       <div>
-        <h1>Login</h1>
+        <h2>Login</h2>
         <div className="container">
           {/*<ShowInvalidCredentials hasLoginFailed={this.state.hasLoginFailed}/>*/}
           {this.state.hasLoginFailed && (
@@ -58,20 +59,24 @@ class LoginComponent extends Component {
           )}
           {this.state.showSuccessMessage && <div>Login Sucessful</div>}
           {/*<ShowLoginSuccessMessage showSuccessMessage={this.state.showSuccessMessage}/>*/}
-          User Name:{" "}
-          <input
-            type="text"
-            name="username"
-            value={this.state.username}
-            onChange={this.handleChange}
-          />
-          Password:{" "}
-          <input
-            type="password"
-            name="password"
-            value={this.state.password}
-            onChange={this.handleChange}
-          />
+          <div>
+            User Name:{" "}
+            <input
+              type="text"
+              name="username"
+              value={this.state.username}
+              onChange={this.handleChange}
+            />
+          </div>
+          <div>
+            Password:{" "}
+            <input
+              type="password"
+              name="password"
+              value={this.state.password}
+              onChange={this.handleChange}
+            />
+          </div>
           <button className="btn btn-success" onClick={this.loginClicked}>
             Login
           </button>
