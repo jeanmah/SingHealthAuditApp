@@ -205,13 +205,13 @@ public class AccountController {
 
     /**
      * gets in depth user details of a certain user if the callerUser is authorized,
-     * all users can call themselves,
+     * all users can call themselves and if no parameters are passed, self is called,
      * a tenant cannot use this function otherwise, auditors can only get tenants from their branch,
      * managers are fully authorized
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param user_id an Optional int of the userId to query, must be present if firstName and lastName is not present
-     * @param firstName an Optional String of the first name to query, must be present is user_id is not present
-     * @param lastName an Optional String of the last name to query, must be present is user_id is not present
+     * @param firstName an Optional String of the first name to query, must be present if lastName is present and used
+     * @param lastName an Optional String of the last name to query, must be present if firstName present and used
      * @return a JsonNode of requested user with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
      * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
@@ -225,19 +225,22 @@ public class AccountController {
                                             @RequestParam(required = false) Optional<String> firstName,
                                             @RequestParam(required = false) Optional<String> lastName
     ){
-        if(user_id.isEmpty() && firstName.isEmpty() && lastName.isEmpty())
-            return ResponseEntity.badRequest().body(null);
-
         //check who is calling
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body(null);
         int userID;
-        if(user_id.isPresent()){
-            userID = user_id.get();
-        } else{
-            if(firstName.isEmpty() || lastName.isEmpty())
-                return ResponseEntity.badRequest().body(null);
-            userID = accountRepo.getAccIdFromNames(firstName.get(),lastName.get());
+
+        if(user_id.isEmpty() && firstName.isEmpty() && lastName.isEmpty()) {
+            userID = callerAccount.getAccount_id();
+            //return ResponseEntity.badRequest().body(null);
+        } else {
+            if (user_id.isPresent()) {
+                userID = user_id.get();
+            } else {
+                if (firstName.isEmpty() || lastName.isEmpty())
+                    return ResponseEntity.badRequest().body(null);
+                userID = accountRepo.getAccIdFromNames(firstName.get(), lastName.get());
+            }
         }
         String accJsonString = getAccount(userID);
         if(accJsonString == null) return ResponseEntity.badRequest().body(null);
