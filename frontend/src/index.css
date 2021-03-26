@@ -408,3 +408,29 @@ Modal
   color: var(--clr-grey);
   cursor: pointer;
 }
+/*
+=============== 
+Tenant
+===============
+*/
+/* .tenant-container {
+  display: flex;
+  flex-direction: column;
+} */
+
+.tenant-name {
+  background: var(--clr-white);
+  display: flex;
+  justify-content: center;
+  font-size: 1rem;
+  padding: 2rem 2rem;
+  border: 3px solid var(--clr-grey);
+}
+.tenant-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: var(--clr-white);
+}

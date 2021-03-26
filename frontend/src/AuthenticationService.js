@@ -36,9 +36,8 @@ class AuthenticationService {
 
   isUserLoggedIn() {
     let user = sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
-    console.log(user);
+
     if (user === null) return false;
-    console.log("start page");
 
     return true;
   }
