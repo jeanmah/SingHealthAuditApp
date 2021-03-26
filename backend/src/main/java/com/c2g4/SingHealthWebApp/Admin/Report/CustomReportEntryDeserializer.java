@@ -3,7 +3,10 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +15,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
+/**
+ * Custom Deserialiser for ReportEntry to handle and convert incomplete ReportEntries from the frontend
+ * @author LunarFox
+ *
+ */
 public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> {
     public CustomReportEntryDeserializer(){
         this(null);
@@ -37,13 +45,24 @@ public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> 
         JsonNode qn_id_node = node.get("qn_id");
         entry.setQn_id(qn_id_node.asInt());
         //check pass or fail
-        JsonNode passFailNode = node.get("passFail");
+        JsonNode passFailNode = node.get("status");
         entry.setStatus(passFailNode.asBoolean());
         //check if should store remarks and evidence
-        if(entry.getStatus() == Component_Status.FAIL){
-            JsonNode remarksNode = node.get("remarks");
+        JsonNode remarksNode = node.get("remarks");
+        if(remarksNode != null) {
             entry.setRemarks(remarksNode.asText());
+        }
+        if(entry.getStatus() == Component_Status.FAIL){
             entry.setSeverity(node.get("severity").asInt());
+        }
+        JsonNode imageNode = node.get("images");
+        if(imageNode != null) {
+        	Iterator<JsonNode> it = imageNode.iterator();
+        	List<String> strImages = new ArrayList<>(imageNode.size());
+        	while(it.hasNext()) {
+        		strImages.add(it.next().asText());
+        	}
+        	entry.setImages(strImages);
         }
 
         return entry;

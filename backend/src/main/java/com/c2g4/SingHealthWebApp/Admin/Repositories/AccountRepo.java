@@ -1,5 +1,7 @@
 package com.c2g4.SingHealthWebApp.Admin.Repositories;
 
+import java.util.List;
+
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -7,8 +9,11 @@ import org.springframework.data.repository.query.Param;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 
-import java.util.List;
-
+/**
+ * Repository of SQL queries to interact with the Account Table
+ * @author LunarFox
+ *
+ */
 public interface AccountRepo extends CrudRepository<AccountModel, Integer>{
     @Query("SELECT * FROM Accounts WHERE username = :username LIMIT 1")
     AccountModel findByUsername(@Param("username") String username);

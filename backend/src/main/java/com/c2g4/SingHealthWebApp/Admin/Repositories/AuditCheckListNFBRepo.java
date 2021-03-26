@@ -11,6 +11,11 @@ import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 
 
+/**
+ * Repository of SQL queries to interact with the AuditCheckListNFBRepo
+ * @author LunarFox
+ *
+ */
 @Repository
 public interface AuditCheckListNFBRepo extends CrudRepository<AuditCheckListNFBModel, Integer>, AuditCheckListRepo {
     @Query("SELECT * FROM NFBCheckList")

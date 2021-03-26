@@ -1,12 +1,13 @@
 package com.c2g4.SingHealthWebApp.Admin.Models;
 
-import java.util.Collection;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
+/**
+ * Object Model/Representation of an entry of the SQL Account Table
+ * @author LunarFox
+ *
+ */
 @Table("Accounts")
 public class AccountModel {
 

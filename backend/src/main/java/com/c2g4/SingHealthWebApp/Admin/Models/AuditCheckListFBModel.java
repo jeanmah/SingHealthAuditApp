@@ -3,6 +3,11 @@ package com.c2g4.SingHealthWebApp.Admin.Models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * Object Model/Representation of an entry of the SQL AuditCheckListFB
+ * @author LunarFox
+ *
+ */
 @Table("FBCheckList")
 public class AuditCheckListFBModel extends AuditCheckListModel{
     @Id
