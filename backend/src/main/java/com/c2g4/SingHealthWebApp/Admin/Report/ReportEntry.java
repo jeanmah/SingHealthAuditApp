@@ -10,8 +10,13 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-//Entries are never modified or deleted, only added.
-//Entries with the same qn_id essentially "overrule" older entries with the same qn_id.
+/**
+ * ReportEntry is a representation of an entry of Report used for manipulation.
+ * Entries are never modified or deleted, only added and entries with the same qn_id essentially "overrule" older entries with the same qn_id.
+ * @author LunarFox
+ *
+ */
+
 @Component
 public class ReportEntry {
 	  private int entry_id;

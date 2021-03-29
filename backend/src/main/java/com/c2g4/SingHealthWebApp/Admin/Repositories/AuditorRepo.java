@@ -1,9 +1,7 @@
 package com.c2g4.SingHealthWebApp.Admin.Repositories;
 
-import java.util.Collection;
 import java.util.List;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +9,11 @@ import org.springframework.stereotype.Repository;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 
+/**
+ * Repository of SQL queries to interact with the Auditors Table
+ * @author LunarFox
+ *
+ */
 @Repository
 public interface AuditorRepo extends CrudRepository<AuditorModel, Integer>{
 	@Query("SELECT * FROM Auditors")

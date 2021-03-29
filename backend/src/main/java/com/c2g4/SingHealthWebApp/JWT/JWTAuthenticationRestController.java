@@ -89,10 +89,7 @@ public class JWTAuthenticationRestController {
         logger.debug("in authenticate");
 
         try {
-            logger.debug("into authentication manager");
-
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            logger.debug("done with manager");
 
         } catch (DisabledException e) {
             throw new AuthenticationException("USER_DISABLED", e);

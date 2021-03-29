@@ -148,7 +148,7 @@ public class ReportBuilder {
     	this.report_type = auditModel.getReport_type();
     	this.overall_score = auditModel.getOverall_score();
     	try {
-			this.entries = objectmapper.treeToValue(auditModel.getReport_data(), OpenReport.class).getEntries();
+			this.entries = objectmapper.treeToValue(auditModel.getReport_data(), ClosedReport.class).getEntries();
     	} catch (JsonProcessingException e) {
 			logger.error("Could not wrap auditModel into Report due to malformed report_data!");
 			e.printStackTrace();
@@ -197,11 +197,13 @@ public class ReportBuilder {
 		Report report = null;
 		switch(this.overall_status) {
 		case 0:
-			report = new OpenReport(report_id, tenant_id, auditor_id, manager_id, open_date, overall_score, overall_remarks, entries, need_tenant,
+			report = new OpenReport(report_id, tenant_id, auditor_id, manager_id, open_date, overall_score, overall_remarks,
+					report_type, entries, need_tenant,
 					need_auditor, need_manager, overall_status, last_update_date);
 			break;
 		case 1:
-			report = new ClosedReport(report_id, tenant_id, auditor_id, manager_id, open_date, overall_score, overall_remarks, entries, need_tenant,
+			report = new ClosedReport(report_id, tenant_id, auditor_id, manager_id, open_date, overall_score, overall_remarks,
+					report_type, entries, need_tenant,
 					need_auditor, need_manager, overall_status, close_date);
 			break;
 		default:
@@ -265,7 +267,7 @@ public class ReportBuilder {
      */
     public static ReportBuilder getLoadedReportBuilder(OpenAuditRepo openAuditRepo, CompletedAuditRepo completedAuditRepo,
     		int report_id) {
-    	ReportBuilder builder = new ReportBuilder();
+    	ReportBuilder builder = ReportBuilder.getNewReportBuilder(openAuditRepo, completedAuditRepo);
     	if(builder.checkOpenReportExists(report_id)) {
     		builder = new ReportBuilder(builder.loadOpenReport(report_id));
     	}else if (builder.checkClosedReportExists(report_id)) {
@@ -280,7 +282,9 @@ public class ReportBuilder {
     }
     
     /**
-     * Closes an openreport into a closedreport.
+     * [POTENTIALLY DEPRECIATED] Closes an openreport into a closedreport.
+     * Might not be a fantastic idea to use this, in fact at line 213 of report controller
+     * I seem to have inadvertently bypassed this.
      * @param report object to be converted into a closedreport
      * @return ClosedReport generated from the openreport object
      */
@@ -293,6 +297,42 @@ public class ReportBuilder {
     	.setOverall_score(report.getOverall_score()).setEntries(report.getEntries());
     	ClosedReport closedreport = (ClosedReport)builder.build();
     	return closedreport;
+    }
+    
+    /**
+     * Deletes an existing open report.
+     * @param report_id report_id of the to be deleted.
+     * @return true if the deletion was successful
+     */
+    public boolean deleteOpenReport(int report_id) {
+    	if(!this.checkOpenReportExists(report_id)) {
+    		logger.error("Report with id " + report_id + "could not be deleted because it does not exist.");
+    		return false;
+    	}
+    		openAuditRepo.deleteAuditById(report_id);
+        	if(this.checkClosedReportExists(report_id)) {
+        		logger.error("Report of id " + report_id + "could not be deleted!");
+        		return false;
+        	}
+        return true;
+    }
+    
+    /**
+     * Deletes an existing closed report.
+     * @param report_id report_id of the to be deleted.
+     * @return true if the deletion was successful
+     */
+    public boolean deleteClosedReport(int report_id) {
+    	if(!this.checkClosedReportExists(report_id)) {
+    		logger.error("Report with id " + report_id + "could not be deleted because it does not exist.");
+    		return false;
+    	}
+		completedAuditRepo.deleteAuditById(report_id);
+    	if(this.checkClosedReportExists(report_id)) {
+    		logger.error("Report of id " + report_id + "could not be deleted!");
+    		return false;
+    	}
+    	return true;
     }
     
     //TODO Implement a way to reopen a closedReport if necessary
@@ -394,6 +434,9 @@ public class ReportBuilder {
         
         CompletedAuditModel audit = (CompletedAuditModel) builder.build();
         try {
+        	if(!completedAuditRepo.existsById(audit.getReport_id())) {
+            	completedAuditRepo.createNewEntryWithId(audit.getReport_id());
+        	}
         	completedAuditRepo.save(audit);
         }catch (IllegalArgumentException e) {
         	return false;

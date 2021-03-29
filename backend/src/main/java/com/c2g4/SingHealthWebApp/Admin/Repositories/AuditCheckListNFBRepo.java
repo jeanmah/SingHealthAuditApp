@@ -7,14 +7,18 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 
 
+/**
+ * Repository of SQL queries to interact with the AuditCheckListNFBRepo
+ * @author LunarFox
+ *
+ */
 @Repository
 public interface AuditCheckListNFBRepo extends CrudRepository<AuditCheckListNFBModel, Integer>, AuditCheckListRepo {
     @Query("SELECT * FROM NFBCheckList")
-    List<AuditCheckListFBModel> getAllQuestions();
+    List<AuditCheckListNFBModel> getAllQuestions();
     
     @Query("SELECT * FROM NFBCheckList WHERE qn_id =:qn_id")
     AuditCheckListNFBModel getQuestion(@Param("qn_id") int qn_id);

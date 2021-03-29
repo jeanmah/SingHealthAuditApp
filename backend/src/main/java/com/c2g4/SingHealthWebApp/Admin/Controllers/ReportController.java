@@ -3,6 +3,8 @@ package com.c2g4.SingHealthWebApp.Admin.Controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +135,7 @@ public class ReportController {
             entryList = objectMapper.readValue(checklist, customClassCollection);
         } catch (JsonProcessingException e) {
             logger.warn("JSON PROCESSING EXCEPTION {} POST",report_type);
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
         
@@ -160,7 +163,7 @@ public class ReportController {
     	return ResponseEntity.ok(auditScore);
 	}
 	
-	@PostMapping("report/postReportUpdate")
+	@PostMapping("/report/postReportUpdate")
 	public ResponseEntity<?> postReportUpdate(
 			@RequestParam(value = "report_id", required = true) int report_id,
             @RequestPart(value = "entry", required = true) String strEntry,
@@ -221,6 +224,8 @@ public class ReportController {
         	ClosedReport updated_report = (ClosedReport) builder.build();
         	if(!builder.saveReport(updated_report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
+        	}else {
+        		builder.deleteOpenReport(report_id);
         	}
         }
         logger.info("Report update completed.");
@@ -299,7 +304,7 @@ public class ReportController {
 		return ResponseEntity.ok(entry);
 	}
 	
-	@GetMapping("report/getReportIDs")
+	@GetMapping("/report/getReportIDs")
 	public ResponseEntity<?> getReportIDs(
 			@RequestParam(required=false, defaultValue="-1") String username,
 			@RequestParam(required=false, defaultValue="-1") int user_id,
@@ -379,6 +384,15 @@ public class ReportController {
 			//TODO
 		}
 		return report_ids;
+	}
+	
+	@GetMapping("/report/print")
+	public ResponseEntity<?> printURLRequest(HttpServletRequest request){
+		String strRequest = request.getRequestURL().toString() + "?" + request.getQueryString();
+		String strRequest2 = request.getParameterNames().toString();
+		logger.info(strRequest);
+		logger.info(strRequest2);
+		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
 
 	
