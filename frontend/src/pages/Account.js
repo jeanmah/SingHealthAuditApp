@@ -12,12 +12,12 @@ const API_URL = "http://localhost:8080";
 // - Returns account information of the specified_user at specified access_level DONE
 
 function Account() {
-  useEffect(() => {
-    return axios.get(`${API_URL}/account/getUserProfile`, {})
-    .then((response) => {
-      console.log(response.data);
-    })
-  },[])
+  // useEffect(() => {
+  //   return axios.get(`${API_URL}/account/getUserProfile`, {})
+  //   .then((response) => {
+  //     console.log(response.data);
+  //   })
+  // },[])
   
   const name = "";
   const id = "";
