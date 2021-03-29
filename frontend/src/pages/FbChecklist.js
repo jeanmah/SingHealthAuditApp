@@ -77,17 +77,17 @@ function FbCategory() {
               );
             })}
             <br />
-            <Link to={`/tenant/${tenantId}`}>
-              <button
-                // onClick={() => {
-                //   updateAudit(tenantId, "FB", tenantName, "unresolved");
-                //   resetTenantFbChecklist(tenantId);
-                // }}
-                onClick={() => submitFbReport(tenantId, fbReportState, "FB")}
-              >
-                Submit
-              </button>
-            </Link>
+            {/* <Link to={`/tenant/${tenantId}`}> */}
+            <button
+              // onClick={() => {
+              //   updateAudit(tenantId, "FB", tenantName, "unresolved");
+              //   resetTenantFbChecklist(tenantId);
+              // }}
+              onClick={() => submitFbReport(1006, fbReportState)}
+            >
+              Submit
+            </button>
+            {/* </Link> */}
           </div>
         </>
       )}

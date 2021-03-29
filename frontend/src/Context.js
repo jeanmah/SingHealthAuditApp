@@ -1,6 +1,7 @@
 import React, { useState, createContext, useCallback } from "react";
 import { audits, fbChecklist, tenants, institutions } from "./data";
 import axios from "axios";
+import { Redirect } from "react-router-dom";
 
 export const Context = createContext();
 
@@ -22,16 +23,29 @@ export const ContextProvider = (props) => {
       });
   }, []);
 
-  const submitFbReport = useCallback((tenantid, fbreport, checklisttype) => {
-    const t_id = parseInt(tenantid);
+  const submitFbReport = useCallback((tenantid, fbreport) => {
+    console.log(JSON.stringify(fbreport));
+    console.log("reached here");
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append("checklist", JSON.stringify(fbreport));
     return axios
       .post(
-        `${API_URL}/report/postReportSubmission`,
-        { params: { type: checklisttype, tenant_id: t_id } },
-        { data: { checklist: fbreport } }
+        `${API_URL}/report/postReportSubmission?type=FB&tenant_id=${tenantid}&remarks=`,
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+          // params: { type: "FB", tenant_id: t_id, remarks: "" },
+          // data: formdata,
+        }
       )
       .then((response) => {
         console.log(response);
+        if (response.status === 200) {
+          return <Redirect to={`/tenant/${tenantid}`} />;
+        }
       })
       .catch(() => {
         console.log("Failed FB report submission");
@@ -59,10 +73,17 @@ export const ContextProvider = (props) => {
     let array = [];
     checklist.forEach((question) => {
       const { fb_qn_id } = question;
-      array.push({ qn_id: fb_qn_id, status: false });
+      array.push({
+        qn_id: fb_qn_id,
+        status: false,
+        severity: 0,
+        remarks: "",
+        images: "",
+      });
     });
     //set fbreportstate to array
     setFbReportState(array);
+
     console.log("created fb report");
     console.log(array);
   }, []);
