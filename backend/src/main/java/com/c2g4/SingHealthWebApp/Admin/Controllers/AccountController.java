@@ -65,7 +65,8 @@ public class AccountController {
     }
 
     /**
-     * only authorized for a manager, returns a list of all users from a branch
+     * only authorized for a manager, and auditors will only get back tenants from their branch
+     * returns a list of all users from a branch
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param branch_id a String of the branch to query from
      * @return a JsonArray of users with keys {acc_id, first_name, last_name, role_id},
@@ -76,10 +77,19 @@ public class AccountController {
     public ResponseEntity<?> getAllUsersofBranch(@AuthenticationPrincipal UserDetails callerUser, @RequestParam String branch_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body(null);
-        if(!callerAccount.getRole_id().equals(MANAGER)){
+        if(callerAccount.getRole_id().equals(TENANT)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
-        List<AccountModel> allAccountsByBranchId = accountRepo.getAllAccountsByBranchId(branch_id);
+        List<AccountModel> allAccountsByBranchId;
+        if(callerAccount.getRole_id().equals(AUDITOR)){
+            if(!callerAccount.getBranch_id().equals(branch_id)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+            allAccountsByBranchId = accountRepo.getAllTenantAccountsByBranchId(branch_id);
+        }
+        else{
+            allAccountsByBranchId = accountRepo.getAllAccountsByBranchId(branch_id);
+        }
         if(allAccountsByBranchId == null) return ResponseEntity.badRequest().body(null);
         ArrayNode output = getBasicAccFieldsArray(allAccountsByBranchId);
         return ResponseEntity.ok(output);

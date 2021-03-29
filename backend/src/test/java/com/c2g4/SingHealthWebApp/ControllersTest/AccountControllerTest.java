@@ -16,9 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -38,7 +36,7 @@ import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 public class AccountControllerTest {
@@ -70,7 +68,7 @@ public class AccountControllerTest {
     private static final String statusBad = "bad";
     private static final String statusUnauthorized = "unauthorized";
 
-    @Before
+    @BeforeEach
     public void before() {
         AccountModel managerAccount = createAccount(MANAGER,MANAGERID,"Marcus","Ho","HQ");
         AccountModel auditorAccount = createAccount(AUDITOR,AUDITORID,"Hannah","Mah","Branch_A");
@@ -150,9 +148,6 @@ public class AccountControllerTest {
     @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
     public void getAllUsersAsAuditor()
             throws Exception {
-//        ArrayList<AccountModel> allAccounts = new ArrayList<>();
-//        createAribraryUsers(allAccounts);
-//        given(accountRepo.getAllAccounts()).willReturn(allAccounts);
         getAllUsers(statusUnauthorized,null);
 
     }
@@ -161,9 +156,6 @@ public class AccountControllerTest {
     @WithMockUser(username = TENANTUSENAME, password = KNOWN_USER_PASSWORD, roles = { TENANT })
     public void getAllUsersAsTenant()
             throws Exception {
-//        ArrayList<AccountModel> allAccounts = new ArrayList<>();
-//        createAribraryUsers(allAccounts);
-//        given(accountRepo.getAllAccounts()).willReturn(allAccounts);
         getAllUsers(statusUnauthorized,null);
     }
 

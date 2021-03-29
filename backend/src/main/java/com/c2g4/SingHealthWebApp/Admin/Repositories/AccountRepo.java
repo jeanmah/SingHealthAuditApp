@@ -33,6 +33,9 @@ public interface AccountRepo extends CrudRepository<AccountModel, Integer>{
     @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id")
     List<AccountModel> getAllAccountsByBranchId(@Param("branch_id") String branch_id);
 
+    @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id AND role_id= Tenant")
+    List<AccountModel> getAllTenantAccountsByBranchId(@Param("branch_id") String branch_id);
+
     @Modifying
     @Query("UPDATE Accounts acc SET acc.password = :password WHERE acc.account_id = :account_id")
     void changePasswordByAccId(@Param("account_id") int account_id, @Param("password") String password);
