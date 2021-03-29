@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONObject;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -562,23 +561,29 @@ public class AccountControllerTest {
 
     @Test
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
-    public void getUserProfileFirstNameOnlyWithResults()
+    public void getUserProfileFirstNameOnlyNoResults()
             throws Exception {
         getUserProfile(statusBad,-1,"Bob",null,null);
     }
 
     @Test
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
-    public void getUserProfileLastNameOnlyWithResults()
+    public void getUserProfileLastNameOnlyNoResults()
             throws Exception {
         getUserProfile(statusBad,-1,null,"Bob",null);
     }
 
     @Test
-    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
     public void getUserProfileNoParamWithResults()
             throws Exception {
-        getUserProfile(statusBad,-1,null,null,null);
+        AccountModel accountModel = createAccount(AUDITOR,AUDITORID,"Hannah","Mah","Branch_A");
+        AuditorModel auditorModel = createAuditor(AUDITORID,"Branch_A");
+        given(accountRepo.findByAccId(AUDITORID)).willReturn(accountModel);
+        given(auditorRepo.getAuditorById(AUDITORID)).willReturn(auditorModel);
+        getUserProfile(statusOK,AUDITORID,null,null,"{\"employee_id\":123,\"username\":\"HannahMah\",\"first_name\":\"Hannah\"," +
+                "\"last_name\":\"Mah\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Auditor\",\"branch_id\":\"Branch_A\"," +
+                "\"acc_id\":100,\"completed_audits\":null,\"appealed_audits\":null,\"outstanding_audit_ids\":null,\"mgr_id\":0}");
     }
 
     private void getUserProfile(String statusExpected, int userID,String firstName, String lastName, String compareJson) throws Exception {
