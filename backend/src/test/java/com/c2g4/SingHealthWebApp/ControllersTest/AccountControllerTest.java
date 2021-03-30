@@ -1,5 +1,6 @@
 package com.c2g4.SingHealthWebApp.ControllersTest;
 
+import com.c2g4.SingHealthWebApp.Admin.Controllers.AccountController;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
@@ -9,24 +10,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONObject;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -35,13 +41,15 @@ import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
+import org.springframework.web.context.WebApplicationContext;
 
-//@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 public class AccountControllerTest {
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
     @MockBean
     private AccountRepo accountRepo;
     @MockBean
@@ -50,6 +58,7 @@ public class AccountControllerTest {
     private AuditorRepo auditorRepo;
     @MockBean
     private ManagerRepo managerRepo;
+
 
     private static final String MANAGERUSENAME = "managerUsername";
     private static final String KNOWN_USER_PASSWORD = "test123";
@@ -178,7 +187,7 @@ public class AccountControllerTest {
         getAllUsersOfBranch(statusOK,"Branch_A","[{\"acc_id\":0,\"first_name\":\"Marcus\"," +
                 "\"last_name\":\"Ho\",\"role_id\":\"Manager\"},{\"acc_id\":0,\"first_name\":\"Hannah\"," +
                 "\"last_name\":\"Mah\",\"role_id\":\"Auditor\"},{\"acc_id\":0,\"first_name\":\"Gregory\"," +
-                "\"last_name\":\"Mah\",\"role_id\":\"Tenant\"}]\n");
+                "\"last_name\":\"Mah\",\"role_id\":\"Tenant\"}]");
     }
 
     @Test
@@ -187,7 +196,6 @@ public class AccountControllerTest {
             throws Exception {
         given(accountRepo.getAllAccountsByBranchId("Branch_A")).willReturn(null);
         getAllUsersOfBranch(statusBad,"Branch_A",null);
-
     }
 
     @Test
@@ -316,7 +324,7 @@ public class AccountControllerTest {
         ArrayList<AccountModel> accountModels = new ArrayList<>();
         createArbitraryTenants(tenantModels, accountModels);
         System.out.println("number of tenants" + tenantModels.size());
-        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(tenantModels);
+        given(tenantRepo.getAllTenants()).willReturn(tenantModels);
         getAllUsersOfType(statusOK,TENANT,accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
                 "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
@@ -333,7 +341,7 @@ public class AccountControllerTest {
     @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
     public void getAllUsersofTypeTenantAsAuditorNoResults()
             throws Exception {
-        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(null);
+        given(tenantRepo.getAllTenants()).willReturn(null);
         getAllUsersOfType(statusBad,TENANT,null,null);
     }
 
@@ -533,7 +541,7 @@ public class AccountControllerTest {
         getUserProfile(statusOK,TENANTID,null,null,"{\"employee_id\":123,\"username\":\"HannahMah\",\"first_name\":\"Hannah\"," +
                 "\"last_name\":\"Mah\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":100,\"type_id\":\"FB\"," +
-                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}\n");
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}");
     }
 
     @Test

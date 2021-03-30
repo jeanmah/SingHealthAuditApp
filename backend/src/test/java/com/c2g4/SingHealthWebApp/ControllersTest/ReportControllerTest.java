@@ -1,20 +1,24 @@
 package com.c2g4.SingHealthWebApp.ControllersTest;
 
+import com.c2g4.SingHealthWebApp.Admin.Controllers.AccountController;
 import com.c2g4.SingHealthWebApp.Admin.Controllers.ReportController;
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
+import com.c2g4.SingHealthWebApp.Admin.Report.Report;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -29,9 +33,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ReportController.class})
-@ExtendWith(SpringExtension.class)
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 public class ReportControllerTest {
     @Autowired
