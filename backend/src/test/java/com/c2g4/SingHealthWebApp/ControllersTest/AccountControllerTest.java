@@ -105,6 +105,7 @@ public class AccountControllerTest {
         if(compareJson!=null){
             resultActions.andExpect(content().json(compareJson));
         }
+        //System.out.println(resultActions.andReturn().getResponse().getContentAsString());
     }
 
     private void getHttpBadRequest(String requestURL, HashMap<String,String> params) throws Exception{
@@ -232,6 +233,87 @@ public class AccountControllerTest {
 
     @Test
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllTenantsofBranchAsManagerWithResults()
+            throws Exception {
+        ArrayList<TenantModel> tenantModels = new ArrayList<>();
+        ArrayList<AccountModel> accountModels = new ArrayList<>();
+        createArbitraryTenants(tenantModels, accountModels);
+        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(tenantModels);
+        getAllTenantsOfBranch(statusOK,"Branch_A", accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
+                "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
+                "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
+                "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\"," +
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}," +
+                "{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\"," +
+                "\"acc_id\":2,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null," +
+                "\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllTenantsofBranchAsManagerNoResults()
+            throws Exception {
+        given(tenantRepo.getAllTenants()).willReturn(null);
+        getAllTenantsOfBranch(statusBad,"Branch_A", null,null);
+    }
+
+    public void getAllTenantsofBranchAsAuditorWithResults()
+            throws Exception {
+        ArrayList<TenantModel> tenantModels = new ArrayList<>();
+        ArrayList<AccountModel> accountModels = new ArrayList<>();
+        createArbitraryTenants(tenantModels, accountModels);
+        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(tenantModels);
+        getAllTenantsOfBranch(statusOK,"Branch_A", accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
+                "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
+                "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
+                "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\"," +
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}," +
+                "{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\"," +
+                "\"acc_id\":2,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null," +
+                "\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllTenantsofBranchAsAuditorNoResults()
+            throws Exception {
+        given(tenantRepo.getAllTenants()).willReturn(null);
+        getAllTenantsOfBranch(statusBad,"Branch_A", null,null);
+    }
+
+    @Test
+    @WithMockUser(username = TENANTUSENAME, password = KNOWN_USER_PASSWORD, roles = { TENANT })
+    public void getAllTenantsofBranchAsTenant()
+            throws Exception {
+        getAllTenantsOfBranch(statusUnauthorized,"Branch_A",null,null);
+    }
+
+    private void getAllTenantsOfBranch(String statusExpected, String branch_id, ArrayList<AccountModel> accountModels, String compareJson) throws Exception {
+        String url = "/account/getAllTenantsOfBranch";
+        HashMap<String,String> params = new HashMap<>(){{
+            put("branch_id",branch_id);
+        }};
+        switch (statusExpected) {
+            case statusOK -> {
+                given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
+                given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
+                given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
+                getHttpOk(url, params, 3, compareJson);
+            }
+            case statusBad -> getHttpBadRequest(url, params);
+            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+        }
+    }
+
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
     public void getAllUsersofTypeTenantAsManagerWithResults()
             throws Exception {
         ArrayList<TenantModel> tenantModels = new ArrayList<>();
@@ -241,14 +323,14 @@ public class AccountControllerTest {
         getAllUsersOfType(statusOK,TENANT,accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
                 "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
-                "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
                 "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
                 "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\"," +
-                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}," +
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}," +
                 "{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
                 "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\"," +
                 "\"acc_id\":2,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null," +
-                "\"store_addr\":\"#01-02\"}]");
+                "\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
     }
 
     @Test
@@ -328,13 +410,13 @@ public class AccountControllerTest {
         getAllUsersOfType(statusOK,TENANT,accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
                 "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
-                "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
                 "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
                 "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\",\"audit_score\":10," +
-                "\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123," +
+                "\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123," +
                 "\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\",\"email\":\"something@email.com\"," +
                 "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":2," +
-                "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}]");
+                "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
     }
 
     @Test
@@ -389,7 +471,7 @@ public class AccountControllerTest {
                 "\"first_name\":\"Bob\",\"last_name\":\"Bobby\",\"email\":\"something@email.com\"," +
                 "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":0," +
                 "\"type_id\":\"FB\",\"audit_score\":10," +
-                "\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}");
+                "\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}");
     }
 
     @Test
@@ -454,7 +536,7 @@ public class AccountControllerTest {
         getUserProfile(statusOK,0,null,null,"{\"employee_id\":123,\"username\":\"BobBobby\",\"first_name\":\"Bob\"," +
                 "\"last_name\":\"Bobby\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
                 "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\"," +
-                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}");
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}");
     }
 
     @Test
@@ -541,7 +623,7 @@ public class AccountControllerTest {
         getUserProfile(statusOK,TENANTID,null,null,"{\"employee_id\":123,\"username\":\"HannahMah\",\"first_name\":\"Hannah\"," +
                 "\"last_name\":\"Mah\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":100,\"type_id\":\"FB\"," +
-                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}");
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}");
     }
 
     @Test
@@ -739,6 +821,7 @@ public class AccountControllerTest {
         tenantModel.setLatest_audit(0);
         tenantModel.setPast_audits(null);
         tenantModel.setBranch_id(branch_id);
+        tenantModel.setStore_name("store");
         tenantModel.setStore_addr("#01-02");
         return tenantModel;
     }

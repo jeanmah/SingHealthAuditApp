@@ -93,7 +93,7 @@ public class AccountController {
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param branch_id a String of the branch to query from
      * @return a JsonArray of Tenants with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id,
-     * type_id,audit_score,latest_audit,past_audits,store_addr},
+     * type_id,audit_score,latest_audit,past_audits,store_name,store_addr},
      */
     @GetMapping("/account/getAllTenantsOfBranch")
     public ResponseEntity<?> getAllTenantsOfBranch(@AuthenticationPrincipal UserDetails callerUser, @RequestParam String branch_id){
@@ -131,7 +131,7 @@ public class AccountController {
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param roleType a String either Tenant, Auditor or Manager
      * @return a JsonArray of users with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
-     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
+     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
      * if the callerUser is unauthorized, returns HttpStatus UNAUTHORIZED with body "Unauthorized",
@@ -174,11 +174,11 @@ public class AccountController {
      * gets all the tenants from a particular Branch
      * @param branch_id a String of the branch to query from
      * @return a JsonArray of Tenants with keys {acc_id, employee_id, username,first_name,last_name,email,hp,
-     * role_id,branch_id,type_id,audit_score,latest_audit,past_audits,store_addr}
+     * role_id,branch_id,type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      */
     private ResponseEntity<?> getTenantsFromBranch(String branch_id){
         List<TenantModel> tenantModels = tenantRepo.getAllTenantsByBranchId(branch_id);
-        if(tenantModels == null) return ResponseEntity.badRequest().body(null);
+        if(tenantModels == null ||tenantModels.size()==0) return ResponseEntity.badRequest().body(null);
         logger.info("TENANT SIZE {}", tenantModels.size());
         return userArrayJson(new ArrayList<typeAccountModel>(tenantModels));
     }
@@ -188,7 +188,7 @@ public class AccountController {
      * and account entry into a JsonNode and returns an array of such JsonNodes
      * @param models a list of either TenantModel, AuditorModel or ManagerModel
      * @return a JsonArray of users with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
-     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
+     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
      * if any other errors occur along the way, return http BAD_REQUEST
@@ -225,7 +225,7 @@ public class AccountController {
      * @param firstName an Optional String of the first name to query, must be present if lastName is present and used
      * @param lastName an Optional String of the last name to query, must be present if firstName present and used
      * @return a JsonNode of requested user with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
-     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
+     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
      * if the callerUser is unauthorized, returns HttpStatus UNAUTHORIZED with body "Unauthorized",
