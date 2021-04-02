@@ -397,14 +397,7 @@ public class ReportController {
 		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
 
-	@PostMapping("/report/print")
-	public ResponseEntity<?> printURLRequest(HttpServletRequest request){
-		String strRequest = request.getRequestURL().toString() + "?" + request.getQueryString();
-		String strRequest2 = request.getParameterNames().toString();
-		logger.info(strRequest);
-		logger.info(strRequest2);
-		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
-	}
+
 
 	
 	
