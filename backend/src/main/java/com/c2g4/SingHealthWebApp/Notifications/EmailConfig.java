@@ -2,6 +2,8 @@ package com.c2g4.SingHealthWebApp.Notifications;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+@Configuration
 @PropertySource(value={"classpath:application.properties"})
 public class EmailConfig {
 
@@ -30,9 +33,6 @@ public class EmailConfig {
 
     @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
     private String mailServerStartTls;
-
-    @Value("${spring.mail.templates.path}")
-    private String mailTemplatesPath;
 
     @Bean
     public JavaMailSender getJavaMailSender() {
