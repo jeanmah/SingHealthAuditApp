@@ -19,6 +19,7 @@ public class TenantModel implements typeAccountModel{
     private int latest_audit;
     private JsonNode past_audits;
     private String branch_id;
+    private String store_name;
     private String store_addr;
 
     @Override
@@ -58,6 +59,8 @@ public class TenantModel implements typeAccountModel{
 	public void setBranch_id(String branch_id) {
 		this.branch_id = branch_id;
 	}
+	public void setStore_name(String store_name) {this.store_name = store_name;}
+	public String getStore_name() {return store_name; }
 	public String getStore_addr() {
 		return store_addr;
 	}

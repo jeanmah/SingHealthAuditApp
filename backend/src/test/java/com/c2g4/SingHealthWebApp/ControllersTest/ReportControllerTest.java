@@ -1,21 +1,25 @@
 package com.c2g4.SingHealthWebApp.ControllersTest;
 
+import com.c2g4.SingHealthWebApp.Admin.Controllers.AccountController;
+import com.c2g4.SingHealthWebApp.Admin.Controllers.ReportController;
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
+import com.c2g4.SingHealthWebApp.Admin.Report.Report;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -28,9 +32,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 public class ReportControllerTest {
@@ -55,7 +57,15 @@ public class ReportControllerTest {
 
     private static final String statusOK = "ok";
     private static final String statusBad = "bad";
+    private static final String statusNotFound = "notFound";
     private static final String statusUnauthorized = "unauthorized";
+
+
+
+    @Test
+    public void testingTest(){
+
+    }
 
     private ResultActions performGetRequest(String requestURL, HashMap<String,String> params) throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.get(requestURL)
@@ -80,6 +90,11 @@ public class ReportControllerTest {
     private void getHttpBadRequest(String requestURL, HashMap<String,String> params) throws Exception{
         ResultActions resultActions = performGetRequest(requestURL,params);
         resultActions.andExpect(status().isBadRequest());
+    }
+
+    private void getHttpNotFoundRequest(String requestURL, HashMap<String,String> params) throws Exception{
+        ResultActions resultActions = performGetRequest(requestURL,params);
+        resultActions.andExpect(status().isNotFound());
     }
 
     private void getHttpUnauthorizedRequest(String requestURL, HashMap<String,String> params) throws Exception{
@@ -126,7 +141,17 @@ public class ReportControllerTest {
         for(int i=0;i<3;i++)
             auditCheckListModels.add(createNFBChecklist(auditCheckListModels.size()));
         given(auditCheckListNFBRepo.getAllQuestions()).willReturn(auditCheckListModels);
-        getAllQuestions(statusBad,"wrongType",null);
+        getAllQuestions(statusNotFound,"wrongType",null);
+    }
+
+    @Test
+    public void getAllQuestionsNoParam()
+            throws Exception {
+        List<AuditCheckListNFBModel> auditCheckListModels = new ArrayList<>();
+        for(int i=0;i<3;i++)
+            auditCheckListModels.add(createNFBChecklist(auditCheckListModels.size()));
+        given(auditCheckListNFBRepo.getAllQuestions()).willReturn(auditCheckListModels);
+        getHttpBadRequest("/report/getAllQuestions", null);
     }
 
     private void getAllQuestions(String statusExpected, String checkListType, String compareJson) throws Exception {
@@ -138,6 +163,7 @@ public class ReportControllerTest {
             case statusOK -> getHttpOk(url, params, 3, compareJson);
             case statusBad -> getHttpBadRequest(url, params);
             case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusNotFound -> getHttpNotFoundRequest(url,params);
         }
     }
 

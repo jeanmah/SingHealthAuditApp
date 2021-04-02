@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,6 @@ import com.c2g4.SingHealthWebApp.Admin.Report.OpenReport;
 import com.c2g4.SingHealthWebApp.Admin.Report.Report;
 import com.c2g4.SingHealthWebApp.Admin.Report.ReportBuilder;
 import com.c2g4.SingHealthWebApp.Admin.Report.ReportEntry;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListFBRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListNFBRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.CompletedAuditRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -57,6 +50,8 @@ public class ReportController {
 	AuditCheckListFBRepo auditCheckListFBRepo;
 	@Autowired
 	AuditCheckListNFBRepo auditCheckListNFBRepo;
+	@Autowired
+	AuditCheckListSMARepo auditCheckListSMARepo;
 	@Autowired
 	OpenAuditRepo openAuditRepo;
 	@Autowired
@@ -82,7 +77,7 @@ public class ReportController {
 		}else if(type.toUpperCase().matches(ResourceString.NFB_KEY)) {
 			questions = new ArrayList<AuditCheckListModel>(auditCheckListNFBRepo.getAllQuestions());
 		}else if(type.toUpperCase().matches(ResourceString.SMA_KEY)) {
-			//To-do when the third checklist repo is implemented
+			questions = new ArrayList<AuditCheckListModel>(auditCheckListSMARepo.getAllQuestions());
 		}
 		if(questions == null) {
 			return ResponseEntity.notFound().build();
@@ -103,7 +98,7 @@ public class ReportController {
 		}else if(type.toUpperCase().matches(ResourceString.NFB_KEY)) {
 			question = auditCheckListNFBRepo.getQuestion(qn_id);
 		}else if(type.toUpperCase().matches(ResourceString.SMA_KEY)) {
-			//To-do when the third checklist repo is implemented
+			question = auditCheckListSMARepo.getQuestion(qn_id);
 		}
 		
 		if(question == null) {
