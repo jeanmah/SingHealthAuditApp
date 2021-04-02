@@ -46,7 +46,7 @@ public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> 
         entry.setQn_id(qn_id_node.asInt());
         //check pass or fail
         JsonNode passFailNode = node.get("status");
-        entry.setStatus(passFailNode.asBoolean());
+        entry.setStatus(passFailNode.asInt());
         //check if should store remarks and evidence
         JsonNode remarksNode = node.get("remarks");
         if(remarksNode != null) {

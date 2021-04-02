@@ -101,12 +101,19 @@ public class ReportEntry {
 	  }
 	  @JsonSetter
 	  public void setStatus(String statusStr) {
-		  status = statusStr.matches("PASS") ? Component_Status.PASS : Component_Status.FAIL;
+		  switch (statusStr) {
+			  case "PASS" -> status = Component_Status.PASS;
+			  case "FAIL" -> status = Component_Status.FAIL;
+			  default -> status = Component_Status.NA;
+		  }
 	  }
 	
-	  public void setStatus(boolean statusBool) {
-	      status = statusBool? Component_Status.PASS : Component_Status.FAIL;
-	  }
+	  public void setStatus(int statusBool) {
+		  switch (statusBool) {
+			  case 1 -> status = Component_Status.PASS;
+			  case 0 -> status = Component_Status.FAIL;
+			  default -> status = Component_Status.NA;
+		  }	  }
 	  
 
 }
