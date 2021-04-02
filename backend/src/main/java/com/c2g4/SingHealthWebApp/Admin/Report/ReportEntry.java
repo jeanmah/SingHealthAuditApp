@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -117,11 +118,10 @@ public class ReportEntry {
 		  }
 	  }
 
+	  @JsonIgnore
 	  public Date getDueDate(){
 	  	int days;
 	  	switch (severity){
-			case 0:
-				return null;
 			case 1:
 				days = 7;
 				break;

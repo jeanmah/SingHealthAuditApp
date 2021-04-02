@@ -32,7 +32,7 @@ public class ScheduledDueDateChecker {
     EmailServiceImpl emailService;
 
     //runs at 6am everyday
-    @Scheduled(cron = "0 18 2 * * ?")
+    @Scheduled(cron = "0 45 2 * * ?")
     public void checkDueDates(){
         logger.info("AUTOMATED CHECK DUE DATE START");
         List<Integer> openAuditModelIds = openAuditRepo.getAllOpenAuditsIds();

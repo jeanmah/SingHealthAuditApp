@@ -38,6 +38,11 @@ public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> 
 
         //internal housekeeping
         entry.setEntry_id(-1); //idk
+        //put here for testing the overdue stuff
+//        Calendar c = Calendar.getInstance();
+//        c.add(Calendar.DAY_OF_MONTH, -5);
+//        entry.setDate(new Date(c.getTime().getTime()));
+
         entry.setDate(new Date(Calendar.getInstance().getTime().getTime()));
         entry.setTime(new Time(Calendar.getInstance().getTime().getTime()));
 

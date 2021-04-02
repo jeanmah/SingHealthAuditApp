@@ -581,13 +581,15 @@ public class ReportBuilder {
 		List<Integer> checked_qns = new ArrayList<>();
 		Collections.reverse(entries);
 		Calendar calendar = Calendar.getInstance();
+		logger.info("calendar instance {}",calendar.toString());
 		for(ReportEntry entry: entries) {
 			if (!checked_qns.contains(entry.getQn_id())) {
 				checked_qns.add(entry.getQn_id());
 			} else {
 				continue;
 			}
-			if(calendar.after(entry.getDueDate())){
+			logger.info("Component status {}, due date {}",entry.getStatus(),entry.getDueDate());
+			if(entry.getStatus() ==Component_Status.FAIL && calendar.getTime().after(entry.getDueDate())){
 				overDueEntries.add(entry);
 			}
 		}
