@@ -2,6 +2,7 @@ import React, { useState, createContext, useCallback } from "react";
 import { audits, fbChecklist, tenants, institutions } from "./data";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
+import AuthenticationService from "./AuthenticationService";
 
 export const Context = createContext();
 
@@ -10,6 +11,8 @@ export const ContextProvider = (props) => {
   const API_URL = "http://localhost:8080";
 
   const getFbChecklistQuestions = useCallback(() => {
+    AuthenticationService.getStoredAxiosInterceptor();
+
     return axios
       .get(`${API_URL}/report/getAllQuestions`, {
         params: { type: "FB" },
