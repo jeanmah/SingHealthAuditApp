@@ -3,6 +3,7 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.lang.Nullable;
@@ -113,7 +114,32 @@ public class ReportEntry {
 			  case 1 -> status = Component_Status.PASS;
 			  case 0 -> status = Component_Status.FAIL;
 			  default -> status = Component_Status.NA;
-		  }	  }
+		  }
+	  }
+
+	  public Date getDueDate(){
+	  	int days;
+	  	switch (severity){
+			case 0:
+				return null;
+			case 1:
+				days = 7;
+				break;
+			case 2:
+				days = 3;
+				break;
+			case 3:
+				days = 1;
+				break;
+			default:
+				days = 0;
+				break;
+		}
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DATE, days);
+		return new Date(c.getTimeInMillis());
+	  }
 	  
 
 }

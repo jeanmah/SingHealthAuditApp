@@ -575,6 +575,24 @@ public class ReportBuilder {
 		if(!success) return false;
 		return deleteOpenReport(report.getReport_id());
 	}
+
+	public List<ReportEntry> getOverDueEntries(){
+    	List<ReportEntry> overDueEntries = new ArrayList<>();
+		List<Integer> checked_qns = new ArrayList<>();
+		Collections.reverse(entries);
+		Calendar calendar = Calendar.getInstance();
+		for(ReportEntry entry: entries) {
+			if (!checked_qns.contains(entry.getQn_id())) {
+				checked_qns.add(entry.getQn_id());
+			} else {
+				continue;
+			}
+			if(calendar.after(entry.getDueDate())){
+				overDueEntries.add(entry);
+			}
+		}
+		return overDueEntries;
+	}
     
    
     //getters and setters
