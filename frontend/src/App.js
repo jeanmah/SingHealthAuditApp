@@ -33,7 +33,7 @@ function App() {
           />
           <AuthenticatedRoute
             exact
-            path="/institution/:institutionid"
+            path="/institution/:institutionName"
             exact
             component={Institution}
           />

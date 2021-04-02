@@ -10,6 +10,7 @@ export const ContextProvider = (props) => {
   //BACKEND  FUNCTIONS
   const API_URL = "http://localhost:8080";
 
+  //function to get Fb Checklist questions
   const getFbChecklistQuestions = useCallback(() => {
     AuthenticationService.getStoredAxiosInterceptor();
 
@@ -26,9 +27,8 @@ export const ContextProvider = (props) => {
       });
   }, []);
 
+  //function to submit FbChecklist report to compute the score
   const submitFbReport = useCallback((tenantid, fbreport) => {
-    console.log(JSON.stringify(fbreport));
-    console.log("reached here");
     let FormData = require("form-data");
     let formdata = new FormData();
     formdata.append("checklist", JSON.stringify(fbreport));
@@ -55,13 +55,31 @@ export const ContextProvider = (props) => {
       });
   });
 
+  //function to get tenants in a particular institution
+  const getInstitutionTenants = (name) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+
+    return axios.get(`${API_URL}/account/getAllTenantsOfBranch`, {
+      params: { branch_id: name },
+    });
+  };
+
+  //function to get user info given user id
+  const getUserInfo = (userId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+
+    return axios.get(`${API_URL}/account/getUserProfile`, {
+      params: { user_id: parseInt(userId) },
+    });
+  };
+
   //FRONTEND STATES AND FUNCTIONS
   //state for report
   const [fbReportState, setFbReportState] = useState([]);
   //state to keep track of audit
   const [auditsState, setAuditsState] = useState(audits);
   //state to keep track of all tenants
-  const [tenantsState, setTenantsState] = useState(tenants);
+  const [tenantsState, setTenantsState] = useState();
   //state for fbChecklist
   const [fbChecklistState, setFbChecklistState] = useState(fbChecklist);
   //state for institutions
@@ -228,6 +246,8 @@ export const ContextProvider = (props) => {
         setFbReportState,
         createFbReportState,
         submitFbReport,
+        getInstitutionTenants,
+        getUserInfo,
       }}
     >
       {props.children}

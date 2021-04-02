@@ -1,63 +1,77 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { tenants, institutions } from "../data";
 import { Link, useParams } from "react-router-dom";
 import { FaAngleRight } from "react-icons/fa";
-import institutionImage from "../images/institutionhome.png";
 import Navbar from "../Navbar";
+import { Context } from "../Context";
+import Loading from "./Loading";
 
-function Institution() {
+const Institution = React.memo(() => {
   //obtain id which is indicated in the url
-  const { institutionid } = useParams();
-  //array of one object which is the selected institution
+  const { institutionName } = useParams();
+  const { getInstitutionTenants } = useContext(Context);
+  const [institutionState, setInstitutionState] = useState();
+
+  useEffect(() => {
+    getInstitutionTenants(institutionName)
+      .then((response) => {
+        //update state of institution tenants
+        setInstitutionState(response.data);
+      })
+      .catch(() => {
+        console.log("Failed to get tenants in the institution");
+      });
+  }, []);
+
+  // array of one object which is the selected institution
   const selectedInstitution = institutions.filter((institution) => {
-    const { id } = institution;
-    return institutionid === id;
+    const { name } = institution;
+    return institutionName === name;
   });
   //filter the tenants based on the selected institution
-  const selectedTenants = tenants.filter((tenant) => {
-    const { institution } = tenant;
-    return institutionid === institution;
-  });
+  // const selectedTenants = tenants.filter((tenant) => {
+  //   const { institution } = tenant;
+  //   return institutionName === institution;
+  // });
 
   return (
-    <>
-      <Navbar />
-      {selectedInstitution.map((institution, index) => {
-        const { id, name, imageUrl } = institution;
-        return (
-          <section key={id} className="institution-header">
-            <img src={imageUrl} className="institution-logo" alt="logo"></img>
-          </section>
-        );
-      })}
-      {selectedTenants.map((tenant, index) => {
-        const { tenantid, tenantName, status } = tenant;
-        return (
-          <>
-            {tenant.status === "resolved" ? (
-              <Link key={tenantid} to={`/tenant/${tenantid}`}>
-                <section className="institution-tenant-resolved">
-                  <div>{tenantName}</div>
-                  <div className="institution-tenantbtn">
-                    <FaAngleRight />
-                  </div>
-                </section>
-              </Link>
-            ) : (
-              <Link key={tenantid} to={`/tenant/${tenantid}`}>
-                <section className="institution-tenant-unresolved">
-                  <div>{tenantName}</div>
-                  <div className="institution-tenantbtn">
-                    <FaAngleRight />
-                  </div>
-                </section>
-              </Link>
-            )}
-          </>
-        );
-      })}
-    </>
+    <div>
+      {institutionState ? (
+        <div>
+          <Navbar />
+          {selectedInstitution.map((institution, index) => {
+            const { id, name, imageUrl } = institution;
+            return (
+              <section key={id} className="institution-header">
+                <img
+                  src={imageUrl}
+                  className="institution-logo"
+                  alt="logo"
+                ></img>
+              </section>
+            );
+          })}
+          {institutionState.map((tenant, index) => {
+            const { store_name, acc_id } = tenant;
+            return (
+              <>
+                <Link key={acc_id} to={`/tenant/${acc_id}`}>
+                  <section className="institution-tenant-resolved">
+                    <div>{store_name}</div>
+                    <div className="institution-tenantbtn">
+                      <FaAngleRight />
+                    </div>
+                  </section>
+                </Link>
+              </>
+            );
+          })}{" "}
+        </div>
+      ) : (
+        <Loading />
+      )}
+    </div>
   );
-}
+});
 
 export default Institution;

@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Question from "../components/Question";
 import { Context } from "../Context";
-import Modal from "../components/Modal";
+
 import Navbar from "../Navbar";
 
 function FbCategory() {
