@@ -29,9 +29,24 @@ public interface TenantRepo extends CrudRepository<TenantModel, Integer> {
     @Query("SELECT latest_audit FROM Tenant WHERE acc_id= :acc_id")
     int getOpenAuditById(@Param("acc_id") int acc_id);
 
+    @Query("SELECT past_audits FROM Tenant WHERE acc_id= :acc_id")
+    String getPastAuditsById(@Param("acc_id") int acc_id);
+
+    @Modifying
+    @Query("UPDATE Tenant t SET t.past_audits = :past_audits WHERE t.acc_id = :acc_id")
+    void updatePastAuditsByTenantId(@Param("acc_id") int acc_id, @Param("past_audits") String past_audits);
+
+
     @Modifying
     @Query("UPDATE Tenant t SET t.latest_audit = :latest_audit WHERE t.acc_id = :acc_id")
     void updateLatestAuditByTenantId(@Param("acc_id") int acc_id, @Param("latest_audit") int latest_audit);
+
+    @Modifying
+    @Query("UPDATE Tenant t SET t.latest_audit = -1 WHERE t.acc_id = :acc_id")
+    void removeLatestAuditByTenantId(@Param("acc_id") int acc_id);
+
+
+
 
     @Query("SELECT * FROM Tenant ")
     List<TenantModel> getAllTenants();

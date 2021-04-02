@@ -2,6 +2,7 @@ package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.*;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
+import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,9 +32,9 @@ public class AccountController {
     @Autowired
     private ManagerRepo managerRepo;
 
-    private static final String MANAGER = "Manager";
-    private static final String AUDITOR = "Auditor";
-    private static final String TENANT = "Tenant";
+    private static final String MANAGER = ResourceString.MANAGER_ROLE_KEY;
+    private static final String AUDITOR = ResourceString.AUDITOR_ROLE_KEY;
+    private static final String TENANT = ResourceString.TENANT_ROLE_KEY;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -379,8 +380,8 @@ public class AccountController {
             case AUDITOR:
                 if(requestedAccountNode.get("role_id").asText().equals(TENANT)){
                     //check if tenant is under the same branch
-                    logger.info("Auditor branch id {}, requested branch id {}",callerAccount.getBranch_id(), requestedAccountNode.get("branch_id").asText());
-                    return requestedAccountNode.get("branch_id").asText().equals(callerAccount.getBranch_id());
+                    //logger.info("Auditor branch id {}, requested branch id {}",callerAccount.getBranch_id(), requestedAccountNode.get("branch_id").asText());
+                    return true;
                 }
                 break;
             case MANAGER:

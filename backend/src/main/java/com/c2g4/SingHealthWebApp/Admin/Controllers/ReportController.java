@@ -140,7 +140,7 @@ public class ReportController {
         builder.setUserIDs(tenant_id, auditor_id, manager_id).setEntries(entryList);
         builder.setReportType(report_type);
         
-        int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo);
+        int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo, auditCheckListSMARepo);
     	if(auditScore == -1) {return ResponseEntity.badRequest().body("Report type does not exist");}
     	
         if(auditScore<100){
@@ -150,9 +150,10 @@ public class ReportController {
                 return ResponseEntity.badRequest().body(null);
         	}
         } else {
-        	builder.setOverall_remarks(remarks).setOverall_statusAsClosed();
-        	ClosedReport report = (ClosedReport) builder.build();
-        	if(!builder.saveReport(report, tenantRepo, auditorRepo, managerRepo)) {
+        	//builder.setOverall_remarks(remarks).setOverall_statusAsClosed();
+			builder.setOverall_remarks(remarks).setNeed(0, 1, 0);
+			Report report = builder.build();
+        	if(!builder.saveImmediatelyCompletedReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
         }
@@ -201,7 +202,10 @@ public class ReportController {
 		if(builder == null) {
 			return ResponseEntity.badRequest().body("Report not found.");
 		}
-		if(builder.getReportType().matches(ResourceString.REPORT_STATUS_CLOSED)) {
+//		if(builder.getReportType().matches(ResourceString.REPORT_STATUS_CLOSED)) {
+//			return ResponseEntity.badRequest().body("Error! This report is already closed.");
+//		}
+		if(builder.getOverall_status()==1) {
 			return ResponseEntity.badRequest().body("Error! This report is already closed.");
 		}
 		
@@ -209,7 +213,7 @@ public class ReportController {
 			builder.addEntry(entry);
 		}
 
-		int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo);
+		int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo, auditCheckListSMARepo);
         if(auditScore<100){
         	builder.setOverall_remarks(remarks).setNeed(1, 0, 0);
         	OpenReport updated_report = (OpenReport) builder.build();
@@ -223,6 +227,7 @@ public class ReportController {
                 return ResponseEntity.badRequest().body(null);
         	}else {
         		builder.deleteOpenReport(report_id);
+        		builder.deleteOpenAuditsFromUsers(updated_report, tenantRepo, auditorRepo, managerRepo);
         	}
         }
         logger.info("Report update completed.");
