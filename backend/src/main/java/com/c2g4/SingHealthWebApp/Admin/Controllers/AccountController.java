@@ -53,7 +53,7 @@ public class AccountController {
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("user account not found");
         }
         if(!callerAccount.getRole_id().equals(MANAGER)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -75,9 +75,10 @@ public class AccountController {
      * if any other errors occur along the way, return http BAD_REQUEST
      */
     @GetMapping("/account/getAllUsersofBranch")
-    public ResponseEntity<?> getAllUsersofBranch(@AuthenticationPrincipal UserDetails callerUser, @RequestParam String branch_id){
+    public ResponseEntity<?> getAllUsersofBranch(@AuthenticationPrincipal UserDetails callerUser,
+                                                 @RequestParam String branch_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         if(!callerAccount.getRole_id().equals(MANAGER)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -99,7 +100,7 @@ public class AccountController {
     @GetMapping("/account/getAllTenantsOfBranch")
     public ResponseEntity<?> getAllTenantsOfBranch(@AuthenticationPrincipal UserDetails callerUser, @RequestParam String branch_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         if(callerAccount.getRole_id().equals(TENANT)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -141,7 +142,7 @@ public class AccountController {
     @GetMapping("/account/getAllUsersofType")
     public ResponseEntity<?> getAllUsersofType(@AuthenticationPrincipal UserDetails callerUser,@RequestParam String roleType){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         if (callerAccount.getRole_id().equals(TENANT)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         } else if(callerAccount.getRole_id().equals(AUDITOR)) {
@@ -240,7 +241,7 @@ public class AccountController {
     ){
         //check who is calling
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         int userID;
 
         if(user_id.isEmpty() && firstName.isEmpty() && lastName.isEmpty()) {
@@ -311,7 +312,7 @@ public class AccountController {
     public ResponseEntity<?> postProfileUpdate(@AuthenticationPrincipal UserDetails callerUser,
                                                @RequestPart(value = "changes") String changes){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         try {
 
             ObjectNode changesNode = objectMapper.readValue(changes, ObjectNode.class);
@@ -356,7 +357,8 @@ public class AccountController {
     @PostMapping("/account/postPasswordUpdate")
     public ResponseEntity<?> postPasswordUpdate(@AuthenticationPrincipal UserDetails callerUser, @RequestPart(value = "new_password") String new_password){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
+
         if(new_password==null ||new_password.isEmpty()) return ResponseEntity.badRequest().body(null);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(new_password);

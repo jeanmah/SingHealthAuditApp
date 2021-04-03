@@ -29,5 +29,8 @@ public class ResourceString {
 	final public static String UNEXPECTED_ERR_MSG = "Something unexpected has occurred,"
 			+ " please contact your server administrator.";
 
+	final public static String CHAT_MESSAGES_JSON_KEY = "messages";
+	final public static String CHAT_ENTRIES_ATTACHMENT_JSON_KEY = "attachments";
+
 	
 }
