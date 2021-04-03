@@ -367,11 +367,15 @@ public class ReportController {
 	
 	private JsonNode getAuditorReportIds(int auditor_id, String type) {
 		AuditorModel auditor = auditorRepo.getAuditorById(auditor_id);
+		logger.info("before if statement");
+		logger.info(type);
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
 			report_ids.put(type, auditor.getCompleted_audits());
+			logger.info("HELLOOOOOO{}");
+
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
