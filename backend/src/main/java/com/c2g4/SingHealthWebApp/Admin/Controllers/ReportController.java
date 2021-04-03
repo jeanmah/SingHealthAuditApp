@@ -148,17 +148,13 @@ public class ReportController {
         	if(!builder.saveReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
-			logger.info("report id {}",report.getReport_id());
 			builder.updateLatestReportIds(report,tenantRepo,auditorRepo,managerRepo);
         } else {
-        	//builder.setOverall_remarks(remarks).setOverall_statusAsClosed();
 			builder.setOverall_remarks(remarks).setNeed(0, 1, 0);
 			Report report = builder.build();
         	if(!builder.saveImmediatelyCompletedReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
-			logger.info("report id {}",report.getReport_id());
-			builder.updateLatestReportIds(report,tenantRepo,auditorRepo,managerRepo);
         }
 
         tenantRepo.updateAuditScoreByTenantId(tenant_id,auditScore);
