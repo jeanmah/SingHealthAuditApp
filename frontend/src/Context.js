@@ -7,25 +7,27 @@ import AuthenticationService from "./AuthenticationService";
 export const Context = createContext();
 
 export const ContextProvider = (props) => {
-  //BACKEND  FUNCTIONS
   const API_URL = "http://localhost:8080";
 
+  /*
+  =============== 
+  BACKEND
+  ===============
+  */
+
+  /*
+  ---------------
+  FbChecklist
+  ---------------
+  */
   //function to get Fb Checklist questions
-  const getFbChecklistQuestions = useCallback(() => {
+  const getFbChecklistQuestions = () => {
     AuthenticationService.getStoredAxiosInterceptor();
 
-    return axios
-      .get(`${API_URL}/report/getAllQuestions`, {
-        params: { type: "FB" },
-      })
-      .then((response) => {
-        setFbChecklistState(response.data);
-        createFbReportState(response.data);
-      })
-      .catch(() => {
-        console.log("fb checklist retrieval failed");
-      });
-  }, []);
+    return axios.get(`${API_URL}/report/getAllQuestions`, {
+      params: { type: "FB" },
+    });
+  };
 
   //function to submit FbChecklist report to compute the score
   const submitFbReport = useCallback((tenantid, fbreport) => {
@@ -55,6 +57,12 @@ export const ContextProvider = (props) => {
       });
   });
 
+  /*
+  ---------------
+  Institution
+  ---------------
+  */
+
   //function to get tenants in a particular institution
   const getInstitutionTenants = (name) => {
     AuthenticationService.getStoredAxiosInterceptor();
@@ -73,6 +81,25 @@ export const ContextProvider = (props) => {
     });
   };
 
+  /*
+  --------------- 
+  Home Auditor
+  ---------------
+  */
+
+  //function to get all the audits done given auditor's username
+  const getAudits = (userName) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getReportIDs`, {
+      params: { username: userName, type: "ALL" },
+    });
+  };
+
+  /*
+  =============== 
+  FRONTEND
+  ===============
+  */
   //FRONTEND STATES AND FUNCTIONS
   //state for report
   const [fbReportState, setFbReportState] = useState([]);
@@ -81,7 +108,7 @@ export const ContextProvider = (props) => {
   //state to keep track of all tenants
   const [tenantsState, setTenantsState] = useState();
   //state for fbChecklist
-  const [fbChecklistState, setFbChecklistState] = useState(fbChecklist);
+
   //state for institutions
   const [institutionsState, setInstitutionstate] = useState(institutions);
   //state of comments in modal
@@ -165,30 +192,6 @@ export const ContextProvider = (props) => {
     // setTenantsState([...remainingTenants, tenantObject]);
   };
 
-  //functions to close and open modal
-  const openQuestionModal = (questionId) => {
-    console.log("clicked openmodal");
-    const checklistQuestion = fbChecklistState.find((question) => {
-      return question.id === questionId;
-    });
-    checklistQuestion.modalOpen = true;
-    // const remainingQuestions = fbChecklistState.filter((question) => {
-    //   return question.id !== questionId;
-    // });
-    // setFbChecklistState([...remainingQuestions, checklistQuestion]);
-  };
-  const closeQuestionModal = (questionId) => {
-    console.log("clicked closemodal");
-    const checklistQuestion = fbChecklistState.find((question) => {
-      return question.id === questionId;
-    });
-    checklistQuestion.modalOpen = false;
-    // const remainingQuestions = fbChecklistState.filter((question) => {
-    //   return question.id !== questionId;
-    // });
-    // setFbChecklistState([...remainingQuestions, checklistQuestion]);
-  };
-
   //functions to update tenant comment property
   const updateTenantComment = (tenantId, questionId) => {
     //find object with specific tenantId
@@ -206,33 +209,15 @@ export const ContextProvider = (props) => {
     console.log(tenantId, questionId);
     console.log(tenantObject);
     console.log(tenantsState);
-
-    // const remainingQuestions = tenantFbChecklist.filter((question) => {
-    //   return question.id !== questionId;
-    // });
-    // const newTenantChecklist = [...remainingQuestions, checklistQuestion];
-    // //update tenantObject
-    // tenantObject[fbChecklist] = newTenantChecklist;
-    // //get tenants array without tenantObject
-    // const remainingTenants = tenantsState.filter((tenant) => {
-    //   return tenant.tenantid !== tenantId;
-    // });
-
-    // //update state with newTenantObject
-    // setTenantsState([...remainingTenants, tenantObject]);
-    // console.log(tenantsState);
   };
 
   return (
     <Context.Provider
       value={{
-        openQuestionModal,
-        closeQuestionModal,
+        // openQuestionModal,
+        // closeQuestionModal,
         tenantsState,
         setTenantsState,
-
-        fbChecklistState,
-        setFbChecklistState,
         auditsState,
         setAuditsState,
         updateAudit,
@@ -248,6 +233,7 @@ export const ContextProvider = (props) => {
         submitFbReport,
         getInstitutionTenants,
         getUserInfo,
+        getAudits,
       }}
     >
       {props.children}

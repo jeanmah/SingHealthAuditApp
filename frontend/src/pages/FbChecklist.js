@@ -2,65 +2,37 @@ import React, { useState, useContext, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Question from "../components/Question";
 import { Context } from "../Context";
-
+import Loading from "./Loading";
 import Navbar from "../Navbar";
 
 function FbCategory() {
   //get tenant id from url
   const { tenantId } = useParams();
+
+  const [fbChecklistState, setFbChecklistState] = useState();
   //Context: Fb Checklist
   const {
-    fbChecklistState,
-    setFbChecklistState,
     getFbChecklistQuestions,
     fbReportState,
-    setFbReportState,
     submitFbReport,
+    createFbReportState,
   } = useContext(Context);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  //Context: to call update audits function and reset checked values after clicking submit
-  // const { updateAudit, resetTenantFbChecklist } = useContext(Context);
-  // //Context: tenants state
-  // const { tenantsState } = useContext(Context);
-
-  //call this function when component is mounted
   useEffect(() => {
     //function to retrieve questions
-    getFbChecklistQuestions();
+    getFbChecklistQuestions()
+      .then((response) => {
+        setFbChecklistState(response.data);
+        createFbReportState(response.data);
+      })
+      .catch(() => {
+        console.log("fb checklist retrieval failed");
+      });
   }, []);
-  //to set isLoading to false and display HTML DOM elements when fbChecklistState is complete
-  useEffect(() => {
-    if (fbChecklistState.length === 96) {
-      setIsLoading(false);
-    }
-  }, [fbChecklistState]);
-  //function called when submit button is clicked
-
-  //retrieve fbchecklist questions from backend
-  // getFbChecklistQuestions("FB")
-  //   .then((response) => {
-  //     setFbChecklistState(response.data);
-  //   })
-  //   .catch(() => {
-  //     console.log("failed to retrieve fbchecklist");
-  //   });
-  //create new array of questions with status to allow checking of pass/fail
-  // const fbChecklistReport = prepareFbChecklistReport(fbChecklistState);
-
-  // console.log(fbChecklistReport);
-
-  // const tenantObject = tenantsState.find(
-  //   (tenant) => tenant.tenantid === tenantId
-  // );
-  //destructure tenantObject
-  // const { tenantid, tenantName, status, institution } = tenantObject;
 
   return (
     <div>
-      {isLoading && <div>Loading</div>}
-      {!isLoading && (
+      {fbChecklistState ? (
         <>
           <Navbar />
           <div className="category-head">
@@ -90,6 +62,8 @@ function FbCategory() {
             {/* </Link> */}
           </div>
         </>
+      ) : (
+        <Loading />
       )}
     </div>
   );

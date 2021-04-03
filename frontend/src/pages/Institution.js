@@ -28,11 +28,6 @@ const Institution = React.memo(() => {
     const { name } = institution;
     return institutionName === name;
   });
-  //filter the tenants based on the selected institution
-  // const selectedTenants = tenants.filter((tenant) => {
-  //   const { institution } = tenant;
-  //   return institutionName === institution;
-  // });
 
   return (
     <div>

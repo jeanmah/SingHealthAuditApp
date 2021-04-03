@@ -5,12 +5,7 @@ import { Context } from "../Context";
 
 function Question({ fb_qn_id, requirement }) {
   //Context: state of modal (whether it is open or not)
-  const {
-    openQuestionModal,
-    fbReportState,
-    setFbReportState,
-    fbChecklist,
-  } = useContext(Context);
+  const { setFbReportState } = useContext(Context);
   //Context: state of tenants to update checklist check
   // const { tenantsState, updateFbChecklistChecked } = useContext(Context);
   //Coontext: state of displayedComments
@@ -31,12 +26,6 @@ function Question({ fb_qn_id, requirement }) {
     // }
   };
 
-  useEffect(() => {
-    if (fbReportState.length === 96) {
-      console.log(fbReportState);
-    }
-  }, [fbReportState]);
-
   return (
     <div>
       <span>{requirement}</span>
@@ -48,12 +37,6 @@ function Question({ fb_qn_id, requirement }) {
           handleChange(fb_qn_id);
         }}
       />
-      <FaRegEdit
-        onClick={() => {
-          // openQuestionModal(fb_qn_id);
-        }}
-      />
-
       <div>Comment: </div>
     </div>
   );

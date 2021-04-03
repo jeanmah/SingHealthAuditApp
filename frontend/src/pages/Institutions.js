@@ -3,13 +3,16 @@ import { institutions } from "../data";
 import { Link } from "react-router-dom";
 import { FaAngleRight } from "react-icons/fa";
 import Navbar from "../Navbar";
+import InstitutionsCards from "../components/InstitutionsCards";
 
 function Institutions() {
   return (
     <>
       <Navbar />
-      <div className="institutions-head">
-        {institutions.map((institution, index) => {
+      <div>
+        {/* <div className="institutions-head"> */}
+        <InstitutionsCards />
+        {/* {institutions.map((institution, index) => {
           const { id, name, tenantNames, imageUrl } = institution;
           return (
             <Link key={index} to={`/institution/${name}`}>
@@ -23,7 +26,7 @@ function Institutions() {
               </article>
             </Link>
           );
-        })}
+        })} */}
       </div>
     </>
   );

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../Context";
 import Navbar from "../Navbar";
+import Loading from "./Loading";
 
 function Tenant() {
   //get tenantid from url
@@ -15,50 +16,29 @@ function Tenant() {
     getUserInfo(tenantId)
       .then((response) => {
         console.log(response);
+        setTenantState(response.data);
       })
       .catch(() => {
         console.log("Failed to retrieve tenant info");
       });
   }, []);
 
-  // const { tenantsState} = useContext(Context);
-  // //Context: audits state
-  // const { auditsState, updateAudit } = useContext(Context);
-
-  //get tenant objects among tenants array
-  // const tenantObject = tenantsState.find(
-  //   (tenant) => tenant.tenantid === tenantId
-  // );
-
-  // const {
-  //   tenantid,
-  //   tenantName,
-  //   timeRemaining,
-  //   status,
-  //   institution,
-  //   latestScore,
-  // } = tenantObject;
-
-  // const tenantAudits = auditsState.filter((audit) => {
-  //   return audit.tenantid === tenantId;
-  // });
   return (
-    <div>tenant</div>
-    // <div className="tenant-page">
-    //   <Navbar />
-    //   <div className="tenant-name">{tenantName}</div>
-    //   <div className="tenant-container">
-    //     {/* <section className="tenant-content">
-    //       {tenantAudits.map((tenant, index) => {
-    //         return <div key={index}>{tenant.score}</div>;
-    //       })}
-    //     </section> */}
-
-    //     <div>View Chat</div>
-    //     <div>View Previous Audits</div>
-    //     <Link to={`/tenant/fbChecklist/${tenantid}`}>Conduct Audit</Link>
-    //   </div>
-    // </div>
+    <div>
+      {tenantState ? (
+        <div className="tenant-page">
+          <Navbar />
+          <div className="tenant-name">{tenantState.store_name}</div>
+          <div className="tenant-container">
+            <div>View Chat</div>
+            <div>View Previous Audits</div>
+            <Link to={`/tenant/fbChecklist/${tenantId}`}>Conduct Audit</Link>
+          </div>
+        </div>
+      ) : (
+        <Loading />
+      )}
+    </div>
   );
 }
 

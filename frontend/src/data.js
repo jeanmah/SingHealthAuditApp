@@ -698,3 +698,21 @@ export const fbChecklist = [
     modalOpen: false,
   },
 ];
+export const tenantImages = [
+  {
+    name: "7-Eleven",
+    imageUrl: "../images/7-11.png",
+  },
+  {
+    name: "168 Florist",
+    imageUrl: "../images/168florist.jpeg",
+  },
+  {
+    name: "1983",
+    imageUrl: "../images/1983.jpeg",
+  },
+  {
+    name: "Coffee Bean",
+    imageUrl: "../images/coffee_bean.jpg",
+  },
+];
