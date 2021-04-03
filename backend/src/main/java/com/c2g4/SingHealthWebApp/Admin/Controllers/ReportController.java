@@ -220,9 +220,10 @@ public class ReportController {
 		for(ReportEntry entry:entries) {
 			builder.addEntry(entry);
 		}
-
+		int initialScore = builder.getOverall_score();
 		int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo, auditCheckListSMARepo);
-        if(auditScore<100){
+        builder.setOverall_score(initialScore);
+		if(auditScore<100){
 			if(callerAccount.getRole_id().equals(ResourceString.TENANT_ROLE_KEY)){
 				builder.setOverall_remarks(remarks).setNeed(0, 1, 0);
 			} else {
