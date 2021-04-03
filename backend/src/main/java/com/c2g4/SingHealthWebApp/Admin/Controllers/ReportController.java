@@ -276,11 +276,20 @@ public class ReportController {
 			//I've left it here just to catch bad reports
 			@SuppressWarnings("unused")
 			String reportJSON = objectmapper.writeValueAsString(report);
-			return ResponseEntity.ok(report);
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode reportWithStoreName = addTenantStoreToReturnJson(objectmapper.writeValueAsString(report),report.getTenant_id());
+			return ResponseEntity.ok(reportWithStoreName);
 		} catch (JsonProcessingException e) {
 			logger.error("MALFORMED REPORT!");
 			return ResponseEntity.unprocessableEntity().build();
 		}
+	}
+
+	private JsonNode addTenantStoreToReturnJson(String currentReturnString, int tenant_id) throws JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode currentReturnNode = (ObjectNode)objectMapper.readTree(currentReturnString);
+		currentReturnNode.put("store_name", tenantRepo.getStoreNameById(tenant_id));
+		return currentReturnNode;
 	}
 	
 	//Is this really necessary? It seems enveloped by the method above
