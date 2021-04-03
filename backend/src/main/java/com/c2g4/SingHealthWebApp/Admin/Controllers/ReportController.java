@@ -308,7 +308,6 @@ public class ReportController {
 		try {
 			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

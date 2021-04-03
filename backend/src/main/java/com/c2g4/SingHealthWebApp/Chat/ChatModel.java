@@ -38,10 +38,8 @@ public class ChatModel {
         try {
             this.messages = objectmapper.readTree(messages);
         } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -86,7 +84,6 @@ public class ChatModel {
         try {
             return objectmapper.writeValueAsString(messages);
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -102,10 +99,8 @@ public class ChatModel {
         try {
             this.messages = objectmapper.readTree(JsonString);
         } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

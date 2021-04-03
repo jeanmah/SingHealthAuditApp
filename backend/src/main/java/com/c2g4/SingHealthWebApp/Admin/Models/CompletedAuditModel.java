@@ -67,11 +67,7 @@ public class CompletedAuditModel extends AuditModel{
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
 			this.report_data = objectmapper.readTree(report_data);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -155,11 +151,7 @@ public class CompletedAuditModel extends AuditModel{
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
 			this.report_data = objectmapper.readTree(report_data);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -170,7 +162,6 @@ public class CompletedAuditModel extends AuditModel{
 		try {
 			return objectmapper.writeValueAsString(report_data);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -181,11 +172,7 @@ public class CompletedAuditModel extends AuditModel{
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
 			this.report_data = objectmapper.readTree(JsonString);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
