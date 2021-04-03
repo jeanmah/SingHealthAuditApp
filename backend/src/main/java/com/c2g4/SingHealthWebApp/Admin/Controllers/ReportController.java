@@ -155,6 +155,7 @@ public class ReportController {
                 return ResponseEntity.badRequest().body(null);
         	}
         }
+        tenantRepo.updateAuditScoreByTenantId(tenant_id,auditScore);
         logger.info("Report Submission Upload Completed.");
     	return ResponseEntity.ok(auditScore);
 	}
