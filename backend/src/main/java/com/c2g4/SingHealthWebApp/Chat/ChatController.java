@@ -1,13 +1,10 @@
 package com.c2g4.SingHealthWebApp.Chat;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,7 +12,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

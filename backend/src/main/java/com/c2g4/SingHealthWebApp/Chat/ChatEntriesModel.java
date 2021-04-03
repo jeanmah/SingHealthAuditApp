@@ -1,13 +1,20 @@
 package com.c2g4.SingHealthWebApp.Chat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.annotation.AccessType;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Date;
 import java.sql.Time;
 
 @Table("ChatEntries")
+@AccessType(AccessType.Type.PROPERTY)
 public class ChatEntriesModel {
     @Id
     private int chatEntry_id;
@@ -16,6 +23,7 @@ public class ChatEntriesModel {
     private int sender_id;
     private String subject;
     private String messageBody;
+    @Transient
     private JsonNode attachments;
 
     public ChatEntriesModel(int chatEntry_id, Date date, Time time, int sender_id, String subject, String messageBody, JsonNode attachments) {
@@ -76,11 +84,42 @@ public class ChatEntriesModel {
         this.messageBody = messageBody;
     }
 
+    @Transient
     public JsonNode getAttachments() {
         return attachments;
     }
-
+    @Transient
     public void setAttachments(JsonNode attachments) {
         this.attachments = attachments;
+    }
+
+    @Column("attachments")
+    public String get_attachments_for_MySql() {
+        ObjectMapper objectmapper = new ObjectMapper();
+        try {
+            return objectmapper.writeValueAsString(attachments);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Column(value="attachments")
+    public void set_attachments_for_MySql(String JsonString) {
+        ObjectMapper objectmapper = new ObjectMapper();
+        if(JsonString==null){
+            this.attachments =objectmapper.createObjectNode();
+            return;
+        }
+        try {
+            this.attachments = objectmapper.readTree(JsonString);
+        } catch (JsonMappingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

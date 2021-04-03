@@ -376,30 +376,35 @@ public class ReportController {
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			report_ids.put(type, tenant.getPast_audits());
+			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, tenant.getPast_audits());
+			logger.info("past audit tenant {}", tenant.getPast_audits().asText());
+
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_LATEST)) {
-			report_ids.put(type, tenant.getLatest_audit());
+			report_ids.put(ResourceString.GETREPORT_FILTER_LATEST, tenant.getLatest_audit());
+			logger.info("latest audit tenant {}", tenant.getLatest_audit());
 		}
 		return report_ids;
 	}
 	
 	private JsonNode getAuditorReportIds(int auditor_id, String type) {
 		AuditorModel auditor = auditorRepo.getAuditorById(auditor_id);
+		logger.info("auditor {}",auditor.getAcc_id());
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			report_ids.put(type, auditor.getCompleted_audits());
+			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
-			report_ids.put(type, auditor.getOutstanding_audit_ids());
+			report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, auditor.getOutstanding_audit_ids());
+			logger.info("outstanding {}", auditor.getOutstanding_audit_ids());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_APPEALED)) {
-			report_ids.put(type, auditor.getAppealed_audits());
+			report_ids.put(ResourceString.GETREPORT_FILTER_APPEALED, auditor.getAppealed_audits());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {

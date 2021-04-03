@@ -1,6 +1,12 @@
 package com.c2g4.SingHealthWebApp.Admin.Models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.annotation.AccessType;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,13 +17,15 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  */
 @Table("Tenant")
+@AccessType(AccessType.Type.PROPERTY)
 public class TenantModel implements typeAccountModel{
     @Id
     private int acc_id;
     private String type_id;
     private int audit_score;
     private int latest_audit;
-    private JsonNode past_audits;
+	@Transient
+	private JsonNode past_audits;
     private String branch_id;
     private String store_name;
     private String store_addr;
@@ -47,9 +55,11 @@ public class TenantModel implements typeAccountModel{
 	public void setLatest_audit(int latest_audit) {
 		this.latest_audit = latest_audit;
 	}
+	@Transient
 	public JsonNode getPast_audits() {
 		return past_audits;
 	}
+	@Transient
 	public void setPast_audits(JsonNode past_audits) {
 		this.past_audits = past_audits;
 	}
@@ -68,6 +78,38 @@ public class TenantModel implements typeAccountModel{
 		this.store_addr = store_addr;
 	}
 
+	@Column("past_audits")
+	public String get_past_audits_for_MySql() {
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			return objectmapper.writeValueAsString(past_audits);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Column("past_audits")
+	public void set_past_audits_for_MySql(String JsonString) {
+		ObjectMapper objectmapper = new ObjectMapper();
+		if(JsonString==null){
+			this.past_audits =objectmapper.createObjectNode();
+			System.out.println("hafdosfjds");
+			return;
+		}
+		System.out.println("hafdosfjds");
+
+		try {
+			this.past_audits = objectmapper.readTree(JsonString);
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
     
     
 
