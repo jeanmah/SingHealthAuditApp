@@ -161,10 +161,14 @@ public class ReportController {
 	
 	@PostMapping("/report/postReportUpdate")
 	public ResponseEntity<?> postReportUpdate(
+			@AuthenticationPrincipal UserDetails callerUser,
 			@RequestParam(value = "report_id", required = true) int report_id,
             @RequestPart(value = "entry", required = true) String strEntry,
             @RequestParam(value = "remarks", required = true) String remarks,
             @RequestParam(value = "group_update", required = false, defaultValue = "false") boolean group_update){
+		AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+		if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+
 		logger.info("Update of report of id " + report_id + " requested.");
 		ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
@@ -194,6 +198,12 @@ public class ReportController {
 			}	
 		}
 
+		if(callerAccount.getRole_id().equals(ResourceString.TENANT_ROLE_KEY)){
+			if(!checkTenantEntryPassFail(entries)){
+				return ResponseEntity.badRequest().body("Tenant entry status should be fail");
+			}
+		}
+
 		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo,
 				completedAuditRepo, report_id);
 		
@@ -213,7 +223,11 @@ public class ReportController {
 
 		int auditScore = (int) builder.markReport(auditCheckListFBRepo, auditCheckListNFBRepo, auditCheckListSMARepo);
         if(auditScore<100){
-        	builder.setOverall_remarks(remarks).setNeed(1, 0, 0);
+			if(callerAccount.getRole_id().equals(ResourceString.TENANT_ROLE_KEY)){
+				builder.setOverall_remarks(remarks).setNeed(0, 1, 0);
+			} else {
+				builder.setOverall_remarks(remarks).setNeed(1, 0, 0);
+			}
         	OpenReport updated_report = (OpenReport) builder.build();
         	if(!builder.saveReport(updated_report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
@@ -230,6 +244,13 @@ public class ReportController {
         }
         logger.info("Report update completed.");
     	return ResponseEntity.ok(auditScore);
+	}
+
+	private boolean checkTenantEntryPassFail(List<ReportEntry> entries){
+		for(ReportEntry reportEntry : entries){
+			if(reportEntry.getStatus()!=Component_Status.FAIL) return false;
+		}
+		return true;
 	}
 	
 	@GetMapping("/report/getReport")
@@ -395,8 +416,10 @@ public class ReportController {
 		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
 
-	
-	
+	private AccountModel convertUserDetailsToAccount(UserDetails callerUser){
+		logger.info("CALLER USER USERNAME {}",callerUser.getUsername());
+		return accountRepo.findByUsername(callerUser.getUsername());
+	}
 	
 	
 	
