@@ -478,7 +478,7 @@ public class ReportBuilder {
     }
 
     
-    private boolean updateLatestReportIds(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
+    public boolean updateLatestReportIds(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
     	//int report_id = openAuditRepo.getReportIdFromTenantId(tenant_id);
 		if(report.getClass().equals(OpenReport.class)) {
 			tenantRepo.updateLatestAuditByTenantId(report.getTenant_id(), report.getReport_id());
@@ -504,7 +504,6 @@ public class ReportBuilder {
 			logger.warn("Report is of an invalid type. Unable to save.");
 		}
 		return false;
-		//to JW: manager???
     }
 
     private String appendToJson(String jsonString, String key, String valueToAppend){
@@ -547,9 +546,6 @@ public class ReportBuilder {
     		success = saveClosedReport((ClosedReport) report);
     	}else {
     		logger.warn("Report is of an invalid type. Unable to save.");
-    	}
-    	if (success) {
-    		success = updateLatestReportIds(report, tenantRepo, auditorRepo, managerRepo);
     	}
     	return success;
     }

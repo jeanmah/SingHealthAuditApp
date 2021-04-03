@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +148,8 @@ public class ReportController {
         	if(!builder.saveReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
+			logger.info("report id {}",report.getReport_id());
+			builder.updateLatestReportIds(report,tenantRepo,auditorRepo,managerRepo);
         } else {
         	//builder.setOverall_remarks(remarks).setOverall_statusAsClosed();
 			builder.setOverall_remarks(remarks).setNeed(0, 1, 0);
@@ -154,7 +157,10 @@ public class ReportController {
         	if(!builder.saveImmediatelyCompletedReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
+			logger.info("report id {}",report.getReport_id());
+			builder.updateLatestReportIds(report,tenantRepo,auditorRepo,managerRepo);
         }
+
         tenantRepo.updateAuditScoreByTenantId(tenant_id,auditScore);
         logger.info("Report Submission Upload Completed.");
     	return ResponseEntity.ok(auditScore);
@@ -242,6 +248,7 @@ public class ReportController {
         	}else {
         		builder.deleteOpenReport(report_id);
         		builder.deleteOpenAuditsFromUsers(updated_report, tenantRepo, auditorRepo, managerRepo);
+        		builder.updateLatestReportIds(updated_report,tenantRepo,auditorRepo,managerRepo);
         	}
         }
         logger.info("Report update completed.");
@@ -409,9 +416,27 @@ public class ReportController {
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
-			//TODO
+			ArrayNode outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
+					.get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
+			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
 		}
 		return report_ids;
+	}
+
+	private ArrayNode getOverDueAudits(ArrayNode outstandingAuditIds){
+		ObjectMapper objectmapper = new ObjectMapper();
+		ArrayNode overdueAudits = objectmapper.createArrayNode();
+		for(int i =0;i<outstandingAuditIds.size();i++){
+			ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo,
+					completedAuditRepo, outstandingAuditIds.get(i).asInt());
+			List<ReportEntry> overDueEntries = builder.getOverDueEntries();
+			if(overDueEntries.size()==0){
+				logger.info("outstanding audit {} is not overdue", outstandingAuditIds.get(i).asInt());
+				continue;
+			}
+			overdueAudits.add(outstandingAuditIds.get(i).asInt());
+		}
+		return overdueAudits;
 	}
 	
 	@GetMapping("/report/print")
