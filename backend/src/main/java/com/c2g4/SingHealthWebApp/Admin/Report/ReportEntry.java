@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class ReportEntry {
 	  private Time time;
 	
 	  @Nullable
-	  private int severity; //for now this is 0-nothing, 1-low, 2-med, 3-high
+	  private int severity; // 7 digits XDDMMYY - X 0-nothing, 1-low, 2-med, 3-high, DDMMYY = 020421 2nd of Apr 2021
 	  @Nullable
 	  private String remarks;
 	  @Nullable
@@ -117,31 +118,26 @@ public class ReportEntry {
 		  }
 	  }
 
+	  @JsonIgnore
 	  public Date getDueDate(){
-	  	int days;
-	  	switch (severity){
-			case 0:
-				return null;
-			case 1:
-				days = 7;
-				break;
-			case 2:
-				days = 3;
-				break;
-			case 3:
-				days = 1;
-				break;
-			default:
-				days = 0;
-				break;
+	  // 7 digits XYYYYYY - X 0-nothing, 1-low, 2-med, 3-high, DDMMYY = 020421 2nd of Apr 2021
+	  	if(severity ==0) return null;
+	  	int DDMMYY = severity%1000000;
+		  int DDMM = DDMMYY/100;
+		  int YY = DDMMYY - DDMM*100;
+		  int DD = DDMM/100;
+		  int MM = DDMM - DD*100;
+		  if(DD ==0|MM ==0|YY ==0){
+	  		System.out.println("day,month,year something 0");
+	  		return null;
 		}
+
 		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.DATE, days);
+		c.set(Calendar.YEAR,YY+2000);
+		c.set(Calendar.MONTH,MM-1); //jan is 0
+		c.set(Calendar.DAY_OF_MONTH,DD);
 		return new Date(c.getTimeInMillis());
 	  }
-	  
-
 }
 
 

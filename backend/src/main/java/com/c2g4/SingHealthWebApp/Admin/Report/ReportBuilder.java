@@ -2,12 +2,7 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -579,16 +574,23 @@ public class ReportBuilder {
 	public List<ReportEntry> getOverDueEntries(){
     	List<ReportEntry> overDueEntries = new ArrayList<>();
 		List<Integer> checked_qns = new ArrayList<>();
-		Collections.reverse(entries);
+
+		sortEntries();
 		Calendar calendar = Calendar.getInstance();
+		logger.info("calendar instance {}",calendar.getTime().toString());
 		for(ReportEntry entry: entries) {
 			if (!checked_qns.contains(entry.getQn_id())) {
 				checked_qns.add(entry.getQn_id());
 			} else {
 				continue;
 			}
-			if(calendar.after(entry.getDueDate())){
-				overDueEntries.add(entry);
+
+			if(entry.getStatus() ==Component_Status.FAIL){
+				Date dueDate = entry.getDueDate();
+				logger.info("Component status {}, due date {}, time {}",entry.getStatus(),dueDate,dueDate.toLocalDate());
+				if(calendar.getTime().after(dueDate)){
+					overDueEntries.add(entry);
+				}
 			}
 		}
 		return overDueEntries;
@@ -814,7 +816,7 @@ public class ReportBuilder {
         	return -1;
         }
         List<Integer> checked_qns = new ArrayList<>();
-       	Collections.reverse(entries);
+		sortEntries();
         for(ReportEntry entry: entries){
         	if(!checked_qns.contains(entry.getQn_id())) {
         		checked_qns.add(entry.getQn_id());
@@ -845,7 +847,20 @@ public class ReportBuilder {
         setOverall_score((int) (Double.parseDouble(str_score) *100.0));
         return Double.parseDouble(str_score) *100.0;
     }
-	
+
+	private void sortEntries(){
+		Comparator<ReportEntry> compareByDateTime = new Comparator<ReportEntry>() {
+			@Override
+			public int compare(ReportEntry r1, ReportEntry r2) {
+				int dateCompare = r1.getDate().compareTo(r2.getDate());
+				if(dateCompare==0){
+					return r1.getTime().compareTo(r2.getTime());
+				}
+				return dateCompare;
+			}
+		};
+		entries.sort(compareByDateTime.reversed());
+	}
 	
 	//Start of logic for processing Report entries
 	/**
