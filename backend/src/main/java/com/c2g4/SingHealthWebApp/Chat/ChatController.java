@@ -5,6 +5,7 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -128,7 +129,7 @@ public class ChatController {
 
         if(!tenantRepo.existsById(tenant_id)) return ResponseEntity.badRequest().body("tenant account not found");
         if(!auditorRepo.existsById(auditor_id)) return ResponseEntity.badRequest().body("auditor account not found");
-        ChatModel chatModel = new ChatModel(-1,tenant_id,auditor_id,objectMapper.createObjectNode());
+        ChatModel chatModel = new ChatModel(0,tenant_id,auditor_id,(JsonNode)objectMapper.createObjectNode());
         chatModel = chatRepo.save(chatModel);
         return ResponseEntity.ok(chatModel.getChat_id());
     }
@@ -164,6 +165,7 @@ public class ChatController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized, chat does not belong to user");
         }
         int chatEntryId = saveChatEntry(chatModel,callerAccount.getAccount_id(),subject,messageBody,attachments);
+        if(chatEntryId==Integer.MIN_VALUE) return ResponseEntity.badRequest().body("chat cannot be saved");
         return ResponseEntity.ok(chatEntryId);
     }
 
@@ -176,14 +178,21 @@ public class ChatController {
      * @param attachments JsonNode, with JsonArray of attachment strings, key should be "attachments"
      * @return the saved chat entry id as an int
      */
-    private int saveChatEntry(ChatModel chatModel, int senderId, String subject, String messageBody, JsonNode attachments){
+    private int saveChatEntry(ChatModel chatModel, int senderId, String subject, String messageBody, JsonNode attachments) {
         Date date = new Date(Calendar.getInstance().getTime().getTime());
         Time time = new Time(Calendar.getInstance().getTime().getTime());
-        if(!attachments.has(ResourceString.CHAT_ENTRIES_ATTACHMENT_JSON_KEY)) throw new IllegalArgumentException();
-        ChatEntriesModel chatEntriesModel = new ChatEntriesModel(-1,date,time, senderId,subject,messageBody,attachments);        chatModel = chatRepo.save(chatModel);
+        //if(!attachments.has(ResourceString.CHAT_ENTRIES_ATTACHMENT_JSON_KEY)) throw new IllegalArgumentException();
+        ChatEntriesModel chatEntriesModel = new ChatEntriesModel(0,date,time, senderId,subject,messageBody,attachments);        chatModel = chatRepo.save(chatModel);
         chatEntriesModel = chatEntriesRepo.save(chatEntriesModel);
-        updateParentChat(chatModel, chatEntriesModel.getChatEntry_id());
-        return chatEntriesModel.getChatEntry_id();
+        try {
+            updateParentChat(chatModel, chatEntriesModel.getChat_entry_id());
+        } catch (JsonProcessingException e) {
+            logger.warn("DELETING CHAT ENTRY NUM {} BECAUSE ENTRY CANNOT BE ADDED TO PARENT", chatEntriesModel.getChat_entry_id());
+            chatEntriesRepo.delete(chatEntriesModel);
+            e.printStackTrace();
+            return Integer.MIN_VALUE;
+        }
+        return chatEntriesModel.getChat_entry_id();
     }
 
     /**
@@ -191,18 +200,24 @@ public class ChatController {
      * @param chatModel ChatModel of the parent Chat
      * @param chatEntryId int, id of the chat entry to add to the parent
      */
-    private void updateParentChat(ChatModel chatModel, int chatEntryId){
+    private void updateParentChat(ChatModel chatModel, int chatEntryId) throws JsonProcessingException {
         ObjectNode messages = (ObjectNode) chatModel.getMessages();
+        logger.info("messages from chatmodel {}",messages);
         if(messages==null) messages = objectMapper.createObjectNode();
         if(!messages.has(ResourceString.CHAT_MESSAGES_JSON_KEY)){
             ArrayNode arrayNode = objectMapper.createArrayNode();
             arrayNode.add(chatEntryId);
             messages.set(ResourceString.CHAT_MESSAGES_JSON_KEY,arrayNode);
+            logger.info("messages no string {}",messages.get(ResourceString.CHAT_MESSAGES_JSON_KEY).get(0).asText());
         } else {
             ArrayNode keyNode = (ArrayNode) messages.get(ResourceString.CHAT_MESSAGES_JSON_KEY);
             keyNode.add(chatEntryId);
+            logger.info("messages have string {}",messages.get(ResourceString.CHAT_MESSAGES_JSON_KEY).asText());
         }
-        chatRepo.updateMessagesByChatId(chatModel.getChat_id(),messages);
+
+        String messageString = objectMapper.writeValueAsString(messages);
+
+        chatRepo.updateMessagesByChatId(chatModel.getChat_id(),messageString);
     }
 
     /**

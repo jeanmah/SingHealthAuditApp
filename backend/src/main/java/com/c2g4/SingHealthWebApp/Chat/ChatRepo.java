@@ -20,5 +20,5 @@ public interface ChatRepo extends CrudRepository<ChatModel, Integer> {
 
     @Modifying
     @Query("UPDATE Chat c SET c.messages = :messages WHERE c.chat_id = :chat_id")
-    void updateMessagesByChatId(@Param("chat_id") int acc_id, @Param("messages") JsonNode messages);
+    void updateMessagesByChatId(@Param("chat_id") int acc_id, @Param("messages") String messages);
 }

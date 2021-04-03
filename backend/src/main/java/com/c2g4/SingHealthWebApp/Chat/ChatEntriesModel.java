@@ -17,31 +17,55 @@ import java.sql.Time;
 @AccessType(AccessType.Type.PROPERTY)
 public class ChatEntriesModel {
     @Id
-    private int chatEntry_id;
+    private int chat_entry_id;
     private Date date;
     private Time time;
     private int sender_id;
     private String subject;
-    private String messageBody;
+    private String message_body;
     @Transient
     private JsonNode attachments;
 
-    public ChatEntriesModel(int chatEntry_id, Date date, Time time, int sender_id, String subject, String messageBody, JsonNode attachments) {
-        this.chatEntry_id = chatEntry_id;
+    public ChatEntriesModel(){}
+
+    public ChatEntriesModel(int chat_entry_id, Date date, Time time, int sender_id, String subject, String message_body, JsonNode attachments) {
+        this.chat_entry_id = chat_entry_id;
         this.date = date;
         this.time = time;
         this.sender_id = sender_id;
         this.subject = subject;
-        this.messageBody = messageBody;
+        this.message_body = message_body;
         this.attachments = attachments;
     }
 
-    public int getChatEntry_id() {
-        return chatEntry_id;
+    public ChatEntriesModel(int chat_entry_id, Date date, Time time, int sender_id, String subject, String message_body, String attachments) {
+        this.chat_entry_id = chat_entry_id;
+        this.date = date;
+        this.time = time;
+        this.sender_id = sender_id;
+        this.subject = subject;
+        this.message_body = message_body;
+        ObjectMapper objectmapper = new ObjectMapper();
+
+        try {
+            this.attachments = objectmapper.readTree(attachments);
+        } catch (JsonMappingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
-    public void setChatEntry_id(int chatEntry_id) {
-        this.chatEntry_id = chatEntry_id;
+
+
+    public int getChat_entry_id() {
+        return chat_entry_id;
+    }
+
+    public void setChat_entry_id(int chat_entry_id) {
+        this.chat_entry_id = chat_entry_id;
     }
 
     public Date getDate() {
@@ -77,11 +101,11 @@ public class ChatEntriesModel {
     }
 
     public String getMessageBody() {
-        return messageBody;
+        return message_body;
     }
 
-    public void setMessageBody(String messageBody) {
-        this.messageBody = messageBody;
+    public void setMessageBody(String message_body) {
+        this.message_body = message_body;
     }
 
     @Transient
