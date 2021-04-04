@@ -30,7 +30,6 @@ public class NotificationsController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     @GetMapping("/notifications/getAllAvailableNotifications")
     public ResponseEntity<?> getAllAvailableNotifications(@AuthenticationPrincipal UserDetails callerUser,
                                          @RequestParam(required = false, defaultValue = "-1") String role_id){
@@ -41,22 +40,31 @@ public class NotificationsController {
         }
         role_id = role_id.equals("-1")?callerAccount.getRole_id() : role_id;
 
-        List<NotificationsModel> allAvailableNotifications;
-        switch (role_id){
-            case ResourceString.TENANT_ROLE_KEY:
-                allAvailableNotifications = notificationsRepo.getAllAvailableNotificationsForTenants();
-                break;
-            case ResourceString.AUDITOR_ROLE_KEY:
-                allAvailableNotifications = notificationsRepo.getAllAvailableNotificationsForAuditor();
-                break;
-            case ResourceString.MANAGER_ROLE_KEY:
-                allAvailableNotifications = notificationsRepo.getAllAvailableNotificationsForManagers();
-                break;
-            default:
-                return ResponseEntity.badRequest().body("role_id cannot be found");
+        if(!callerAccount.getRole_id().equals(ResourceString.MANAGER_ROLE_KEY)
+                && !role_id.equals(callerAccount.getRole_id())){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
-        if(allAvailableNotifications == null) return ResponseEntity.badRequest().body("no notifications found");
-        return ResponseEntity.ok(allAvailableNotifications);
+
+        List<NotificationsModel> unCheckedAllAvailableNotifications = notificationsRepo.getAllAvailableNotifications();
+        if(unCheckedAllAvailableNotifications == null) return ResponseEntity.badRequest().body("no notifications found");
+
+        List<NotificationsModel> notificationsModels = new ArrayList<>();
+        for(NotificationsModel notificationsModel: unCheckedAllAvailableNotifications) {
+            switch (role_id) {
+                case ResourceString.TENANT_ROLE_KEY:
+                    if(notificationsModel.isForTenant()) notificationsModels.add(notificationsModel);
+                    break;
+                case ResourceString.AUDITOR_ROLE_KEY:
+                    if(notificationsModel.isForAuditor()) notificationsModels.add(notificationsModel);
+                    break;
+                case ResourceString.MANAGER_ROLE_KEY:
+                    if(notificationsModel.isForManager()) notificationsModels.add(notificationsModel);
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("role_id cannot be found");
+            }
+        }
+        return ResponseEntity.ok(notificationsModels);
     }
 
     @GetMapping("/notifications/getCurrentNotifications")
@@ -69,22 +77,31 @@ public class NotificationsController {
         }
         role_id = role_id.equals("-1")?callerAccount.getRole_id() : role_id;
 
-        List<NotificationsModel> currentNotifications;
-        switch (role_id){
-            case ResourceString.TENANT_ROLE_KEY:
-                currentNotifications = notificationsRepo.getCurrentNotificationsForTenants();
-                break;
-            case ResourceString.AUDITOR_ROLE_KEY:
-                currentNotifications = notificationsRepo.getCurrentNotificationsForAuditors();
-                break;
-            case ResourceString.MANAGER_ROLE_KEY:
-                currentNotifications = notificationsRepo.getCurrentNotificationsForManagers();
-                break;
-            default:
-                return ResponseEntity.badRequest().body("role_id cannot be found");
+        if(!callerAccount.getRole_id().equals(ResourceString.MANAGER_ROLE_KEY)
+                && !role_id.equals(callerAccount.getRole_id())){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
-        if(currentNotifications == null) return ResponseEntity.badRequest().body("no notifications found");
-        return ResponseEntity.ok(currentNotifications);
+
+        List<NotificationsModel> unCheckedAllCurrentNotifications = notificationsRepo.getCurrentNotifications();
+        if(unCheckedAllCurrentNotifications == null) return ResponseEntity.badRequest().body("no notifications found");
+
+        List<NotificationsModel> notificationsModels = new ArrayList<>();
+        for(NotificationsModel notificationsModel: unCheckedAllCurrentNotifications) {
+            switch (role_id) {
+                case ResourceString.TENANT_ROLE_KEY:
+                    if(notificationsModel.isForTenant()) notificationsModels.add(notificationsModel);
+                    break;
+                case ResourceString.AUDITOR_ROLE_KEY:
+                    if(notificationsModel.isForAuditor()) notificationsModels.add(notificationsModel);
+                    break;
+                case ResourceString.MANAGER_ROLE_KEY:
+                    if(notificationsModel.isForManager()) notificationsModels.add(notificationsModel);
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("role_id cannot be found");
+            }
+        }
+        return ResponseEntity.ok(notificationsModels);
     }
 
 
@@ -126,7 +143,6 @@ public class NotificationsController {
     //    only authorised for managers to create a notification
     @PostMapping("/notifications/postNewNotification")
     public ResponseEntity<?> postNewNotification(@AuthenticationPrincipal UserDetails callerUser,
-                                                 @RequestPart(value = "creator_id") int creator_id,
                                                  @RequestPart(value = "title") String title,
                                                  @RequestPart(value = "message") String message,
                                                  @RequestPart(value = "receipt_date") Date receipt_date,
@@ -140,7 +156,7 @@ public class NotificationsController {
         }
         Date create_date = new Date(Calendar.getInstance().getTime().getTime());
         NotificationsModel newNotification =
-                new NotificationsModel(0,creator_id,title,message,create_date,receipt_date,end_date,to_role_ids);
+                new NotificationsModel(0,callerAccount.getAccount_id(),title,message,create_date,receipt_date,end_date,to_role_ids);
         newNotification = notificationsRepo.save(newNotification);
         return ResponseEntity.ok("notification created with ID: " + newNotification.getNotification_id());
     }
@@ -176,7 +192,7 @@ public class NotificationsController {
     //    only authorised for the creator of the notification, cannot be undone
     @DeleteMapping("/notifications/deleteNotification")
     public ResponseEntity<?> deleteNotification(@AuthenticationPrincipal UserDetails callerUser,
-                                                @RequestPart(value = "notification_id") int notification_id){
+                                                @RequestParam int notification_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
 

@@ -17,23 +17,11 @@ public interface NotificationsRepo extends CrudRepository<NotificationsModel, In
     @Query("SELECT * FROM Notifications WHERE creator_id = :creator_id")
     List<NotificationsModel> getNotificationsByCreatorId(@Param("creator_id") int creator_id);
 
-    @Query("SELECT * FROM Notifications WHERE to_role_ids&4 = 4 AND receipt_date <= curdate()")
-    List<NotificationsModel> getAllAvailableNotificationsForTenants();
+    @Query("SELECT * FROM Notifications WHERE receipt_date <= curdate()")
+    List<NotificationsModel> getAllAvailableNotifications();
 
-    @Query("SELECT * FROM Notifications WHERE to_role_ids&2 = 2 AND receipt_date <= curdate()")
-    List<NotificationsModel> getAllAvailableNotificationsForAuditor();
-
-    @Query("SELECT * FROM Notifications WHERE to_role_ids&1 = 1 AND receipt_date <= curdate()")
-    List<NotificationsModel> getAllAvailableNotificationsForManagers();
-
-    @Query("SELECT * FROM Notifications WHERE to_role_ids&4 = 4 AND receipt_date <= curdate() AND end_date >= curdate()")
-    List<NotificationsModel> getCurrentNotificationsForTenants();
-
-    @Query("SELECT * FROM Notifications WHERE to_role_ids&2 = 2 AND receipt_date <= curdate() AND end_date >= curdate()")
-    List<NotificationsModel> getCurrentNotificationsForAuditors();
-
-    @Query("SELECT * FROM Notifications WHERE to_role_ids&1 = 1 AND receipt_date <= curdate() AND end_date >= curdate()")
-    List<NotificationsModel> getCurrentNotificationsForManagers();
+    @Query("SELECT * FROM Notifications WHERE receipt_date <= curdate() AND end_date >= curdate()")
+    List<NotificationsModel> getCurrentNotifications();
 
     @Modifying
     @Query("UPDATE Notifications n SET n.title = :title, n.message = :message, " +
