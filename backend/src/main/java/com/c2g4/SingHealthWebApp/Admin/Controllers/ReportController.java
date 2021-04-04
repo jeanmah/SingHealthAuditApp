@@ -392,23 +392,14 @@ public class ReportController {
 	
 	private JsonNode getAuditorReportIds(int auditor_id, String type) {
 		AuditorModel auditor = auditorRepo.getAuditorById(auditor_id);
-<<<<<<< HEAD
-		logger.info("before if statement");
-		logger.info(type);
-=======
-		logger.info("auditor {}",auditor.getAcc_id());
->>>>>>> f543f0661944e1f7ff0ecb9e034ab00e50c64bef
+
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-<<<<<<< HEAD
-			report_ids.put(type, auditor.getCompleted_audits());
-			logger.info("HELLOOOOOO{}");
 
-=======
 			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
->>>>>>> f543f0661944e1f7ff0ecb9e034ab00e50c64bef
+
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
@@ -435,17 +426,12 @@ public class ReportController {
 		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
 
-<<<<<<< HEAD
 
-
-	
-	
-=======
 	private AccountModel convertUserDetailsToAccount(UserDetails callerUser){
 		logger.info("CALLER USER USERNAME {}",callerUser.getUsername());
 		return accountRepo.findByUsername(callerUser.getUsername());
 	}
->>>>>>> f543f0661944e1f7ff0ecb9e034ab00e50c64bef
+
 	
 	
 	
