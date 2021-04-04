@@ -84,7 +84,6 @@ public class TenantModel implements typeAccountModel{
 		try {
 			return objectmapper.writeValueAsString(past_audits);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -102,11 +101,7 @@ public class TenantModel implements typeAccountModel{
 
 		try {
 			this.past_audits = objectmapper.readTree(JsonString);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

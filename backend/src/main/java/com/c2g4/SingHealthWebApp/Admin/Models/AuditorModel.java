@@ -81,7 +81,6 @@ public class AuditorModel implements typeAccountModel{
 		try {
 			return objectmapper.writeValueAsString(outstanding_audit_ids);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -96,11 +95,7 @@ public class AuditorModel implements typeAccountModel{
 		}
 		try {
 			this.outstanding_audit_ids = objectmapper.readTree(JsonString);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -111,7 +106,6 @@ public class AuditorModel implements typeAccountModel{
 		try {
 			return objectmapper.writeValueAsString(completed_audits);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -126,11 +120,7 @@ public class AuditorModel implements typeAccountModel{
 		}
 		try {
 			this.completed_audits = objectmapper.readTree(JsonString);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -141,7 +131,6 @@ public class AuditorModel implements typeAccountModel{
 		try {
 			return objectmapper.writeValueAsString(appealed_audits);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -156,11 +145,7 @@ public class AuditorModel implements typeAccountModel{
 		}
 		try {
 			this.appealed_audits = objectmapper.readTree(JsonString);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

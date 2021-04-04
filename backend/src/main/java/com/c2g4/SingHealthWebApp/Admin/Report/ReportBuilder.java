@@ -478,8 +478,9 @@ public class ReportBuilder {
     }
 
     
-    private boolean updateLatestReportIds(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
+    public boolean updateLatestReportIds(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
     	//int report_id = openAuditRepo.getReportIdFromTenantId(tenant_id);
+		logger.info("UPDATING for report {}", report.getReport_id());
 		if(report.getClass().equals(OpenReport.class)) {
 			tenantRepo.updateLatestAuditByTenantId(report.getTenant_id(), report.getReport_id());
 			String outstandingAudits = auditorRepo.getOutstandingAuditsFromAuditorID(report.getAuditor_id());
@@ -487,6 +488,7 @@ public class ReportBuilder {
 					ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY, String.valueOf(report.getReport_id()));
 			if (updatedJsonAuditor==null) return false;
 			auditorRepo.updateLatestOutstandingAuditsByAuditorId(report.getAuditor_id(), updatedJsonAuditor);
+			logger.info("updating outstanding");
 			return true;
 		}else if(report.getClass().equals(ClosedReport.class)) {
 			String TenantPastAudits = tenantRepo.getPastAuditsById(report.getTenant_id());
@@ -499,12 +501,13 @@ public class ReportBuilder {
 					ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY, String.valueOf(report.getReport_id()));
 			if(updatedJsonAuditor==null) return false;
 			auditorRepo.updateLatestCompletedAuditsByAuditorId(report.getAuditor_id(), updatedJsonAuditor);
+			logger.info("updating closed");
+
 			return true;
 		} else{
 			logger.warn("Report is of an invalid type. Unable to save.");
 		}
 		return false;
-		//to JW: manager???
     }
 
     private String appendToJson(String jsonString, String key, String valueToAppend){
@@ -547,9 +550,6 @@ public class ReportBuilder {
     		success = saveClosedReport((ClosedReport) report);
     	}else {
     		logger.warn("Report is of an invalid type. Unable to save.");
-    	}
-    	if (success) {
-    		success = updateLatestReportIds(report, tenantRepo, auditorRepo, managerRepo);
     	}
     	return success;
     }

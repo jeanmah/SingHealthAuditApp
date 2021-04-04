@@ -32,6 +32,9 @@ public interface TenantRepo extends CrudRepository<TenantModel, Integer> {
     @Query("SELECT past_audits FROM Tenant WHERE acc_id= :acc_id")
     String getPastAuditsById(@Param("acc_id") int acc_id);
 
+    @Query("SELECT store_name FROM Tenant WHERE acc_id= :acc_id")
+    String getStoreNameById(@Param("acc_id") int acc_id);
+
     @Modifying
     @Query("UPDATE Tenant t SET t.past_audits = :past_audits WHERE t.acc_id = :acc_id")
     void updatePastAuditsByTenantId(@Param("acc_id") int acc_id, @Param("past_audits") String past_audits);
@@ -45,7 +48,9 @@ public interface TenantRepo extends CrudRepository<TenantModel, Integer> {
     @Query("UPDATE Tenant t SET t.latest_audit = -1 WHERE t.acc_id = :acc_id")
     void removeLatestAuditByTenantId(@Param("acc_id") int acc_id);
 
-
+    @Modifying
+    @Query("UPDATE Tenant t SET t.audit_score = :audit_score WHERE t.acc_id = :acc_id")
+    void updateAuditScoreByTenantId(@Param("acc_id") int acc_id, @Param("audit_score") int audit_score);
 
 
     @Query("SELECT * FROM Tenant ")

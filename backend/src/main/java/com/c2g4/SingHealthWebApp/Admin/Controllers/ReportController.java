@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,14 +150,16 @@ public class ReportController {
         	if(!builder.saveReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
+			builder.updateLatestReportIds(report,tenantRepo,auditorRepo,managerRepo);
         } else {
-        	//builder.setOverall_remarks(remarks).setOverall_statusAsClosed();
 			builder.setOverall_remarks(remarks).setNeed(0, 1, 0);
 			Report report = builder.build();
         	if(!builder.saveImmediatelyCompletedReport(report, tenantRepo, auditorRepo, managerRepo)) {
                 return ResponseEntity.badRequest().body(null);
         	}
         }
+
+        tenantRepo.updateAuditScoreByTenantId(tenant_id,auditScore);
         logger.info("Report Submission Upload Completed.");
     	return ResponseEntity.ok(auditScore);
 	}
@@ -243,6 +246,7 @@ public class ReportController {
         	}else {
         		builder.deleteOpenReport(report_id);
         		builder.deleteOpenAuditsFromUsers(updated_report, tenantRepo, auditorRepo, managerRepo);
+        		builder.updateLatestReportIds(updated_report,tenantRepo,auditorRepo,managerRepo);
         	}
         }
         logger.info("Report update completed.");
@@ -274,11 +278,20 @@ public class ReportController {
 			//I've left it here just to catch bad reports
 			@SuppressWarnings("unused")
 			String reportJSON = objectmapper.writeValueAsString(report);
-			return ResponseEntity.ok(report);
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode reportWithStoreName = addTenantStoreToReturnJson(objectmapper.writeValueAsString(report),report.getTenant_id());
+			return ResponseEntity.ok(reportWithStoreName);
 		} catch (JsonProcessingException e) {
 			logger.error("MALFORMED REPORT!");
 			return ResponseEntity.unprocessableEntity().build();
 		}
+	}
+
+	private JsonNode addTenantStoreToReturnJson(String currentReturnString, int tenant_id) throws JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode currentReturnNode = (ObjectNode)objectMapper.readTree(currentReturnString);
+		currentReturnNode.put("store_name", tenantRepo.getStoreNameById(tenant_id));
+		return currentReturnNode;
 	}
 	
 	//Is this really necessary? It seems enveloped by the method above
@@ -302,7 +315,6 @@ public class ReportController {
 		try {
 			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -412,9 +424,27 @@ public class ReportController {
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
-			//TODO
+			ArrayNode outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
+					.get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
+			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
 		}
 		return report_ids;
+	}
+
+	private ArrayNode getOverDueAudits(ArrayNode outstandingAuditIds){
+		ObjectMapper objectmapper = new ObjectMapper();
+		ArrayNode overdueAudits = objectmapper.createArrayNode();
+		for(int i =0;i<outstandingAuditIds.size();i++){
+			ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo,
+					completedAuditRepo, outstandingAuditIds.get(i).asInt());
+			List<ReportEntry> overDueEntries = builder.getOverDueEntries();
+			if(overDueEntries.size()==0){
+				logger.info("outstanding audit {} is not overdue", outstandingAuditIds.get(i).asInt());
+				continue;
+			}
+			overdueAudits.add(outstandingAuditIds.get(i).asInt());
+		}
+		return overdueAudits;
 	}
 	
 	@GetMapping("/report/print")
@@ -432,10 +462,6 @@ public class ReportController {
 		return accountRepo.findByUsername(callerUser.getUsername());
 	}
 
-	
-	
-	
-	
 	
 	
 }
