@@ -359,7 +359,7 @@ public class AccountController {
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
 
-        if(new_password==null ||new_password.isEmpty()) return ResponseEntity.badRequest().body(null);
+        if(new_password==null ||new_password.trim().isEmpty() || new_password.equals("null")) return ResponseEntity.badRequest().body(null);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(new_password);
         accountRepo.changePasswordByAccId(callerAccount.getAccount_id(),encodedPassword);

@@ -9,19 +9,19 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("SMACheckList")
 public class AuditCheckListSMAModel extends AuditCheckListModel {
     @Id
-    private int nfb_qn_id;
+    private int sma_qn_id;
     private String category;
     private String sub_category;
     private double weight;
     private String requirement;
     private String sub_requirement;
 
-    public int getNfb_qn_id() {
-        return nfb_qn_id;
+    public int getSma_qn_id() {
+        return sma_qn_id;
     }
 
-    public void setNfb_qn_id(int nfb_qn_id) {
-        this.nfb_qn_id = nfb_qn_id;
+    public void setSma_qn_id(int sma_qn_id) {
+        this.sma_qn_id = sma_qn_id;
     }
 
     public String getCategory() {

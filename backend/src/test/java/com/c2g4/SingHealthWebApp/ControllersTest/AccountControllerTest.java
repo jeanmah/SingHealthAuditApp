@@ -1,6 +1,5 @@
 package com.c2g4.SingHealthWebApp.ControllersTest;
 
-import com.c2g4.SingHealthWebApp.Admin.Controllers.AccountController;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
@@ -10,33 +9,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONObject;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
@@ -87,51 +72,6 @@ public class AccountControllerTest {
         given(accountRepo.findByUsername(TENANTUSENAME)).willReturn(tenantAccount);
     }
 
-    private ResultActions performGetRequest(String requestURL, HashMap<String,String> params) throws Exception {
-        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.get(requestURL)
-                                                                            .contentType(MediaType.APPLICATION_JSON);
-        if(params!=null){
-            for(String key:params.keySet()){
-                mockHttpServletRequestBuilder.param(key,params.get(key));
-            }
-        }
-        return mvc.perform(mockHttpServletRequestBuilder);
-    }
-
-    private void getHttpOk(String requestURL, HashMap<String,String> params, int jsonSize, String compareJson) throws Exception {
-        ResultActions resultActions = performGetRequest(requestURL,params);
-        resultActions.andExpect(status().isOk());
-        if(jsonSize!=-1) resultActions.andExpect(jsonPath("$",hasSize(jsonSize)));
-        if(compareJson!=null){
-            resultActions.andExpect(content().json(compareJson));
-        }
-        //System.out.println(resultActions.andReturn().getResponse().getContentAsString());
-    }
-
-    private void getHttpBadRequest(String requestURL, HashMap<String,String> params) throws Exception{
-        ResultActions resultActions = performGetRequest(requestURL,params);
-        resultActions.andExpect(status().isBadRequest());
-    }
-
-    private void getHttpUnauthorizedRequest(String requestURL, HashMap<String,String> params) throws Exception{
-        ResultActions resultActions = performGetRequest(requestURL,params);
-        resultActions.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
-    }
-
-    private ResultActions performPostRequest(String url, String bodyString) throws Exception {
-        MockMultipartFile postFile = new MockMultipartFile("changes","changes",MediaType.APPLICATION_JSON_VALUE,bodyString.getBytes());
-        return mvc.perform(MockMvcRequestBuilders.multipart(url).file(postFile));
-    }
-
-    private void postHttpOK(String requestURL, String bodyString) throws Exception{
-        ResultActions resultActions = performPostRequest(requestURL,bodyString);
-        resultActions.andExpect(status().isOk());
-    }
-
-    private void postHttpBadRequest(String requestURL, String bodyString) throws Exception{
-        ResultActions resultActions = performPostRequest(requestURL,bodyString);
-        resultActions.andExpect(status().isBadRequest());
-    }
 
     @Test
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
@@ -172,9 +112,9 @@ public class AccountControllerTest {
     private void getAllUsers(String statusExpected, String compareJson) throws Exception {
         String url = "/account/getAllUsers";
         switch (statusExpected) {
-            case statusOK -> getHttpOk(url, null, 3, compareJson);
-            case statusBad -> getHttpBadRequest(url, null);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, null);
+            case statusOK -> HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, null, 3, compareJson);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc,url, null);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc,url, null);
         }
     }
 
@@ -225,9 +165,9 @@ public class AccountControllerTest {
             put("branch_id",branch_id);
         }};
         switch (statusExpected) {
-            case statusOK -> getHttpOk(url, params, 3, compareJson);
-            case statusBad -> getHttpBadRequest(url, params);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusOK -> HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, params, 3, compareJson);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc, url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc, url, params);
         }
     }
 
@@ -304,10 +244,10 @@ public class AccountControllerTest {
                 given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
                 given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
                 given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
-                getHttpOk(url, params, 3, compareJson);
+                HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, params, 3, compareJson);
             }
-            case statusBad -> getHttpBadRequest(url, params);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc, url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc, url, params);
         }
     }
 
@@ -451,10 +391,10 @@ public class AccountControllerTest {
                 given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
                 given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
                 given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
-                getHttpOk(url, params, 3, compareJson);
+                HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, params, 3, compareJson);
             }
-            case statusBad -> getHttpBadRequest(url, params);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc, url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc,url, params);
         }
     }
 
@@ -545,15 +485,6 @@ public class AccountControllerTest {
             throws Exception {
         given(accountRepo.findByAccId(0)).willReturn(null);
         getUserProfile(statusBad,0,null,null,null);
-    }
-
-    @Test
-    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
-    public void getUserProfileTenantDiffBranchAsAuditorUserIDWithResults()
-            throws Exception {
-        AccountModel accountModel = createAccount(TENANT,"Bob","Bobby","Branch_B");
-        given(accountRepo.findByAccId(1)).willReturn(accountModel);
-        getUserProfile(statusUnauthorized,1,null,null,null);
     }
 
     @Test
@@ -675,9 +606,9 @@ public class AccountControllerTest {
         if(firstName!=null) params.put("firstName",firstName);
         if(lastName!=null) params.put("lastName",lastName);
         switch (statusExpected) {
-            case statusOK -> getHttpOk(url, params, -1, compareJson);
-            case statusBad -> getHttpBadRequest(url, params);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusOK -> HTTPRequestHelperTestFunctions.getHttpOk(mvc,url, params, -1, compareJson);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc,url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc,url, params);
         }
     }
 
@@ -713,10 +644,14 @@ public class AccountControllerTest {
         if(hp!=null) checklistNode.put("hp", hp);
         String bodyString = mapper.writeValueAsString(checklistNode);
 
+        HashMap<String,String> postBody = new HashMap<>(){{
+            put("changes",bodyString);
+        }};
+
         String url = "/account/postProfileUpdate";
         switch (statusExpected) {
-            case statusOK -> postHttpOK(url,bodyString );
-            case statusBad -> postHttpBadRequest(url, bodyString);
+            case statusOK -> HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,postBody,null,null ,false);
+            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,null);
         }
     }
 
@@ -724,7 +659,7 @@ public class AccountControllerTest {
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
     public void postPasswordUpdateOK()
             throws Exception {
-        postPasswordUpdate(statusBad,"newPassword");
+        postPasswordUpdate(statusOK,"newPassword");
     }
 
     @Test
@@ -738,18 +673,19 @@ public class AccountControllerTest {
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
     public void postPasswordUpdateEmptyPassword()
             throws Exception {
-        postPasswordUpdate(statusBad,"");
+        postPasswordUpdate(statusBad,"   ");
     }
 
     private void postPasswordUpdate(String statusExpected, String password) throws Exception {
         String url = "/account/postPasswordUpdate";
+        HashMap<String,String> postBody = new HashMap<>(){{
+            put("new_password",password);
+        }};
         switch (statusExpected) {
-            case statusOK -> postHttpOK(url,password);
-            case statusBad -> postHttpBadRequest(url, password);
+            case statusOK -> HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,postBody,null,null,false);
+            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,null);
         }
     }
-
-
 
     private void createArbitraryTenants(ArrayList<TenantModel> tenantModels, ArrayList<AccountModel> accountModels){
         createTenantWithAccount("John","doh",tenantModels,accountModels);
