@@ -71,7 +71,11 @@ export const ContextProvider = (props) => {
       params: { branch_id: name },
     });
   };
-
+  /*
+  --------------- 
+  Tenant
+  ---------------
+  */
   //function to get user info given user id
   const getUserInfo = (userId) => {
     AuthenticationService.getStoredAxiosInterceptor();
@@ -95,6 +99,13 @@ export const ContextProvider = (props) => {
     });
   };
 
+  const getReport = (reportId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getReport`, {
+      params: { report_id: parseInt(reportId) },
+    });
+  };
+
   /*
   =============== 
   FRONTEND
@@ -104,7 +115,7 @@ export const ContextProvider = (props) => {
   //state for report
   const [fbReportState, setFbReportState] = useState([]);
   //state to keep track of audit
-  const [auditsState, setAuditsState] = useState(audits);
+  const [auditsState, setAuditsState] = useState();
   //state to keep track of all tenants
   const [tenantsState, setTenantsState] = useState();
   //state for fbChecklist
@@ -234,6 +245,7 @@ export const ContextProvider = (props) => {
         getInstitutionTenants,
         getUserInfo,
         getAudits,
+        getReport,
       }}
     >
       {props.children}

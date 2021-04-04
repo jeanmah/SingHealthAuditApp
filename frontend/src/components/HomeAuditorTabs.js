@@ -27,7 +27,7 @@ const StyledTab = withStyles((theme) => ({
     textTransform: "none",
     color: "#000000",
     fontWeight: theme.typography.fontWeightBold,
-    fontSize: theme.typography.pxToRem(18),
+    fontSize: theme.typography.pxToRem(16),
     margin: theme.spacing(2, 0, 2, 0),
     "&:focus": {
       opacity: 1,
@@ -46,9 +46,9 @@ export default function CenteredTabs() {
   return (
     <Paper className={classes.root}>
       <StyledTabs value={value} onChange={handleChange} centered>
-        <StyledTab label="Completed" />
-        <StyledTab label="Unresolved" />
-        <StyledTab label="Overdue" />
+        <StyledTab label="COMPLETED" />
+        <StyledTab label="UNRESOLVED" />
+        <StyledTab label="OVERDUE" />
       </StyledTabs>
     </Paper>
   );

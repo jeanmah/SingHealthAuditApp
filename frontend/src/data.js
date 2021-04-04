@@ -636,7 +636,7 @@ export const institutions = [
     name: "NDCS",
     tenantNames: [],
     tenantIDs: [],
-    imageUrl: "../images/ndcs.png",
+    imageUrl: "../images/ndcs.jpeg",
   },
 ];
 

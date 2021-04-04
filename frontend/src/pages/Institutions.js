@@ -7,12 +7,12 @@ import InstitutionsCards from "../components/InstitutionsCards";
 
 function Institutions() {
   return (
-    <>
+    <div>
       <Navbar />
-      <div>
-        {/* <div className="institutions-head"> */}
-        <InstitutionsCards />
-        {/* {institutions.map((institution, index) => {
+
+      {/* <div className="institutions-head"> */}
+      <InstitutionsCards />
+      {/* {institutions.map((institution, index) => {
           const { id, name, tenantNames, imageUrl } = institution;
           return (
             <Link key={index} to={`/institution/${name}`}>
@@ -27,8 +27,7 @@ function Institutions() {
             </Link>
           );
         })} */}
-      </div>
-    </>
+    </div>
   );
 }
 

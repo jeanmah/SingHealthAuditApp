@@ -4,28 +4,56 @@ import HomeAuditorTabs from "../components/HomeAuditorTabs";
 import Navbar from "../Navbar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { Context } from "../Context";
+import Loading from "./Loading";
 
 function HomeAuditor() {
-  const { getAudits } = useContext(Context);
+  const { getAudits, auditsState, setAuditsState, getReport } = useContext(
+    Context
+  );
 
   useEffect(() => {
     const username = sessionStorage.getItem("authenticatedUser");
-    console.log(username);
-    getAudits(username)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch(() => {
-        console.log("Failed to retrieve audits");
-      });
-  });
+
+    async function getResponse() {
+      try {
+        const reportIdArray = await getAudits(username).then((response) => {
+          return [
+            ...response.data.CLOSED.completed_audits,
+            ...response.data.OPEN.outstanding_audits,
+          ];
+        });
+        //initialize array to store all objects of report info
+        let reportInfoArray = [];
+
+        for (let i = 0; i < reportIdArray.length; i++) {
+          let reportInfo = await getReport(reportIdArray[i]).then(
+            (response) => {
+              return response.data;
+            }
+          );
+          reportInfoArray.push(reportInfo);
+        }
+        //set state of audits to be an array of report info objects
+        setAuditsState(reportInfoArray);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getResponse();
+  }, []);
 
   return (
     <div>
-      <CssBaseline />
-      <Navbar />
-      <HomeAuditorTabs />
-      <HomeAuditorCards />
+      {auditsState ? (
+        <>
+          <CssBaseline />
+          <Navbar />
+          <HomeAuditorTabs />
+          <HomeAuditorCards />
+        </>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 }
