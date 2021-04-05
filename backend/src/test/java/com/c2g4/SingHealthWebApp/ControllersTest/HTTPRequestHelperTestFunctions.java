@@ -87,4 +87,42 @@ public class HTTPRequestHelperTestFunctions {
         ResultActions resultActions = performPostRequest(mvc, url,multipartForm,params);
         resultActions.andExpect(status().isBadRequest());
     }
+
+    public static void postHttpUnauthorizedRequest(MockMvc mvc, String url, HashMap<String,String> multipartForm, HashMap<String,String> params) throws Exception{
+        ResultActions resultActions = performPostRequest(mvc, url,multipartForm,params);
+        resultActions.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    public static ResultActions performDeleteRequest(MockMvc mvc, String requestURL, HashMap<String,String> params) throws Exception {
+        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.delete(requestURL)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON);
+        if(params!=null){
+            for(String key:params.keySet()){
+                mockHttpServletRequestBuilder.param(key,params.get(key));
+            }
+        }
+        return mvc.perform(mockHttpServletRequestBuilder);
+    }
+
+    public static void deleteHttpOk(MockMvc mvc, String requestURL, HashMap<String,String> params, String checkOutput) throws Exception {
+        ResultActions resultActions = performDeleteRequest(mvc, requestURL,params);
+        resultActions.andExpect(status().isOk());
+        assert checkOutput == null || (resultActions.andReturn().getResponse().getContentAsString().equals(checkOutput));
+    }
+
+    public static void deleteHttpBadRequest(MockMvc mvc, String requestURL, HashMap<String,String> params) throws Exception{
+        ResultActions resultActions = performDeleteRequest(mvc, requestURL,params);
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    public static void deleteHttpNotFoundRequest(MockMvc mvc, String requestURL, HashMap<String,String> params) throws Exception{
+        ResultActions resultActions = performDeleteRequest(mvc, requestURL,params);
+        resultActions.andExpect(status().isNotFound());
+    }
+
+    public static void deleteHttpUnauthorizedRequest(MockMvc mvc, String requestURL, HashMap<String,String> params) throws Exception{
+        ResultActions resultActions = performDeleteRequest(mvc,requestURL,params);
+        resultActions.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
+    }
 }

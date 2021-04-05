@@ -47,7 +47,9 @@ public class NotificationsController {
             return ResponseEntity.badRequest().body("user account not found");
         }
         role_id = role_id.equals("-1")?callerAccount.getRole_id() : role_id;
-
+        if(!(role_id.equals(ResourceString.MANAGER_ROLE_KEY) || role_id.equals(ResourceString.AUDITOR_ROLE_KEY) || role_id.equals(ResourceString.TENANT_ROLE_KEY))){
+            return ResponseEntity.badRequest().body("role_id invalid");
+        }
         if(!callerAccount.getRole_id().equals(ResourceString.MANAGER_ROLE_KEY)
                 && !role_id.equals(callerAccount.getRole_id())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -81,7 +83,9 @@ public class NotificationsController {
             return ResponseEntity.badRequest().body("user account not found");
         }
         role_id = role_id.equals("-1")?callerAccount.getRole_id() : role_id;
-
+        if(!(role_id.equals(ResourceString.MANAGER_ROLE_KEY) || role_id.equals(ResourceString.AUDITOR_ROLE_KEY) || role_id.equals(ResourceString.TENANT_ROLE_KEY))){
+            return ResponseEntity.badRequest().body("role_id invalid");
+        }
         if(!callerAccount.getRole_id().equals(ResourceString.MANAGER_ROLE_KEY)
                 && !role_id.equals(callerAccount.getRole_id())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -175,6 +179,7 @@ public class NotificationsController {
             }
         }
         List<NotificationsModel> uncheckedNotificationsModels = notificationsRepo.getNotificationsByCreatorId(creator_id);
+        if(uncheckedNotificationsModels==null) return ResponseEntity.badRequest().body("No notifications found");
         List<NotificationsModel> notificationModels = new ArrayList<>();
         for(NotificationsModel notificationsModel: uncheckedNotificationsModels){
             if(checkNotificationAuthorization(callerAccount.getRole_id(),notificationsModel)){
@@ -211,6 +216,9 @@ public class NotificationsController {
         if(!callerAccount.getRole_id().equals(ResourceString.MANAGER_ROLE_KEY)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
+
+        if(to_role_ids<=0 || to_role_ids>7) return ResponseEntity.badRequest().body("role_id invalid");
+
         Date create_date = new Date(Calendar.getInstance().getTime().getTime());
         NotificationsModel newNotification =
                 new NotificationsModel(0,callerAccount.getAccount_id(),title,message,create_date,receipt_date,end_date,to_role_ids);
@@ -245,6 +253,7 @@ public class NotificationsController {
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
 
+        if(to_role_ids<=0 || to_role_ids>7) return ResponseEntity.badRequest().body("role_id invalid");
         NotificationsModel notificationToModify = notificationsRepo.getNotificationByNotificationId(notification_id);
         if(notificationToModify==null) return ResponseEntity.badRequest().body("notification to modify not found");
         if(!(notificationToModify.getCreator_id()==callerAccount.getAccount_id())){
