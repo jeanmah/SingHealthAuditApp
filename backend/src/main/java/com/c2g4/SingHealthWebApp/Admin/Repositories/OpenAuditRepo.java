@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
 
+import java.util.List;
+
 /**
  * Repository of SQL queries to interact with the OpenAudits Table
  * @author LunarFox
@@ -17,6 +19,9 @@ import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
 public interface OpenAuditRepo extends CrudRepository<OpenAuditModel, Integer> {
     @Query("SELECT * FROM Open_Audits WHERE report_id = :report_id LIMIT 1")
     OpenAuditModel getOpenAuditById(@Param("report_id") int report_id);
+
+    @Query("SELECT report_id FROM Open_Audits")
+    List<Integer> getAllOpenAuditsIds();
 
     //by right there should only be one open report per tenant
     @Query("SELECT report_id FROM Open_Audits WHERE tenant_id= :tenant_id LIMIT 1")
