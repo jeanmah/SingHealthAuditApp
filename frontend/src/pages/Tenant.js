@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../Context";
 import Navbar from "../Navbar";
@@ -32,20 +32,21 @@ function Tenant() {
     return audit.tenantid === tenantId;
   });
   return (
-    <>
+    <div className="tenant-page">
       <Navbar />
+      <div className="tenant-name">{tenantName}</div>
       <div className="tenant-container">
-        <section className="tenant-header">
-          <div>hello {tenantName}</div>
-        </section>
-        <section className="tenant-content">
+        {/* <section className="tenant-content">
           {tenantAudits.map((tenant, index) => {
             return <div key={index}>{tenant.score}</div>;
           })}
-        </section>
+        </section> */}
+
+        <div>View Chat</div>
+        <div>View Previous Audits</div>
         <Link to={`/tenant/fbChecklist/${tenantid}`}>Conduct Audit</Link>
       </div>
-    </>
+    </div>
   );
 }
 

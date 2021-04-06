@@ -1,9 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-import { FaBars } from "react-icons/fa";
-import { navLinks, navBarImage } from "./data";
-import auditor from "./auditor.png";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
+import { FaBars } from "react-icons/fa";
+
+import { auditorNavLinks, tenantNavLinks, managerNavLinks, navBarImage } from "./data";
+import auditor from "./auditor.png";
+import { Context } from './Context';
+
 function Navbar() {
+  const { accountState, getAccountInfo } = useContext(Context);
+  const { role_id, username } = accountState;
   const [toggleClicked, settoggleClicked] = useState(false);
   const linksContainerRef = useRef(null);
   const linksRef = useRef(null);
@@ -12,6 +17,7 @@ function Navbar() {
   };
 
   useEffect(() => {
+    getAccountInfo();
     let linksHeight = linksRef.current.getBoundingClientRect().height;
     if (toggleClicked) {
       linksContainerRef.current.style.height = `${linksHeight}px`;
@@ -20,12 +26,54 @@ function Navbar() {
     }
   }, [toggleClicked]);
 
+  function mapLinks(links) {
+    return (
+      links.map((link, index) => {
+        const { id, url, text } = link;
+        return (
+          <li key={index}>
+            <Link to={url}>{text}</Link>
+          </li>
+        );
+      })
+    )
+  }
+
+  function getNavLinks(role) {
+    if (role === "Auditor") {
+      return mapLinks(auditorNavLinks);
+    } else if (role === "Tenant") {
+      return mapLinks(tenantNavLinks);
+    } else if (role === "Manager") {
+      return mapLinks(managerNavLinks);
+    };
+  };
+
+  // function getNavLinks(role) {
+  //   if (role == "Auditor") {
+  //     return auditorNavLinks;
+  //   } else if (role == "Tenant") {
+  //     return tenantNavLinks;
+  //   } else if (role == "Manager") {
+  //     return managerNavLinks;
+  //   };
+  // };
+
+  const navLinks = auditorNavLinks;
+
+  const fakeNavLinks = getNavLinks(role_id);
+
+  console.log(role_id);
+  console.log(navLinks);
+  console.log(fakeNavLinks);
+  console.log(navLinks===fakeNavLinks);
+
   return (
     <nav>
       <div className="nav-pc">
         <div className="nav-mobile">
           <img src={auditor} className="logo" alt="auditor"></img>
-          <div className="auditor-name">Welcome Marcus {}</div>
+          <div className="auditor-name">Welcome {username}</div>
           <button
             className="nav-toggle"
             onClick={() => {
@@ -37,19 +85,43 @@ function Navbar() {
         </div>
         <div className="links-container" ref={linksContainerRef}>
           <ul className="links" ref={linksRef}>
-            {navLinks.map((link, index) => {
-              const { id, url, text } = link;
-              return (
-                <li key={index}>
-                  <Link to={url}>{text}</Link>
-                </li>
-              );
-            })}
+            {getNavLinks(accountState.role_id)}
           </ul>
         </div>
       </div>
     </nav>
   );
+
+  // return (
+  //   <nav>
+  //     <div className="nav-pc">
+  //       <div className="nav-mobile">
+  //         <img src={auditor} className="logo" alt="auditor"></img>
+  //         <div className="auditor-name">Welcome Marcus {}</div>
+  //         <button
+  //           className="nav-toggle"
+  //           onClick={() => {
+  //             showLinks();
+  //           }}
+  //         >
+  //           <FaBars />
+  //         </button>
+  //       </div>
+  //       <div className="links-container" ref={linksContainerRef}>
+  //         <ul className="links" ref={linksRef}>
+  //           {fakeNavLinks.map((link, index) => {
+  //             const { id, url, text } = link;
+  //             return (
+  //               <li key={index}>
+  //                 <Link to={url}>{text}</Link>
+  //               </li>
+  //             );
+  //           })}
+  //         </ul>
+  //       </div>
+  //     </div>
+  //   </nav>
+  // );
 }
 
 export default Navbar;

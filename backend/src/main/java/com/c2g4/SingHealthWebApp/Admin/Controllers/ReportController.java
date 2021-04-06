@@ -46,6 +46,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import javax.servlet.http.HttpServletRequest;
+
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
 public class ReportController {
@@ -386,7 +388,9 @@ public class ReportController {
 		return report_ids;
 	}
 	
-	@GetMapping("/report/print")
+
+
+	@PostMapping("/report/print")
 	public ResponseEntity<?> printURLRequest(HttpServletRequest request){
 		String strRequest = request.getRequestURL().toString() + "?" + request.getQueryString();
 		String strRequest2 = request.getParameterNames().toString();
