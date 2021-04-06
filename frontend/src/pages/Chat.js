@@ -21,6 +21,25 @@ function Chat() {
 
   const styles = useStyles();
 
+  // allChatsOfUserState.map(chat => {
+  //   console.log("chat: " + chat);
+  //   console.log("chat ID: " + chat.chat_id);
+  //   console.log("auditor ID: " + chat.auditor_id);
+  //   console.log("tenant ID: " + chat.tenant_id);
+  //   console.log("messages: " + chat.messages);
+  // })
+
+  const ChatInfo = (props) => {
+    return (
+      <div>
+        <div>Chat ID: {props.chat_id}</div>
+        <div>Tenant ID: {props.tenant_id}</div>
+        <div>Auditor ID: {props.auditor_id}</div>
+        <div>Messages: {props.messages}</div>
+      </div>   
+    );
+  };
+
   return (
     <main className={styles.main}>
       <Navbar />
@@ -32,9 +51,37 @@ function Chat() {
         variant="outlined"
         color="primary"
         fullWidth
+        onClick={() => {
+          console.log("chatState: " + allChatsOfUserState);
+          console.log("firstChat: " + allChatsOfUserState[0]);
+          console.log("firstChatID: " + allChatsOfUserState[0].chat_id);
+        }}
       >
         Get All Chats of User
       </Button>
+
+      <div>
+        {allChatsOfUserState.map((chat, index) => {
+          console.log("Chats in chat page: " + chat.chat_id);
+          console.log("Chat info: " + chat);
+          return (
+            <ChatInfo key={index}
+              chat_id={chat.chat_id}
+              tenant_id={chat.tenant_id}
+              auditor_id={chat.auditor_id}
+              messages={chat.messages}
+            />
+          )
+        })}
+      </div>
+
+      {/* <ChatInfo 
+        chat_id={allChatsOfUserState[0].chat_id}
+        tenant_id={allChatsOfUserState[0].tenant_id}
+        auditor_id={allChatsOfUserState[0].auditor_id}
+        messages={allChatsOfUserState[0].messages}
+      /> */}
+
     </main>
   )
 }

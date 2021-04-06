@@ -1,7 +1,6 @@
-import logo from "./logo.svg";
+//import logo from "./logo.svg";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Navbar from "./Navbar";
 import AuditorHome from "./pages/AuditorHome";
 import Account from "./pages/Account";
 import Tenant from "./pages/Tenant";
@@ -28,7 +27,7 @@ function App() {
     <Router>
       <ContextProvider>
         <Switch>
-          <Route exact path="/" exact component={LoginComponent} />
+          <Route exact path="/" component={LoginComponent} />
           <AuthenticatedRoute exact path="/home/a" component={AuditorHome} />
           <AuthenticatedRoute exact path="/home/t" component={TenantHome} />
           <AuthenticatedRoute exact path="/home/m" component={ManagerHome} />

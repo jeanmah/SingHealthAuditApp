@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 
-import { auditorNavLinks, tenantNavLinks, managerNavLinks, navBarImage } from "./data";
+import { auditorNavLinks, tenantNavLinks, managerNavLinks } from "./data";
 import auditor from "./auditor.png";
 import { Context } from './Context';
 
@@ -29,7 +29,7 @@ function Navbar() {
   function mapLinks(links) {
     return (
       links.map((link, index) => {
-        const { id, url, text } = link;
+        const { url, text } = link;
         return (
           <li key={index}>
             <Link to={url}>{text}</Link>
@@ -49,24 +49,10 @@ function Navbar() {
     };
   };
 
-  // function getNavLinks(role) {
-  //   if (role == "Auditor") {
-  //     return auditorNavLinks;
-  //   } else if (role == "Tenant") {
-  //     return tenantNavLinks;
-  //   } else if (role == "Manager") {
-  //     return managerNavLinks;
-  //   };
-  // };
-
-  const navLinks = auditorNavLinks;
-
-  const fakeNavLinks = getNavLinks(role_id);
-
-  console.log(role_id);
-  console.log(navLinks);
-  console.log(fakeNavLinks);
-  console.log(navLinks===fakeNavLinks);
+  // console.log(role_id);
+  // console.log(navLinks);
+  // console.log(fakeNavLinks);
+  // console.log(navLinks===fakeNavLinks);
 
   return (
     <nav>
@@ -85,7 +71,7 @@ function Navbar() {
         </div>
         <div className="links-container" ref={linksContainerRef}>
           <ul className="links" ref={linksRef}>
-            {getNavLinks(accountState.role_id)}
+            {getNavLinks(role_id)}
           </ul>
         </div>
       </div>

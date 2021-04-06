@@ -35,8 +35,23 @@ export const ContextProvider = (props) => {
       })
       .then((response) => {
         console.log("Response from getAllChatsOfUser", response.data);
-        //setAllChatsOfUserState(response.data);
+        setAllChatsOfUserState(response.data);
       })
+      // .then((response) => {
+      //   console.log("Response from getAllChatsOfUser", response.data);
+      //   // Since the response.data is an array of chats, use map() to push chats into the state one by one
+      //   response.data.map(chat => {
+      //     setAllChatsOfUserState([]); // Before pushing, clear the original state
+      //     console.log("Pushing new chat: " + chat.chat_id);
+      //     const chats = allChatsOfUserState;
+      //     chats.push(chat);
+      //     setAllChatsOfUserState(chats);
+      //   })
+      //   console.log("All chats pushed: " + allChatsOfUserState);
+      //   console.log("Type of allChatsOfUserState: " + typeof allChatsOfUserState);
+      //   console.log("Chat in chats: " + allChatsOfUserState[0]);
+      //   console.log("Chat in chats: " + allChatsOfUserState[0].chat_id);
+      // })
       .catch(() => {
         console.log("allChatsOfUser retrieval failed")
       })
@@ -96,7 +111,7 @@ export const ContextProvider = (props) => {
   //state for fbChecklist
   const [fbChecklistState, setFbChecklistState] = useState(fbChecklist);
   //state for institutions
-  const [institutionsState, setInstitutionstate] = useState(institutions);
+  //const [institutionsState, setInstitutionstate] = useState(institutions);
   //state for account
   const [accountState, setAccountState] = useState([]);
   //state for chats of user
