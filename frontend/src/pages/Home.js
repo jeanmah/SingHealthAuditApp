@@ -19,6 +19,7 @@ function Home() {
       setHomeAudits(filteredAudits);
     }
   };
+  
   return (
     <main>
       <div>
