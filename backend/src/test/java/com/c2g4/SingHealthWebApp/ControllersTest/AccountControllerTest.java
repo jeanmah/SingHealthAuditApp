@@ -9,41 +9,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONObject;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
+import org.springframework.web.context.WebApplicationContext;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 public class AccountControllerTest {
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
     @MockBean
     private AccountRepo accountRepo;
     @MockBean
@@ -52,6 +43,7 @@ public class AccountControllerTest {
     private AuditorRepo auditorRepo;
     @MockBean
     private ManagerRepo managerRepo;
+
 
     private static final String MANAGERUSENAME = "managerUsername";
     private static final String KNOWN_USER_PASSWORD = "test123";
@@ -70,7 +62,7 @@ public class AccountControllerTest {
     private static final String statusBad = "bad";
     private static final String statusUnauthorized = "unauthorized";
 
-    @Before
+    @BeforeEach
     public void before() {
         AccountModel managerAccount = createAccount(MANAGER,MANAGERID,"Marcus","Ho","HQ");
         AccountModel auditorAccount = createAccount(AUDITOR,AUDITORID,"Hannah","Mah","Branch_A");
@@ -80,50 +72,6 @@ public class AccountControllerTest {
         given(accountRepo.findByUsername(TENANTUSENAME)).willReturn(tenantAccount);
     }
 
-    private ResultActions performGetRequest(String requestURL, HashMap<String,String> params) throws Exception {
-        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.get(requestURL)
-                                                                            .contentType(MediaType.APPLICATION_JSON);
-        if(params!=null){
-            for(String key:params.keySet()){
-                mockHttpServletRequestBuilder.param(key,params.get(key));
-            }
-        }
-        return mvc.perform(mockHttpServletRequestBuilder);
-    }
-
-    private void getHttpOk(String requestURL, HashMap<String,String> params, int jsonSize, String compareJson) throws Exception {
-        ResultActions resultActions = performGetRequest(requestURL,params);
-        resultActions.andExpect(status().isOk());
-        if(jsonSize!=-1) resultActions.andExpect(jsonPath("$",hasSize(jsonSize)));
-        if(compareJson!=null){
-            resultActions.andExpect(content().json(compareJson));
-        }
-    }
-
-    private void getHttpBadRequest(String requestURL, HashMap<String,String> params) throws Exception{
-        ResultActions resultActions = performGetRequest(requestURL,params);
-        resultActions.andExpect(status().isBadRequest());
-    }
-
-    private void getHttpUnauthorizedRequest(String requestURL, HashMap<String,String> params) throws Exception{
-        ResultActions resultActions = performGetRequest(requestURL,params);
-        resultActions.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
-    }
-
-    private ResultActions performPostRequest(String url, String bodyString) throws Exception {
-        MockMultipartFile postFile = new MockMultipartFile("changes","changes",MediaType.APPLICATION_JSON_VALUE,bodyString.getBytes());
-        return mvc.perform(MockMvcRequestBuilders.multipart(url).file(postFile));
-    }
-
-    private void postHttpOK(String requestURL, String bodyString) throws Exception{
-        ResultActions resultActions = performPostRequest(requestURL,bodyString);
-        resultActions.andExpect(status().isOk());
-    }
-
-    private void postHttpBadRequest(String requestURL, String bodyString) throws Exception{
-        ResultActions resultActions = performPostRequest(requestURL,bodyString);
-        resultActions.andExpect(status().isBadRequest());
-    }
 
     @Test
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
@@ -150,9 +98,6 @@ public class AccountControllerTest {
     @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
     public void getAllUsersAsAuditor()
             throws Exception {
-//        ArrayList<AccountModel> allAccounts = new ArrayList<>();
-//        createAribraryUsers(allAccounts);
-//        given(accountRepo.getAllAccounts()).willReturn(allAccounts);
         getAllUsers(statusUnauthorized,null);
 
     }
@@ -161,18 +106,15 @@ public class AccountControllerTest {
     @WithMockUser(username = TENANTUSENAME, password = KNOWN_USER_PASSWORD, roles = { TENANT })
     public void getAllUsersAsTenant()
             throws Exception {
-//        ArrayList<AccountModel> allAccounts = new ArrayList<>();
-//        createAribraryUsers(allAccounts);
-//        given(accountRepo.getAllAccounts()).willReturn(allAccounts);
         getAllUsers(statusUnauthorized,null);
     }
 
     private void getAllUsers(String statusExpected, String compareJson) throws Exception {
         String url = "/account/getAllUsers";
         switch (statusExpected) {
-            case statusOK -> getHttpOk(url, null, 3, compareJson);
-            case statusBad -> getHttpBadRequest(url, null);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, null);
+            case statusOK -> HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, null, 3, compareJson);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc,url, null);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc,url, null);
         }
     }
 
@@ -186,7 +128,7 @@ public class AccountControllerTest {
         getAllUsersOfBranch(statusOK,"Branch_A","[{\"acc_id\":0,\"first_name\":\"Marcus\"," +
                 "\"last_name\":\"Ho\",\"role_id\":\"Manager\"},{\"acc_id\":0,\"first_name\":\"Hannah\"," +
                 "\"last_name\":\"Mah\",\"role_id\":\"Auditor\"},{\"acc_id\":0,\"first_name\":\"Gregory\"," +
-                "\"last_name\":\"Mah\",\"role_id\":\"Tenant\"}]\n");
+                "\"last_name\":\"Mah\",\"role_id\":\"Tenant\"}]");
     }
 
     @Test
@@ -195,7 +137,6 @@ public class AccountControllerTest {
             throws Exception {
         given(accountRepo.getAllAccountsByBranchId("Branch_A")).willReturn(null);
         getAllUsersOfBranch(statusBad,"Branch_A",null);
-
     }
 
     @Test
@@ -224,11 +165,92 @@ public class AccountControllerTest {
             put("branch_id",branch_id);
         }};
         switch (statusExpected) {
-            case statusOK -> getHttpOk(url, params, 3, compareJson);
-            case statusBad -> getHttpBadRequest(url, params);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusOK -> HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, params, 3, compareJson);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc, url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc, url, params);
         }
     }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllTenantsofBranchAsManagerWithResults()
+            throws Exception {
+        ArrayList<TenantModel> tenantModels = new ArrayList<>();
+        ArrayList<AccountModel> accountModels = new ArrayList<>();
+        createArbitraryTenants(tenantModels, accountModels);
+        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(tenantModels);
+        getAllTenantsOfBranch(statusOK,"Branch_A", accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
+                "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
+                "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
+                "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\"," +
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}," +
+                "{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\"," +
+                "\"acc_id\":2,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null," +
+                "\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllTenantsofBranchAsManagerNoResults()
+            throws Exception {
+        given(tenantRepo.getAllTenants()).willReturn(null);
+        getAllTenantsOfBranch(statusBad,"Branch_A", null,null);
+    }
+
+    public void getAllTenantsofBranchAsAuditorWithResults()
+            throws Exception {
+        ArrayList<TenantModel> tenantModels = new ArrayList<>();
+        ArrayList<AccountModel> accountModels = new ArrayList<>();
+        createArbitraryTenants(tenantModels, accountModels);
+        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(tenantModels);
+        getAllTenantsOfBranch(statusOK,"Branch_A", accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
+                "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
+                "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
+                "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\"," +
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}," +
+                "{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
+                "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\"," +
+                "\"acc_id\":2,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null," +
+                "\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void getAllTenantsofBranchAsAuditorNoResults()
+            throws Exception {
+        given(tenantRepo.getAllTenants()).willReturn(null);
+        getAllTenantsOfBranch(statusBad,"Branch_A", null,null);
+    }
+
+    @Test
+    @WithMockUser(username = TENANTUSENAME, password = KNOWN_USER_PASSWORD, roles = { TENANT })
+    public void getAllTenantsofBranchAsTenant()
+            throws Exception {
+        getAllTenantsOfBranch(statusUnauthorized,"Branch_A",null,null);
+    }
+
+    private void getAllTenantsOfBranch(String statusExpected, String branch_id, ArrayList<AccountModel> accountModels, String compareJson) throws Exception {
+        String url = "/account/getAllTenantsOfBranch";
+        HashMap<String,String> params = new HashMap<>(){{
+            put("branch_id",branch_id);
+        }};
+        switch (statusExpected) {
+            case statusOK -> {
+                given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
+                given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
+                given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
+                HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, params, 3, compareJson);
+            }
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc, url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc, url, params);
+        }
+    }
+
 
     @Test
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
@@ -241,14 +263,14 @@ public class AccountControllerTest {
         getAllUsersOfType(statusOK,TENANT,accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
                 "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
-                "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
                 "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
                 "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\"," +
-                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}," +
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}," +
                 "{\"employee_id\":123,\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\"," +
                 "\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\"," +
                 "\"acc_id\":2,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null," +
-                "\"store_addr\":\"#01-02\"}]");
+                "\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
     }
 
     @Test
@@ -324,24 +346,24 @@ public class AccountControllerTest {
         ArrayList<AccountModel> accountModels = new ArrayList<>();
         createArbitraryTenants(tenantModels, accountModels);
         System.out.println("number of tenants" + tenantModels.size());
-        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(tenantModels);
+        given(tenantRepo.getAllTenants()).willReturn(tenantModels);
         getAllUsersOfType(statusOK,TENANT,accountModels,"[{\"employee_id\":123,\"username\":\"Johndoh\",\"first_name\":\"John\"," +
                 "\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0," +
-                "\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
+                "\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123,\"username\":\"Marydoh\"," +
                 "\"first_name\":\"Mary\",\"last_name\":\"doh\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
                 "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":1,\"type_id\":\"FB\",\"audit_score\":10," +
-                "\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"},{\"employee_id\":123," +
+                "\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"},{\"employee_id\":123," +
                 "\"username\":\"Pauldoh\",\"first_name\":\"Paul\",\"last_name\":\"doh\",\"email\":\"something@email.com\"," +
                 "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":2," +
-                "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}]");
+                "\"type_id\":\"FB\",\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}]");
     }
 
     @Test
     @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
     public void getAllUsersofTypeTenantAsAuditorNoResults()
             throws Exception {
-        given(tenantRepo.getAllTenantsByBranchId("Branch_A")).willReturn(null);
+        given(tenantRepo.getAllTenants()).willReturn(null);
         getAllUsersOfType(statusBad,TENANT,null,null);
     }
 
@@ -369,10 +391,10 @@ public class AccountControllerTest {
                 given(accountRepo.findByAccId(0)).willReturn(accountModels.get(0));
                 given(accountRepo.findByAccId(1)).willReturn(accountModels.get(1));
                 given(accountRepo.findByAccId(2)).willReturn(accountModels.get(2));
-                getHttpOk(url, params, 3, compareJson);
+                HTTPRequestHelperTestFunctions.getHttpOk(mvc, url, params, 3, compareJson);
             }
-            case statusBad -> getHttpBadRequest(url, params);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc, url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc,url, params);
         }
     }
 
@@ -389,7 +411,7 @@ public class AccountControllerTest {
                 "\"first_name\":\"Bob\",\"last_name\":\"Bobby\",\"email\":\"something@email.com\"," +
                 "\"hp\":\"234\",\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":0," +
                 "\"type_id\":\"FB\",\"audit_score\":10," +
-                "\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}");
+                "\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}");
     }
 
     @Test
@@ -454,7 +476,7 @@ public class AccountControllerTest {
         getUserProfile(statusOK,0,null,null,"{\"employee_id\":123,\"username\":\"BobBobby\",\"first_name\":\"Bob\"," +
                 "\"last_name\":\"Bobby\",\"email\":\"something@email.com\",\"hp\":\"234\"," +
                 "\"role_id\":\"Tenant\",\"branch_id\":\"Branch_A\",\"acc_id\":0,\"type_id\":\"FB\"," +
-                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}");
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}");
     }
 
     @Test
@@ -463,15 +485,6 @@ public class AccountControllerTest {
             throws Exception {
         given(accountRepo.findByAccId(0)).willReturn(null);
         getUserProfile(statusBad,0,null,null,null);
-    }
-
-    @Test
-    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
-    public void getUserProfileTenantDiffBranchAsAuditorUserIDWithResults()
-            throws Exception {
-        AccountModel accountModel = createAccount(TENANT,"Bob","Bobby","Branch_B");
-        given(accountRepo.findByAccId(1)).willReturn(accountModel);
-        getUserProfile(statusUnauthorized,1,null,null,null);
     }
 
     @Test
@@ -541,7 +554,7 @@ public class AccountControllerTest {
         getUserProfile(statusOK,TENANTID,null,null,"{\"employee_id\":123,\"username\":\"HannahMah\",\"first_name\":\"Hannah\"," +
                 "\"last_name\":\"Mah\",\"email\":\"something@email.com\",\"hp\":\"234\",\"role_id\":\"Tenant\"," +
                 "\"branch_id\":\"Branch_A\",\"acc_id\":100,\"type_id\":\"FB\"," +
-                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_addr\":\"#01-02\"}\n");
+                "\"audit_score\":10,\"latest_audit\":0,\"past_audits\":null,\"store_name\":\"store\",\"store_addr\":\"#01-02\"}");
     }
 
     @Test
@@ -593,9 +606,9 @@ public class AccountControllerTest {
         if(firstName!=null) params.put("firstName",firstName);
         if(lastName!=null) params.put("lastName",lastName);
         switch (statusExpected) {
-            case statusOK -> getHttpOk(url, params, -1, compareJson);
-            case statusBad -> getHttpBadRequest(url, params);
-            case statusUnauthorized -> getHttpUnauthorizedRequest(url, params);
+            case statusOK -> HTTPRequestHelperTestFunctions.getHttpOk(mvc,url, params, -1, compareJson);
+            case statusBad -> HTTPRequestHelperTestFunctions.getHttpBadRequest(mvc,url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.getHttpUnauthorizedRequest(mvc,url, params);
         }
     }
 
@@ -631,10 +644,14 @@ public class AccountControllerTest {
         if(hp!=null) checklistNode.put("hp", hp);
         String bodyString = mapper.writeValueAsString(checklistNode);
 
+        HashMap<String,String> postBody = new HashMap<>(){{
+            put("changes",bodyString);
+        }};
+
         String url = "/account/postProfileUpdate";
         switch (statusExpected) {
-            case statusOK -> postHttpOK(url,bodyString );
-            case statusBad -> postHttpBadRequest(url, bodyString);
+            case statusOK -> HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,postBody,null,null ,false);
+            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,null);
         }
     }
 
@@ -642,7 +659,7 @@ public class AccountControllerTest {
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
     public void postPasswordUpdateOK()
             throws Exception {
-        postPasswordUpdate(statusBad,"newPassword");
+        postPasswordUpdate(statusOK,"newPassword");
     }
 
     @Test
@@ -656,18 +673,19 @@ public class AccountControllerTest {
     @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
     public void postPasswordUpdateEmptyPassword()
             throws Exception {
-        postPasswordUpdate(statusBad,"");
+        postPasswordUpdate(statusBad,"   ");
     }
 
     private void postPasswordUpdate(String statusExpected, String password) throws Exception {
         String url = "/account/postPasswordUpdate";
+        HashMap<String,String> postBody = new HashMap<>(){{
+            put("new_password",password);
+        }};
         switch (statusExpected) {
-            case statusOK -> postHttpOK(url,password);
-            case statusBad -> postHttpBadRequest(url, password);
+            case statusOK -> HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,postBody,null,null,false);
+            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,null);
         }
     }
-
-
 
     private void createArbitraryTenants(ArrayList<TenantModel> tenantModels, ArrayList<AccountModel> accountModels){
         createTenantWithAccount("John","doh",tenantModels,accountModels);
@@ -739,6 +757,7 @@ public class AccountControllerTest {
         tenantModel.setLatest_audit(0);
         tenantModel.setPast_audits(null);
         tenantModel.setBranch_id(branch_id);
+        tenantModel.setStore_name("store");
         tenantModel.setStore_addr("#01-02");
         return tenantModel;
     }

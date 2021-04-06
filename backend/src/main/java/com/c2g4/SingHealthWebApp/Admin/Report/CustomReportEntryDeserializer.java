@@ -38,6 +38,7 @@ public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> 
 
         //internal housekeeping
         entry.setEntry_id(-1); //idk
+
         entry.setDate(new Date(Calendar.getInstance().getTime().getTime()));
         entry.setTime(new Time(Calendar.getInstance().getTime().getTime()));
 
@@ -46,14 +47,16 @@ public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> 
         entry.setQn_id(qn_id_node.asInt());
         //check pass or fail
         JsonNode passFailNode = node.get("status");
-        entry.setStatus(passFailNode.asBoolean());
+        entry.setStatus(passFailNode.asInt());
         //check if should store remarks and evidence
         JsonNode remarksNode = node.get("remarks");
         if(remarksNode != null) {
             entry.setRemarks(remarksNode.asText());
         }
         if(entry.getStatus() == Component_Status.FAIL){
-            entry.setSeverity(node.get("severity").asInt());
+            int severity = node.get("severity").asInt();
+            if(!checkSeverityFormat(severity)) throw new IllegalArgumentException();
+            entry.setSeverity(severity);
         }
         JsonNode imageNode = node.get("images");
         if(imageNode != null) {
@@ -66,6 +69,16 @@ public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> 
         }
 
         return entry;
+    }
+
+    boolean checkSeverityFormat(int severity){
+        if(severity<=1000000) return false;
+        int DDMMYY = severity%1000000;
+        int DDMM = DDMMYY/100;
+        int YY = DDMMYY - DDMM*100;
+        int DD = DDMM/100;
+        int MM = DDMM - DD*100;
+        return !(DD == 0 | MM == 0 | YY == 0);
     }
 }
 

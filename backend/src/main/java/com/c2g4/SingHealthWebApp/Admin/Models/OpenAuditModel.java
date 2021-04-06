@@ -74,10 +74,8 @@ public class OpenAuditModel extends AuditModel {
 		try {
 			this.report_data = objectmapper.readTree(report_data);
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.need_tenant = need_tenant;
@@ -166,7 +164,6 @@ public class OpenAuditModel extends AuditModel {
 		try {
 			return objectmapper.writeValueAsString(report_data);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -178,10 +175,8 @@ public class OpenAuditModel extends AuditModel {
 		try {
 			this.report_data = objectmapper.readTree(JsonString);
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -2,28 +2,20 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditModelBuilder;
 import com.c2g4.SingHealthWebApp.Admin.Models.CompletedAuditModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListFBRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListNFBRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.CompletedAuditRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -124,14 +116,17 @@ public class ReportBuilder {
     	this.overall_score = report.getOverall_score();
     	this.entries = report.getEntries();
     	
-    	if(this.report_type.matches(ResourceString.REPORT_STATUS_OPEN)) {
+    	//if(this.report_type.matches(ResourceString.REPORT_STATUS_OPEN)) {
+    	if(report.getClass().equals(OpenReport.class)){
     		OpenReport openReport = (OpenReport) report;
         	this.need_auditor = openReport.getNeed_auditor();
         	this.need_tenant = openReport.getNeed_tenant();
         	this.need_manager = openReport.getNeed_manager();
         	this.last_update_date = openReport.getLast_update_date();
         	this.overall_status = 0;
-    	}else if (this.report_type.matches(ResourceString.REPORT_STATUS_CLOSED)) {
+    	}
+    	//else if (this.report_type.matches(ResourceString.REPORT_STATUS_CLOSED)) {
+		else if (report.getClass().equals(ClosedReport.class)) {
     		ClosedReport closedReport = (ClosedReport) report;
     		this.close_date = closedReport.getClose_date();
     		this.overall_status = 1;
@@ -310,12 +305,45 @@ public class ReportBuilder {
     		return false;
     	}
     		openAuditRepo.deleteAuditById(report_id);
-        	if(this.checkClosedReportExists(report_id)) {
-        		logger.error("Report of id " + report_id + "could not be deleted!");
+        	if(this.checkOpenReportExists(report_id)) {
+        		logger.error("Report of id " + report_id + " could not be deleted!");
         		return false;
         	}
         return true;
     }
+
+	public boolean deleteOpenAuditsFromUsers(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
+		tenantRepo.removeLatestAuditByTenantId(report.getTenant_id());
+		String outstandingAudits = auditorRepo.getOutstandingAuditsFromAuditorID(report.getAuditor_id());
+		String updatedJsonAuditor = removeFromJson(outstandingAudits,
+				ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY, String.valueOf(report.getReport_id()));
+		logger.info("UPDATEDJSONAUDITOR :{}",updatedJsonAuditor);
+		if(updatedJsonAuditor==null) return false;
+		auditorRepo.updateLatestOutstandingAuditsByAuditorId(report.getAuditor_id(), updatedJsonAuditor);
+		return true;
+    }
+
+	private String removeFromJson(String jsonString, String key, String valueToRemove){
+//		logger.info("val to remove {}",valueToRemove);
+    	try {
+			ObjectNode root = (ObjectNode) objectmapper.readTree(jsonString);
+			ArrayNode keyNode = (ArrayNode) root.get(key);
+			int index = -1;
+			for(int i=0;i<keyNode.size();i++){
+//				logger.info("keynode {}: {}",i,keyNode.get(i));
+				if(keyNode.get(i).asText().equals(valueToRemove)){
+					index = i;
+					break;
+				}
+			}
+			if(index==-1) return null;
+			keyNode.remove(index);
+			return objectmapper.writeValueAsString(root);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
     
     /**
      * Deletes an existing closed report.
@@ -411,7 +439,9 @@ public class ReportBuilder {
         
         OpenAuditModel audit = (OpenAuditModel) builder.build();
         try {
-        	openAuditRepo.save(audit);
+        	OpenAuditModel openAuditModel = openAuditRepo.save(audit);
+        	logger.info("GENERATED REPORT ID: {}",openAuditModel.getReport_id());
+        	report.setReport_id(openAuditModel.getReport_id());
         }catch (IllegalArgumentException e) {
         	return false;
         }
@@ -437,18 +467,72 @@ public class ReportBuilder {
         	if(!completedAuditRepo.existsById(audit.getReport_id())) {
             	completedAuditRepo.createNewEntryWithId(audit.getReport_id());
         	}
-        	completedAuditRepo.save(audit);
+			CompletedAuditModel completedAuditModel = completedAuditRepo.save(audit);
+			logger.info("GENERATED REPORT ID: {}",completedAuditModel.getReport_id());
+			report.setReport_id(completedAuditModel.getReport_id());
+
         }catch (IllegalArgumentException e) {
         	return false;
         }
         return true;
     }
+
     
-    private void updateLatestReportIds(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
-    	int report_id = openAuditRepo.getReportIdFromTenantId(tenant_id);
-    	tenantRepo.updateLatestAuditByTenantId(report.getTenant_id(), report_id);
-    	//update the rest
+    public boolean updateLatestReportIds(Report report, TenantRepo tenantRepo, AuditorRepo auditorRepo, ManagerRepo managerRepo) {
+    	//int report_id = openAuditRepo.getReportIdFromTenantId(tenant_id);
+		logger.info("UPDATING for report {}", report.getReport_id());
+		if(report.getClass().equals(OpenReport.class)) {
+			tenantRepo.updateLatestAuditByTenantId(report.getTenant_id(), report.getReport_id());
+			String outstandingAudits = auditorRepo.getOutstandingAuditsFromAuditorID(report.getAuditor_id());
+			String updatedJsonAuditor = appendToJson(outstandingAudits,
+					ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY, String.valueOf(report.getReport_id()));
+			if (updatedJsonAuditor==null) return false;
+			auditorRepo.updateLatestOutstandingAuditsByAuditorId(report.getAuditor_id(), updatedJsonAuditor);
+			logger.info("updating outstanding");
+			return true;
+		}else if(report.getClass().equals(ClosedReport.class)) {
+			String TenantPastAudits = tenantRepo.getPastAuditsById(report.getTenant_id());
+			String updatedJsonTenant = appendToJson(TenantPastAudits,
+					ResourceString.TENANT_PAST_AUDITS_JSON_KEY, String.valueOf(report.getReport_id()));
+			if(updatedJsonTenant==null) return false;
+			tenantRepo.updatePastAuditsByTenantId(report.getTenant_id(),updatedJsonTenant);
+			String completedAudits = auditorRepo.getCompletedAuditsFromAuditorID(report.getAuditor_id());
+			String updatedJsonAuditor = appendToJson(completedAudits,
+					ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY, String.valueOf(report.getReport_id()));
+			if(updatedJsonAuditor==null) return false;
+			auditorRepo.updateLatestCompletedAuditsByAuditorId(report.getAuditor_id(), updatedJsonAuditor);
+			logger.info("updating closed");
+
+			return true;
+		} else{
+			logger.warn("Report is of an invalid type. Unable to save.");
+		}
+		return false;
     }
+
+    private String appendToJson(String jsonString, String key, String valueToAppend){
+    	if(jsonString==null|| jsonString.equals("-1")){
+    		ObjectNode root = objectmapper.createObjectNode();
+    		ArrayNode arrayNode = objectmapper.createArrayNode();
+    		arrayNode.add(valueToAppend);
+    		root.set(key,arrayNode);
+			try {
+				return objectmapper.writeValueAsString(root);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				ObjectNode root = (ObjectNode) objectmapper.readTree(jsonString);
+				ArrayNode keyNode = (ArrayNode) root.get(key);
+				keyNode.add(valueToAppend);
+				return objectmapper.writeValueAsString(root);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
     
     /**
      * Saves a given report object into the database, regardless of its subclass.
@@ -467,11 +551,50 @@ public class ReportBuilder {
     	}else {
     		logger.warn("Report is of an invalid type. Unable to save.");
     	}
-    	if (success) {
-    		updateLatestReportIds(report, tenantRepo, auditorRepo, managerRepo);
-    	}
     	return success;
     }
+
+    //save if the report is never open
+    public boolean saveImmediatelyCompletedReport(Report report, TenantRepo tenantRepo,
+												  AuditorRepo auditorRepo, ManagerRepo managerRepo){
+		boolean success = false;
+		success = saveOpenReport((OpenReport) report);
+		if(!success) return false;
+		setOverall_statusAsClosed();
+		setReport_id(report.getReport_id());
+		report = build();
+		success = saveClosedReport((ClosedReport) report);
+
+		if(!success) return false;
+		success = updateLatestReportIds(report, tenantRepo, auditorRepo, managerRepo);
+		if(!success) return false;
+		return deleteOpenReport(report.getReport_id());
+	}
+
+	public List<ReportEntry> getOverDueEntries(){
+    	List<ReportEntry> overDueEntries = new ArrayList<>();
+		List<Integer> checked_qns = new ArrayList<>();
+
+		sortEntries();
+		Calendar calendar = Calendar.getInstance();
+		logger.info("calendar instance {}",calendar.getTime().toString());
+		for(ReportEntry entry: entries) {
+			if (!checked_qns.contains(entry.getQn_id())) {
+				checked_qns.add(entry.getQn_id());
+			} else {
+				continue;
+			}
+
+			if(entry.getStatus() ==Component_Status.FAIL){
+				Date dueDate = entry.getDueDate();
+				logger.info("Component status {}, due date {}, time {}",entry.getStatus(),dueDate,dueDate.toLocalDate());
+				if(calendar.getTime().after(dueDate)){
+					overDueEntries.add(entry);
+				}
+			}
+		}
+		return overDueEntries;
+	}
     
    
     //getters and setters
@@ -665,17 +788,20 @@ public class ReportBuilder {
 	}
 	
 	//New Marker that does not handle images
-	public double markExternalReport(Report report, AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+	public double markExternalReport(Report report, AuditCheckListFBRepo auditCheckListFBRepo,
+									 AuditCheckListNFBRepo auditCheckListNFBRepo, AuditCheckListSMARepo auditCheckListSMARepo,
 			String category) {
-		return markEntries(report.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, category);
+		return markEntries(report.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, auditCheckListSMARepo, category);
 	}
 	
-	public double markReport(AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo) {
-		return markEntries(this.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, this.getReportType());
+	public double markReport(AuditCheckListFBRepo auditCheckListFBRepo, AuditCheckListNFBRepo auditCheckListNFBRepo,
+							 AuditCheckListSMARepo auditCheckListSMARepo) {
+		return markEntries(this.getEntries(), auditCheckListFBRepo, auditCheckListNFBRepo, auditCheckListSMARepo, this.getReportType());
 	}
 	
 	private double markEntries(List<ReportEntry> entries, AuditCheckListFBRepo auditCheckListFBRepo,
-			AuditCheckListNFBRepo auditCheckListNFBRepo, String report_type){
+							   AuditCheckListNFBRepo auditCheckListNFBRepo, AuditCheckListSMARepo auditCheckListSMARepo,
+							   String report_type){
 		        HashMap<String,ChecklistCategoryScores> checklistCategoryScoresHashMap = new HashMap<>();
         AuditCheckListRepo repo = null;
         if(report_type.matches(ResourceString.FB_KEY)) {
@@ -683,14 +809,14 @@ public class ReportBuilder {
         }else if (report_type.matches(ResourceString.NFB_KEY)) {
         	repo = auditCheckListNFBRepo;
         }else if(report_type.matches(ResourceString.SMA_KEY)) {
-        	//todo
+			repo = auditCheckListSMARepo;
         }
                 if(repo == null) {
         	logger.error("Unknown report type!");
         	return -1;
         }
         List<Integer> checked_qns = new ArrayList<>();
-       	Collections.reverse(entries);
+		sortEntries();
         for(ReportEntry entry: entries){
         	if(!checked_qns.contains(entry.getQn_id())) {
         		checked_qns.add(entry.getQn_id());
@@ -721,7 +847,20 @@ public class ReportBuilder {
         setOverall_score((int) (Double.parseDouble(str_score) *100.0));
         return Double.parseDouble(str_score) *100.0;
     }
-	
+
+	private void sortEntries(){
+		Comparator<ReportEntry> compareByDateTime = new Comparator<ReportEntry>() {
+			@Override
+			public int compare(ReportEntry r1, ReportEntry r2) {
+				int dateCompare = r1.getDate().compareTo(r2.getDate());
+				if(dateCompare==0){
+					return r1.getTime().compareTo(r2.getTime());
+				}
+				return dateCompare;
+			}
+		};
+		entries.sort(compareByDateTime.reversed());
+	}
 	
 	//Start of logic for processing Report entries
 	/**

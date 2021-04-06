@@ -2,6 +2,7 @@ package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.*;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
+import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,9 +32,9 @@ public class AccountController {
     @Autowired
     private ManagerRepo managerRepo;
 
-    private static final String MANAGER = "Manager";
-    private static final String AUDITOR = "Auditor";
-    private static final String TENANT = "Tenant";
+    private static final String MANAGER = ResourceString.MANAGER_ROLE_KEY;
+    private static final String AUDITOR = ResourceString.AUDITOR_ROLE_KEY;
+    private static final String TENANT = ResourceString.TENANT_ROLE_KEY;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -52,7 +53,7 @@ public class AccountController {
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("user account not found");
         }
         if(!callerAccount.getRole_id().equals(MANAGER)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -65,7 +66,8 @@ public class AccountController {
     }
 
     /**
-     * only authorized for a manager, returns a list of all users from a branch
+     * only authorized for a manager
+     * returns a list of all users from a branch
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param branch_id a String of the branch to query from
      * @return a JsonArray of users with keys {acc_id, first_name, last_name, role_id},
@@ -73,16 +75,36 @@ public class AccountController {
      * if any other errors occur along the way, return http BAD_REQUEST
      */
     @GetMapping("/account/getAllUsersofBranch")
-    public ResponseEntity<?> getAllUsersofBranch(@AuthenticationPrincipal UserDetails callerUser, @RequestParam String branch_id){
+    public ResponseEntity<?> getAllUsersofBranch(@AuthenticationPrincipal UserDetails callerUser,
+                                                 @RequestParam String branch_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         if(!callerAccount.getRole_id().equals(MANAGER)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
         List<AccountModel> allAccountsByBranchId = accountRepo.getAllAccountsByBranchId(branch_id);
+
         if(allAccountsByBranchId == null) return ResponseEntity.badRequest().body(null);
         ArrayNode output = getBasicAccFieldsArray(allAccountsByBranchId);
         return ResponseEntity.ok(output);
+    }
+
+    /**
+     * not authorized for tenants
+     * returns a lost of all tenants from a branch
+     * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
+     * @param branch_id a String of the branch to query from
+     * @return a JsonArray of Tenants with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id,
+     * type_id,audit_score,latest_audit,past_audits,store_name,store_addr},
+     */
+    @GetMapping("/account/getAllTenantsOfBranch")
+    public ResponseEntity<?> getAllTenantsOfBranch(@AuthenticationPrincipal UserDetails callerUser, @RequestParam String branch_id){
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
+        if(callerAccount.getRole_id().equals(TENANT)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+        return getTenantsFromBranch(branch_id);
     }
 
     /**
@@ -110,8 +132,8 @@ public class AccountController {
      * managers are fully authorized
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
      * @param roleType a String either Tenant, Auditor or Manager
-     * @return a JsonArray of users with keys {account_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
-     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
+     * @return a JsonArray of users with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
+     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
      * if the callerUser is unauthorized, returns HttpStatus UNAUTHORIZED with body "Unauthorized",
@@ -120,53 +142,45 @@ public class AccountController {
     @GetMapping("/account/getAllUsersofType")
     public ResponseEntity<?> getAllUsersofType(@AuthenticationPrincipal UserDetails callerUser,@RequestParam String roleType){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
-        switch (callerAccount.getRole_id()) {
-            case TENANT:
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
+        if (callerAccount.getRole_id().equals(TENANT)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        } else if(callerAccount.getRole_id().equals(AUDITOR)) {
+            if (!roleType.equals(TENANT))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+        List<typeAccountModel> typeAccountModels;
+        switch (roleType) {
+            case TENANT:
+                List<TenantModel> tenantModels = tenantRepo.getAllTenants();
+                if(tenantModels==null) return ResponseEntity.badRequest().body(null);
+                typeAccountModels = new ArrayList<>(tenantModels);
+                break;
             case AUDITOR:
-                //Auditors can only get tenants from the same branch
-                if (!roleType.equals(TENANT))
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-                String branchId = callerAccount.getBranch_id();
-                logger.info("BRANCH ID: {}",branchId);
-                return getTenantsFromBranch(branchId);
+                List<AuditorModel> auditorModels = auditorRepo.getAllAuditors();
+                if(auditorModels==null) return ResponseEntity.badRequest().body(null);
+                typeAccountModels = new ArrayList<>(auditorModels);
+                break;
             case MANAGER:
-                List<typeAccountModel> typeAccountModels;
-                switch (roleType) {
-                    case TENANT:
-                        List<TenantModel> tenantModels = tenantRepo.getAllTenants();
-                        if(tenantModels==null) return ResponseEntity.badRequest().body(null);
-                        typeAccountModels = new ArrayList<>(tenantModels);
-                        break;
-                    case AUDITOR:
-                        List<AuditorModel> auditorModels = auditorRepo.getAllAuditors();
-                        if(auditorModels==null) return ResponseEntity.badRequest().body(null);
-                        typeAccountModels = new ArrayList<>(auditorModels);
-                        break;
-                    case MANAGER:
-                        List<ManagerModel> managerModels = managerRepo.getAllManagers();
-                        if(managerModels==null) return ResponseEntity.badRequest().body(null);
-                        typeAccountModels = new ArrayList<>(managerModels);
-                        break;
-                    default:
-                        return ResponseEntity.badRequest().body(null);
-                }
-                return userArrayJson(typeAccountModels);
+                List<ManagerModel> managerModels = managerRepo.getAllManagers();
+                if(managerModels==null) return ResponseEntity.badRequest().body(null);
+                typeAccountModels = new ArrayList<>(managerModels);
+                break;
             default:
                 return ResponseEntity.badRequest().body(null);
         }
+        return userArrayJson(typeAccountModels);
     }
 
     /**
      * gets all the tenants from a particular Branch
      * @param branch_id a String of the branch to query from
      * @return a JsonArray of Tenants with keys {acc_id, employee_id, username,first_name,last_name,email,hp,
-     * role_id,branch_id,type_id,audit_score,latest_audit,past_audits,store_addr}
+     * role_id,branch_id,type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      */
     private ResponseEntity<?> getTenantsFromBranch(String branch_id){
         List<TenantModel> tenantModels = tenantRepo.getAllTenantsByBranchId(branch_id);
-        if(tenantModels == null) return ResponseEntity.badRequest().body(null);
+        if(tenantModels == null ||tenantModels.size()==0) return ResponseEntity.badRequest().body(null);
         logger.info("TENANT SIZE {}", tenantModels.size());
         return userArrayJson(new ArrayList<typeAccountModel>(tenantModels));
     }
@@ -176,7 +190,7 @@ public class AccountController {
      * and account entry into a JsonNode and returns an array of such JsonNodes
      * @param models a list of either TenantModel, AuditorModel or ManagerModel
      * @return a JsonArray of users with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
-     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
+     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
      * if any other errors occur along the way, return http BAD_REQUEST
@@ -213,7 +227,7 @@ public class AccountController {
      * @param firstName an Optional String of the first name to query, must be present if lastName is present and used
      * @param lastName an Optional String of the last name to query, must be present if firstName present and used
      * @return a JsonNode of requested user with keys {acc_id, employee_id, username,first_name,last_name,email,hp,role_id,branch_id},
-     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_addr}
+     * if roleType == "Tenant" additional keys of {type_id,audit_score,latest_audit,past_audits,store_name, store_addr}
      * if roleType == "Auditor" additional keys of {completed_audits, appealed_audits, outstanding_audit_ids,mgr_id}
      * if roleType == "Manager" no additional keys
      * if the callerUser is unauthorized, returns HttpStatus UNAUTHORIZED with body "Unauthorized",
@@ -227,7 +241,7 @@ public class AccountController {
     ){
         //check who is calling
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         int userID;
 
         if(user_id.isEmpty() && firstName.isEmpty() && lastName.isEmpty()) {
@@ -298,7 +312,7 @@ public class AccountController {
     public ResponseEntity<?> postProfileUpdate(@AuthenticationPrincipal UserDetails callerUser,
                                                @RequestPart(value = "changes") String changes){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         try {
 
             ObjectNode changesNode = objectMapper.readValue(changes, ObjectNode.class);
@@ -343,8 +357,9 @@ public class AccountController {
     @PostMapping("/account/postPasswordUpdate")
     public ResponseEntity<?> postPasswordUpdate(@AuthenticationPrincipal UserDetails callerUser, @RequestPart(value = "new_password") String new_password){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
-        if (callerAccount==null) return ResponseEntity.badRequest().body(null);
-        if(new_password==null ||new_password.isEmpty()) return ResponseEntity.badRequest().body(null);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
+
+        if(new_password==null ||new_password.trim().isEmpty() || new_password.equals("null")) return ResponseEntity.badRequest().body(null);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(new_password);
         accountRepo.changePasswordByAccId(callerAccount.getAccount_id(),encodedPassword);
@@ -367,8 +382,8 @@ public class AccountController {
             case AUDITOR:
                 if(requestedAccountNode.get("role_id").asText().equals(TENANT)){
                     //check if tenant is under the same branch
-                    logger.info("Auditor branch id {}, requested branch id {}",callerAccount.getBranch_id(), requestedAccountNode.get("branch_id").asText());
-                    return requestedAccountNode.get("branch_id").asText().equals(callerAccount.getBranch_id());
+                    //logger.info("Auditor branch id {}, requested branch id {}",callerAccount.getBranch_id(), requestedAccountNode.get("branch_id").asText());
+                    return true;
                 }
                 break;
             case MANAGER:
