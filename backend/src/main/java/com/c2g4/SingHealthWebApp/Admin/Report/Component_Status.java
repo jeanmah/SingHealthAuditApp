@@ -1,14 +1,21 @@
 package com.c2g4.SingHealthWebApp.Admin.Report;
 
+/**
+ * Enum for use in ReportEntry to track its status
+ * @author LunarFox
+ *
+ */
 public enum Component_Status {
-    PASS(true),				//Component Passed
-    FAIL(false);			//Component Failed, needs Tenant attention
+    PASS(1),				//Component Passed
+    FAIL(0),			//Component Failed, needs Tenant attention
+    NA(-1);			//Component Not Applicable
 
-    private final boolean status;
-    Component_Status(boolean pass){
+    private final int status;
+    Component_Status(int pass){
         status = pass;
     }
-    public boolean isStatus() {
+
+    public int isStatus() {
         return status;
     }
 }

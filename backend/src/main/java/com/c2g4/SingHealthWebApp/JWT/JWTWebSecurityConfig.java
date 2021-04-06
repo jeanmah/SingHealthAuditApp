@@ -43,7 +43,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JWTTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter;
 
     //@value implicitly also implies @Autowired
-    @Value("${com.SHAudit.singHealthAudit.jwt.get.token.uri}")
+    @Value("${com.c2g4.singHealthAudit.jwt.get.token.uri}")
     private String authenticationPath;
 
     @Autowired

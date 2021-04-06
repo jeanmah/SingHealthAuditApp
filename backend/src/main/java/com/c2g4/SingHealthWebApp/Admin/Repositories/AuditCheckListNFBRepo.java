@@ -7,14 +7,18 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 
 
+/**
+ * Repository of SQL queries to interact with the AuditCheckListNFBRepo
+ * @author LunarFox
+ *
+ */
 @Repository
-public interface AuditCheckListNFBRepo extends CrudRepository<AuditCheckListNFBModel, Integer> {
+public interface AuditCheckListNFBRepo extends CrudRepository<AuditCheckListNFBModel, Integer>, AuditCheckListRepo {
     @Query("SELECT * FROM NFBCheckList")
-    List<AuditCheckListFBModel> getAllQuestions();
+    List<AuditCheckListNFBModel> getAllQuestions();
     
     @Query("SELECT * FROM NFBCheckList WHERE qn_id =:qn_id")
     AuditCheckListNFBModel getQuestion(@Param("qn_id") int qn_id);
@@ -25,9 +29,11 @@ public interface AuditCheckListNFBRepo extends CrudRepository<AuditCheckListNFBM
     //Consider making a question class s.t. we get all the details of a qn with one query
     //then we obtain info from the qn object
     //Might be better for the DB
-    @Query("SELECT category FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
+    @Override
+	@Query("SELECT category FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
     String getCategoryByQnID(@Param("fb_qn_id") int category);
 
+    @Override
     @Query("SELECT weight FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
     double getWeightByQnID(@Param("nfb_qn_id") int category);
 

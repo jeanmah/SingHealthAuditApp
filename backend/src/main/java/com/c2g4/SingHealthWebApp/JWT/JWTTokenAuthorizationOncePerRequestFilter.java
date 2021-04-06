@@ -34,13 +34,13 @@ public class JWTTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
-    @Value("${com.SHAudit.singHealthAudit.jwt.http.request.header}")
+    @Value("${com.c2g4.singHealthAudit.jwt.http.request.header}")
     private String tokenHeader;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         logger.debug("Authentication Request For '{}'", request.getRequestURL());
-
+        logger.debug("HTTPSERVLETREQUEST" +request);
         final String requestTokenHeader = request.getHeader(this.tokenHeader);
 
         String username = null;

@@ -20,12 +20,14 @@ function Navbar() {
     }
   }, [toggleClicked]);
 
+  const username = sessionStorage.getItem("authenticatedUser");
+
   return (
     <nav>
       <div className="nav-pc">
         <div className="nav-mobile">
           <img src={auditor} className="logo" alt="auditor"></img>
-          <div className="auditor-name">Welcome Marcus {}</div>
+          <div className="auditor-name">Welcome {username}</div>
           <button
             className="nav-toggle"
             onClick={() => {
@@ -37,10 +39,10 @@ function Navbar() {
         </div>
         <div className="links-container" ref={linksContainerRef}>
           <ul className="links" ref={linksRef}>
-            {navLinks.map((link) => {
+            {navLinks.map((link, index) => {
               const { id, url, text } = link;
               return (
-                <li>
+                <li key={index}>
                   <Link to={url}>{text}</Link>
                 </li>
               );
