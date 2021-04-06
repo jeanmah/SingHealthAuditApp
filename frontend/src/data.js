@@ -715,4 +715,12 @@ export const tenantImages = [
     name: "Coffee Bean",
     imageUrl: "../images/coffee_bean.jpg",
   },
+  {
+    name: "Kopitiam",
+    imageUrl: "../images/kopitiam.jpeg",
+  },
+  {
+    name: "Delifrance",
+    imageUrl: "../images/delifrance.jpeg",
+  },
 ];

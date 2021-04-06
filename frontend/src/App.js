@@ -12,6 +12,7 @@ import FbChecklist from "./pages/FbChecklist";
 import AuthenticatedRoute from "./components/testJwt/AuthenticatedRoute";
 import LoginComponent from "./components/testJwt/Login";
 import HomeAuditor from "./pages/HomeAuditor";
+import Loading from "./pages/Loading";
 // import FbCategoryB from "./pages/fbChecklistPages/FbCategoryB";
 // import FbCategoryC from "./pages/fbChecklistPages/FbCategoryC";
 // import FbCategoryD from "./pages/fbChecklistPages/FbCategoryD";
@@ -24,13 +25,13 @@ function App() {
       <ContextProvider>
         <Switch>
           <Route exact path="/" exact component={LoginComponent} />
-          <AuthenticatedRoute exact path="/home/a" exact component={Home} />
           <AuthenticatedRoute
             exact
-            path="/account"
+            path="/home/a"
             exact
             component={HomeAuditor}
           />
+          <AuthenticatedRoute exact path="/account" exact component={Account} />
           <AuthenticatedRoute
             exact
             path="/institutions"

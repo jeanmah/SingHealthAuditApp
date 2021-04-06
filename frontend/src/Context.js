@@ -31,6 +31,7 @@ export const ContextProvider = (props) => {
 
   //function to submit FbChecklist report to compute the score
   const submitFbReport = useCallback((tenantid, fbreport) => {
+    console.log(fbreport);
     let FormData = require("form-data");
     let formdata = new FormData();
     formdata.append("checklist", JSON.stringify(fbreport));
@@ -106,12 +107,18 @@ export const ContextProvider = (props) => {
     });
   };
 
+  const filterAudits = (category) => {
+    console.log(auditsState);
+  };
+
   /*
   =============== 
   FRONTEND
   ===============
   */
   //FRONTEND STATES AND FUNCTIONS
+  //state for report ids
+  const [reportIdsState, setReportIdsState] = useState();
   //state for report
   const [fbReportState, setFbReportState] = useState([]);
   //state to keep track of audit
@@ -134,7 +141,7 @@ export const ContextProvider = (props) => {
       const { fb_qn_id } = question;
       array.push({
         qn_id: fb_qn_id,
-        status: false,
+        status: true,
         severity: 0,
         remarks: "",
         images: "",
@@ -142,47 +149,44 @@ export const ContextProvider = (props) => {
     });
     //set fbreportstate to array
     setFbReportState(array);
-
-    console.log("created fb report");
-    console.log(array);
   }, []);
 
   //function to update audits state
-  const updateAudit = (
-    tenantid,
-    type,
-    tenantname,
-    // timeremaining,
-    status
-    // date
-  ) => {
-    const tenantObject = tenantsState.find(
-      (tenant) => tenant.tenantid === tenantid
-    );
-    const tenantFbChecklist = tenantObject.fbChecklist;
-    let score = tenantFbChecklist.reduce((total, question) => {
-      if (question.checked === true) {
-        total += 1;
-      }
-      return total;
-    }, 0);
+  // const updateAudit = (
+  //   tenantid,
+  //   type,
+  //   tenantname,
+  //   // timeremaining,
+  //   status
+  //   // date
+  // ) => {
+  //   const tenantObject = tenantsState.find(
+  //     (tenant) => tenant.tenantid === tenantid
+  //   );
+  //   const tenantFbChecklist = tenantObject.fbChecklist;
+  //   let score = tenantFbChecklist.reduce((total, question) => {
+  //     if (question.checked === true) {
+  //       total += 1;
+  //     }
+  //     return total;
+  //   }, 0);
 
-    setAuditsState((prevAudits) => {
-      return [
-        ...prevAudits,
-        {
-          tenantid: tenantid,
-          type: type,
-          tenantname: tenantname,
-          // timeremaining: timeremaining,
-          status: status,
-          // date: date,
-          institution: tenantObject.institution,
-          score: score,
-        },
-      ];
-    });
-  };
+  //   setAuditsState((prevAudits) => {
+  //     return [
+  //       ...prevAudits,
+  //       {
+  //         tenantid: tenantid,
+  //         type: type,
+  //         tenantname: tenantname,
+  //         // timeremaining: timeremaining,
+  //         status: status,
+  //         // date: date,
+  //         institution: tenantObject.institution,
+  //         score: score,
+  //       },
+  //     ];
+  //   });
+  // };
 
   //function to reset tenant's fb checklist checked values
   const resetTenantFbChecklist = (tenantId) => {
@@ -231,13 +235,11 @@ export const ContextProvider = (props) => {
         setTenantsState,
         auditsState,
         setAuditsState,
-        updateAudit,
         resetTenantFbChecklist,
         comment,
         setComment,
         updateTenantComment,
         getFbChecklistQuestions,
-
         fbReportState,
         setFbReportState,
         createFbReportState,
@@ -246,6 +248,7 @@ export const ContextProvider = (props) => {
         getUserInfo,
         getAudits,
         getReport,
+        filterAudits,
       }}
     >
       {props.children}

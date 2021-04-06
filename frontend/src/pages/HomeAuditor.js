@@ -28,11 +28,13 @@ function HomeAuditor() {
         for (let i = 0; i < reportIdArray.length; i++) {
           let reportInfo = await getReport(reportIdArray[i]).then(
             (response) => {
+              console.log(response);
               return response.data;
             }
           );
           reportInfoArray.push(reportInfo);
         }
+
         //set state of audits to be an array of report info objects
         setAuditsState(reportInfoArray);
       } catch (err) {

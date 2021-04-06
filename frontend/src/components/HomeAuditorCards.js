@@ -6,7 +6,6 @@ import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
-
 import Grid from "@material-ui/core/Grid";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -14,6 +13,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Link from "@material-ui/core/Link";
 import { Context } from "../Context";
+import { tenantImages } from "../data";
 import zIndex from "@material-ui/core/styles/zIndex";
 
 // function Copyright() {
@@ -50,7 +50,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   cardMedia: {
-    paddingTop: "56.25%", // 16:9
+    // padding: theme.spacing(2, 2, 2, 2),
+    height: 150,
+    width: "100%",
+    // paddingTop: "56.25%", // 16:9
   },
   cardContent: {
     flexGrow: 1,
@@ -60,8 +63,6 @@ const useStyles = makeStyles((theme) => ({
   //   padding: theme.spacing(6),
   // },
 }));
-
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function HomeAuditorCards() {
   const classes = useStyles();
@@ -74,18 +75,24 @@ export default function HomeAuditorCards() {
         {/* End hero unit */}
         <Grid container spacing={4}>
           {auditsState.map((audit, index) => {
-            const { tenant_id } = audit;
+            const { store_name } = audit;
+            let imageObject = tenantImages.find(
+              (image) => image.name === store_name
+            );
+
             return (
               <Grid item key={index} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
                   <CardMedia
+                    component="img"
+                    alt="tenant-image"
                     className={classes.cardMedia}
-                    image="https://source.unsplash.com/random"
+                    image={`${imageObject.imageUrl}`}
                     title="Image title"
                   />
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant="h5" component="h2">
-                      {tenant_id}
+                      {store_name}
                     </Typography>
                     <Typography>
                       This is a media card. You can use this section to describe

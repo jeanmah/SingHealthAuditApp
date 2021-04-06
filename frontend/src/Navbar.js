@@ -20,12 +20,14 @@ function Navbar() {
     }
   }, [toggleClicked]);
 
+  const username = sessionStorage.getItem("authenticatedUser");
+
   return (
     <nav>
       <div className="nav-pc">
         <div className="nav-mobile">
           <img src={auditor} className="logo" alt="auditor"></img>
-          <div className="auditor-name">Welcome Marcus {}</div>
+          <div className="auditor-name">Welcome {username}</div>
           <button
             className="nav-toggle"
             onClick={() => {
