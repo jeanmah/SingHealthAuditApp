@@ -10,8 +10,13 @@ import org.springframework.stereotype.Repository;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 
+/**
+ * Repository of SQL queries to interact with the AuditCheckListFB Table
+ * @author LunarFox
+ *
+ */
 @Repository
-public interface AuditCheckListFBRepo extends CrudRepository<AuditCheckListFBModel, Integer> {
+public interface AuditCheckListFBRepo extends CrudRepository<AuditCheckListFBModel, Integer>, AuditCheckListRepo{
     @Query("SELECT * FROM FBCheckList")
     List<AuditCheckListFBModel> getAllQuestions();
     
@@ -23,9 +28,11 @@ public interface AuditCheckListFBRepo extends CrudRepository<AuditCheckListFBMod
     
     //Consider create a question class that stores all this info
     //Might be more efficient for the DB by avoiding excessive queries
-    @Query("SELECT category FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
+    @Override
+	@Query("SELECT category FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
     String getCategoryByQnID(@Param("fb_qn_id") int fb_qn_id);
 
+    @Override
     @Query("SELECT weight FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
     double getWeightByQnID(@Param("fb_qn_id") int fb_qn_id);
 

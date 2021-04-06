@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 
 @RestController
-@CrossOrigin(origins= "http://localhost:3000")
+@CrossOrigin(origins= {"http://localhost:3000","http://localhost:3002" })
 public class JWTAuthenticationRestController {
 
-    @Value("${com.SHAudit.singHealthAudit.jwt.http.request.header}")
+    @Value("${com.c2g4.singHealthAudit.jwt.http.request.header}")
     private String tokenHeader;
 
     @Autowired
@@ -48,10 +48,10 @@ public class JWTAuthenticationRestController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
-    @PostMapping(value = "${com.SHAudit.singHealthAudit.jwt.get.token.uri}")
+    @PostMapping(value = "${com.c2g4.singHealthAudit.jwt.get.token.uri}")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JWTTokenRequest authenticationRequest)
             throws AuthenticationException {
-
+        logger.warn("HEREEEE");
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         logger.warn("AUTHENTICATED");
 
@@ -62,7 +62,7 @@ public class JWTAuthenticationRestController {
         return ResponseEntity.ok(new JWTTokenResponse(token,accountType));
     }
 
-    @RequestMapping(value = "${com.SHAudit.singHealthAudit.jwt.refresh.token.uri}", method = RequestMethod.GET)
+    @RequestMapping(value = "${com.c2g4.singHealthAudit.jwt.refresh.token.uri}", method = RequestMethod.GET)
     public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) {
         String authToken = request.getHeader(tokenHeader);
         final String token = authToken.substring(7);
@@ -89,10 +89,7 @@ public class JWTAuthenticationRestController {
         logger.debug("in authenticate");
 
         try {
-            logger.debug("into authentication manager");
-
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            logger.debug("done with manager");
 
         } catch (DisabledException e) {
             throw new AuthenticationException("USER_DISABLED", e);
