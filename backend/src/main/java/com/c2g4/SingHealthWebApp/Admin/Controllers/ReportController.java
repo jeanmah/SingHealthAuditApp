@@ -447,7 +447,9 @@ public class ReportController {
 		return overdueAudits;
 	}
 	
-	@GetMapping("/report/print")
+
+
+	@PostMapping("/report/print")
 	public ResponseEntity<?> printURLRequest(HttpServletRequest request){
 		String strRequest = request.getRequestURL().toString() + "?" + request.getQueryString();
 		String strRequest2 = request.getParameterNames().toString();
@@ -455,7 +457,6 @@ public class ReportController {
 		logger.info(strRequest2);
 		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
-
 
 	private AccountModel convertUserDetailsToAccount(UserDetails callerUser){
 		logger.info("CALLER USER USERNAME {}",callerUser.getUsername());

@@ -39,10 +39,6 @@ public class ChatController {
     @Autowired
     private ChatEntriesRepo chatEntriesRepo;
 
-    private static final String MANAGER = ResourceString.MANAGER_ROLE_KEY;
-    private static final String AUDITOR = ResourceString.AUDITOR_ROLE_KEY;
-    private static final String TENANT = ResourceString.TENANT_ROLE_KEY;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -68,7 +64,8 @@ public class ChatController {
         } else {
             return ResponseEntity.badRequest().body("user is not a tenant or auditor");
         }
-        if (allChats == null) return ResponseEntity.badRequest().body("no chats found");
+
+        if (allChats == null || allChats.isEmpty()) return ResponseEntity.badRequest().body("no chats found");
         return ResponseEntity.ok(allChats);
     }
 
@@ -110,8 +107,7 @@ public class ChatController {
                 allChatEntries.add(chatEntriesModel);
             }
         }
-
-        if (allChatEntries.size()==0) return ResponseEntity.badRequest().body("no chat entries found");
+        if (allChatEntries.isEmpty()) return ResponseEntity.badRequest().body("no chat entries found");
         return ResponseEntity.ok(allChatEntries);
     }
 
@@ -182,7 +178,7 @@ public class ChatController {
         Date date = new Date(Calendar.getInstance().getTime().getTime());
         Time time = new Time(Calendar.getInstance().getTime().getTime());
         //if(!attachments.has(ResourceString.CHAT_ENTRIES_ATTACHMENT_JSON_KEY)) throw new IllegalArgumentException();
-        ChatEntriesModel chatEntriesModel = new ChatEntriesModel(0,date,time, senderId,subject,messageBody,attachments);        chatModel = chatRepo.save(chatModel);
+        ChatEntriesModel chatEntriesModel = new ChatEntriesModel(0,date,time, senderId,subject,messageBody,attachments);
         chatEntriesModel = chatEntriesRepo.save(chatEntriesModel);
         try {
             updateParentChat(chatModel, chatEntriesModel.getChat_entry_id());

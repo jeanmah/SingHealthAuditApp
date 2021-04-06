@@ -1,6 +1,64 @@
 import React from "react";
 
-export const navLinks = [
+const users = [
+  {
+    username: "hannz",
+    password: "test123",
+    type: "auditor",
+  },
+  {
+    username: "ZHZHZH",
+    pasword: "test123",
+    type: "tenant",
+  }
+]
+
+export const auditorAccountDatas = [
+  "acc_id", // 1003
+  "appealed_audits", // null
+  "branch_id", // "*"
+  "completed_audits", // null
+  "email", // "jeanmah828@gmail.com"
+  "employee_id", // 1004332
+  "first_name", // "Hannah"
+  "hp", // "90270062"
+  "last_name", // "Mah"
+  "mgr_id", // 1001
+  "outstanding_audit_ids", // null
+  "role_id", // "Auditor"
+  "username", // "hannz"
+]
+
+export const tenantAccountDatas = [
+  "acc_id", //1004
+  "audit_score", //2
+  "branch_id", //"CGH"
+  "email", //"yzh98640860@gmail.com"
+  "employee_id", //1004516
+  "first_name", //"Zhonghao"
+  "hp", //"98640860"
+  "last_name", //"Yang"
+  "last_audit", //-1
+  "past_audits", //null
+  "role_id", //"Tenant"
+  "store_addr", //"#01-20"
+  "type_id", //"FB"
+  "username", //"ZHZHZH"
+];
+
+export const managerAccountDatas = [
+  "acc_id", //1001
+  "branch_id", //"HQ"
+  "email", //"marcushojww@gmail.com"
+  "employee_id", //1002222
+  "first_name", //"Marcus"
+  "hp", //"+65 432432"
+  "last_name", //"Ho"
+  "role_id", //"Manager"
+  "username", //"mcMarcus"
+];
+
+export const auditorNavLinks = [
   {
     id: 1,
     url: "/home/a",
@@ -8,15 +66,56 @@ export const navLinks = [
   },
   {
     id: 2,
+    url: "/chat",
+    text: "Chat",
+  },
+  {
+    id: 3,
     url: "/institutions",
     text: "Institutions",
   },
   {
-    id: 3,
+    id: 4,
     url: "/account",
     text: "My Account",
   },
 ];
+
+export const tenantNavLinks = [
+  {
+    id: 1,
+    url: "/home/t",
+    text: "Home",
+  },
+  {
+    id: 2,
+    url: "/chat",
+    text: "Chat",
+  },
+  {
+    id: 3,
+    url: "/store",
+    text: "My Store",
+  },
+  {
+    id: 4,
+    url: "/account",
+    text: "My Account",
+  }
+]
+
+export const managerNavLinks = [
+  {
+    id: 1,
+    url: "/home/m",
+    text: "Home",
+  },
+  {
+    id: 2,
+    url: "/account",
+    text: "My Account",
+  }
+]
 
 export const audits = [
   {
@@ -676,25 +775,25 @@ export const fbChecklist = [
   {
     id: "5",
     category: "B",
-    text: "FB-B-Question-1",
+    text: "Cleaning and maintenance records for equipment, ventilation and exhaust system.",
     modalOpen: false,
   },
   {
     id: "6",
     category: "B",
-    text: "FB-B-Question-2",
+    text: "Adequate and regular pest control.",
     modalOpen: false,
   },
   {
     id: "7",
     category: "B",
-    text: "FB-B-Question-3",
+    text: "Goods and equipment are within shop boundary.",
     modalOpen: false,
   },
   {
     id: "8",
     category: "B",
-    text: "FB-B-Question-4",
+    text: "Store display/ Shop front is neat and tidy.",
     modalOpen: false,
   },
 ];
