@@ -34,12 +34,36 @@ function App() {
           <AuthenticatedRoute exact path="/home/t" component={TenantHome} />
           <AuthenticatedRoute exact path="/home/m" component={ManagerHome} />
           <AuthenticatedRoute exact path="/account" component={Account} />
-          <AuthenticatedRoute exact path="/edit_account" component={EditAccount} />
-          <AuthenticatedRoute exact path="/edit_password" component={EditPassword} />
-          <AuthenticatedRoute exact path="/institutions" component={Institutions} />
-          <AuthenticatedRoute exact path="/institution/:institutionid" component={Institution} />
-          <AuthenticatedRoute exact path="/tenant/:tenantId" component={Tenant} />
-          <AuthenticatedRoute exact path="/tenant/fbChecklist/:tenantId" component={FbChecklist} />
+          <AuthenticatedRoute
+            exact
+            path="/edit_account"
+            component={EditAccount}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/edit_password"
+            component={EditPassword}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/institutions"
+            component={Institutions}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/institution/:institutionName"
+            component={Institution}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/:tenantId"
+            component={Tenant}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/fbChecklist/:tenantId"
+            component={FbChecklist}
+          />
           <AuthenticatedRoute exact path="/store" component={Store} />
           <AuthenticatedRoute exact path="/chat" component={Chat} />
           <AuthenticatedRoute exact path="/error" component={Error} />

@@ -6,12 +6,12 @@ import Navbar from "../Navbar";
 import { Context } from "../Context";
 import Loading from "./Loading";
 
-const Institution = React.memo(() => {
+const Institution = () => {
   //obtain id which is indicated in the url
   const { institutionName } = useParams();
   const { getInstitutionTenants } = useContext(Context);
   const [institutionState, setInstitutionState] = useState();
-
+  console.log(institutionName);
   useEffect(() => {
     getInstitutionTenants(institutionName)
       .then((response) => {
@@ -67,6 +67,6 @@ const Institution = React.memo(() => {
       )}
     </div>
   );
-});
+};
 
 export default Institution;

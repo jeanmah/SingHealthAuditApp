@@ -20,7 +20,7 @@ export const ContextProvider = (props) => {
   FbChecklist
   ---------------
   */
-  
+
   const getAccountInfo = () => {
     AuthenticationService.getStoredAxiosInterceptor();
     console.log("this is calling getAccountInfo");
@@ -35,54 +35,56 @@ export const ContextProvider = (props) => {
       .catch(() => {
         console.log("userProfile retrieval failed");
       });
-  }
+  };
 
   const getAllChatsOfUser = () => {
     AuthenticationService.getStoredAxiosInterceptor();
     console.log("This is calling getAllChatsOfUser");
-    return axios
-      .get(`${API_URL}/chat/getAllChatsOfUser`, {
-        params: {},
-      })
-      .then((response) => {
-        console.log("Response from getAllChatsOfUser", response.data);
-        setAllChatsOfUserState(response.data);
-      })
-      // .then((response) => {
-      //   console.log("Response from getAllChatsOfUser", response.data);
-      //   // Since the response.data is an array of chats, use map() to push chats into the state one by one
-      //   response.data.map(chat => {
-      //     setAllChatsOfUserState([]); // Before pushing, clear the original state
-      //     console.log("Pushing new chat: " + chat.chat_id);
-      //     const chats = allChatsOfUserState;
-      //     chats.push(chat);
-      //     setAllChatsOfUserState(chats);
-      //   })
-      //   console.log("All chats pushed: " + allChatsOfUserState);
-      //   console.log("Type of allChatsOfUserState: " + typeof allChatsOfUserState);
-      //   console.log("Chat in chats: " + allChatsOfUserState[0]);
-      //   console.log("Chat in chats: " + allChatsOfUserState[0].chat_id);
-      // })
-      .catch(() => {
-        console.log("allChatsOfUser retrieval failed")
-      })
-  }
+    return (
+      axios
+        .get(`${API_URL}/chat/getAllChatsOfUser`, {
+          params: {},
+        })
+        .then((response) => {
+          console.log("Response from getAllChatsOfUser", response.data);
+          setAllChatsOfUserState(response.data);
+        })
+        // .then((response) => {
+        //   console.log("Response from getAllChatsOfUser", response.data);
+        //   // Since the response.data is an array of chats, use map() to push chats into the state one by one
+        //   response.data.map(chat => {
+        //     setAllChatsOfUserState([]); // Before pushing, clear the original state
+        //     console.log("Pushing new chat: " + chat.chat_id);
+        //     const chats = allChatsOfUserState;
+        //     chats.push(chat);
+        //     setAllChatsOfUserState(chats);
+        //   })
+        //   console.log("All chats pushed: " + allChatsOfUserState);
+        //   console.log("Type of allChatsOfUserState: " + typeof allChatsOfUserState);
+        //   console.log("Chat in chats: " + allChatsOfUserState[0]);
+        //   console.log("Chat in chats: " + allChatsOfUserState[0].chat_id);
+        // })
+        .catch(() => {
+          console.log("allChatsOfUser retrieval failed");
+        })
+    );
+  };
 
   //function to get Fb Checklist questions
   const getFbChecklistQuestions = () => {
     AuthenticationService.getStoredAxiosInterceptor();
-  //   return axios
-  //     .get(`${API_URL}/report/getAllQuestions`, {
-  //       params: { type: "FB" },
-  //     })
-  //     .then((response) => {
-  //       setFbChecklistState(response.data);
-  //       createFbReportState(response.data);
-  //     })
-  //     .catch(() => {
-  //       console.log("fb checklist retrieval failed");
-  //     });
-  // }, []);
+    //   return axios
+    //     .get(`${API_URL}/report/getAllQuestions`, {
+    //       params: { type: "FB" },
+    //     })
+    //     .then((response) => {
+    //       setFbChecklistState(response.data);
+    //       createFbReportState(response.data);
+    //     })
+    //     .catch(() => {
+    //       console.log("fb checklist retrieval failed");
+    //     });
+    // }, []);
 
     return axios.get(`${API_URL}/report/getAllQuestions`, {
       params: { type: "FB" },
@@ -127,7 +129,7 @@ export const ContextProvider = (props) => {
   //function to get tenants in a particular institution
   const getInstitutionTenants = (name) => {
     AuthenticationService.getStoredAxiosInterceptor();
-
+    console.log(name);
     return axios.get(`${API_URL}/account/getAllTenantsOfBranch`, {
       params: { branch_id: name },
     });
@@ -300,7 +302,7 @@ export const ContextProvider = (props) => {
         auditsState,
         setAuditsState,
         resetTenantFbChecklist,
-        
+
         comment,
         setComment,
         updateTenantComment,

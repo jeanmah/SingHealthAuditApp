@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
 function Tenant() {
   //get tenantid from url
   const { tenantId } = useParams();
+  console.log(tenantId);
   //tenant state
   const [tenantState, setTenantState] = useState();
   const [open, setOpen] = useState(false);
