@@ -369,11 +369,13 @@ public class ReportController {
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			report_ids.put(type, auditor.getCompleted_audits());
+			report_ids.put(type, auditor.getCompleted_audits().toString());
+
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
 			report_ids.put(type, auditor.getOutstanding_audit_ids());
+
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_APPEALED)) {
