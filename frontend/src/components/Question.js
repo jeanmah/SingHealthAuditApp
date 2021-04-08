@@ -131,23 +131,47 @@ function Question({ fb_qn_id, requirement, labelId }) {
   //function to update fb report state upon clicking save
   const handleSave = () => {
     let today = new Date();
-    // console.log(today.getFullYear());
-    // console.log(today.getMonth());
-    // console.log(today.getDate());
+    // console.log(severity);
+
+    switch (severity) {
+      case "1":
+        today.setDate(today.getDate() + 21);
+        break;
+      case "2":
+        today.setDate(today.getDate() + 14);
+        break;
+      case "3":
+        today.setDate(today.getDate() + 7);
+        break;
+      case "4":
+        today.setDate(today.getDate() + 4);
+        break;
+      case "5":
+        today.setDate(today.getDate() + 1);
+        break;
+      default:
+        today.setDate(today.getDate());
+        break;
+    }
+    // console.log(today);
+
     let severityDate =
       (today.getDate() < 10
         ? "0" + today.getDate().toString()
-        : today.getDate.toString()) +
+        : today.getDate().toString()) +
       (today.getMonth() < 10
         ? "0" + today.getMonth().toString()
         : today.getMonth().toString()) +
       today.getFullYear().toString().slice(2, 4);
     console.log(severityDate);
-
     setFbReportState((prevState) => {
       return prevState.map((question) =>
         question.qn_id === fb_qn_id && severity !== "0"
-          ? { ...question, severity: severity + severityDate, remarks: comment }
+          ? {
+              ...question,
+              severity: parseInt(severity + severityDate),
+              remarks: comment,
+            }
           : question
       );
     });
@@ -189,9 +213,9 @@ function Question({ fb_qn_id, requirement, labelId }) {
             <Box component="fieldset" mb={3} borderColor="transparent">
               <Typography component="legend">Set Severity</Typography>
               <Rating
-                name="customized-icons"
+                name={`${fb_qn_id}`}
                 defaultValue={0}
-                getLabelText={(value) => customIcons[value].label}
+                // getLabelText={(value) => customIcons[value].label}
                 IconContainerComponent={IconContainer}
                 onChange={(e) => {
                   handleSeverity(e);

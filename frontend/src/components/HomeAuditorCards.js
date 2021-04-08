@@ -87,7 +87,11 @@ export default function HomeAuditorCards() {
                     component="img"
                     alt="tenant-image"
                     className={classes.cardMedia}
-                    image={`${imageObject.imageUrl}`}
+                    image={
+                      imageObject.imageUrl
+                        ? `${imageObject.imageUrl}`
+                        : "url(https://source.unsplash.com/random)"
+                    }
                     title="Image title"
                   />
                   <CardContent className={classes.cardContent}>

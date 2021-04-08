@@ -36,7 +36,9 @@ function HomeAuditor() {
         }
 
         //set state of audits to be an array of report info objects
-        setAuditsState(reportInfoArray);
+        if (reportInfoArray.length === reportIdArray.length) {
+          setAuditsState(reportInfoArray);
+        }
       } catch (err) {
         console.log(err);
       }

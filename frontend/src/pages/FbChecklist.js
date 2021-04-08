@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Question from "../components/Question";
 import { Context } from "../Context";
 import Loading from "./Loading";
@@ -33,13 +33,18 @@ const useStyles = makeStyles((theme) => ({
     color: "#F15A22",
     fontWeight: "medium",
     width: "100%",
-    maxWidth: 800,
+    // maxWidth: 800,
     backgroundColor: theme.palette.background.paper,
     height: 50,
   },
   header: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2, 2, 2, 2),
+  },
+  link: {
+    width: "100%",
+    maxWidth: 800,
+    backgroundColor: theme.palette.background.paper,
   },
 }));
 
@@ -54,6 +59,8 @@ function FbChecklist() {
     getFbChecklistQuestions,
     createFbReportState,
     getUserInfo,
+    fbReportState,
+    submitFbReport,
   } = useContext(Context);
 
   //state to update fb checklist questions
@@ -67,7 +74,7 @@ function FbChecklist() {
         const tenant_name = await getUserInfo(tenantId).then((response) => {
           return response.data.store_name;
         });
-        console.log(tenant_name);
+        // console.log(tenant_name);
         setTenantName(tenant_name);
       } catch (err) {
         console.log(err);
@@ -83,6 +90,12 @@ function FbChecklist() {
         console.log("fb checklist retrieval failed");
       });
   }, []);
+
+  //function to submit report upon click of submit
+  async function handleSubmit(tenantid, report) {
+    let score = await submitFbReport(tenantid, report);
+    // console.log(score);
+  }
 
   return (
     <>
@@ -110,54 +123,24 @@ function FbChecklist() {
                 );
               })}
             </List>
-            <Button
-              className={classes.button}
-              size="small"
-              // color="secondary"
-            >
-              Submit
-            </Button>
+            <Link to={`/tenant/${tenantId}`} className={classes.link}>
+              <Button
+                className={classes.button}
+                size="small"
+                onClick={() => {
+                  handleSubmit(tenantId, fbReportState);
+                }}
+                // color="secondary"
+              >
+                Submit checklist
+              </Button>
+            </Link>
           </Grid>
         </>
       ) : (
         <Loading />
       )}
     </>
-    // <div>
-    //   {fbChecklistState ? (
-    //     <>
-    //       <Navbar />
-    //       <div className="category-head">
-    //         <h2>FB Checklist</h2>
-    //         {fbChecklistState.map((question, index) => {
-    //           const { fb_qn_id, requirement } = question;
-    //           return (
-    //             <Question
-    //               key={index}
-    //               fb_qn_id={fb_qn_id}
-    //               requirement={requirement}
-    //               tenantId={tenantId}
-    //             />
-    //           );
-    //         })}
-    //         <br />
-    //         {/* <Link to={`/tenant/${tenantId}`}> */}
-    //         <button
-    //           // onClick={() => {
-    //           //   updateAudit(tenantId, "FB", tenantName, "unresolved");
-    //           //   resetTenantFbChecklist(tenantId);
-    //           // }}
-    //           onClick={() => submitFbReport(1006, fbReportState)}
-    //         >
-    //           Submit
-    //         </button>
-    //         {/* </Link> */}
-    //       </div>
-    //     </>
-    //   ) : (
-    //     <Loading />
-    //   )}
-    // </div>
   );
 }
 

@@ -10,8 +10,8 @@ const users = [
     username: "ZHZHZH",
     pasword: "test123",
     type: "tenant",
-  }
-]
+  },
+];
 
 export const auditorAccountDatas = [
   "acc_id", // 1003
@@ -27,7 +27,7 @@ export const auditorAccountDatas = [
   "outstanding_audit_ids", // null
   "role_id", // "Auditor"
   "username", // "hannz"
-]
+];
 
 export const tenantAccountDatas = [
   "acc_id", //1004
@@ -101,8 +101,8 @@ export const tenantNavLinks = [
     id: 4,
     url: "/account",
     text: "My Account",
-  }
-]
+  },
+];
 
 export const managerNavLinks = [
   {
@@ -114,8 +114,8 @@ export const managerNavLinks = [
     id: 2,
     url: "/account",
     text: "My Account",
-  }
-]
+  },
+];
 
 export const audits = [
   {
@@ -775,7 +775,8 @@ export const fbChecklist = [
   {
     id: "5",
     category: "B",
-    text: "Cleaning and maintenance records for equipment, ventilation and exhaust system.",
+    text:
+      "Cleaning and maintenance records for equipment, ventilation and exhaust system.",
     modalOpen: false,
   },
   {
@@ -821,5 +822,9 @@ export const tenantImages = [
   {
     name: "Delifrance",
     imageUrl: "../images/delifrance.jpeg",
+  },
+  {
+    name: "Mr Bean",
+    imageUrl: "../images/mr_bean.jpeg",
   },
 ];

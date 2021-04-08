@@ -15,21 +15,15 @@ export const ContextProvider = (props) => {
   ===============
   */
 
-  /*
-  ---------------
-  FbChecklist
-  ---------------
-  */
-
   const getAccountInfo = () => {
     AuthenticationService.getStoredAxiosInterceptor();
-    console.log("this is calling getAccountInfo");
+    // console.log("this is calling getAccountInfo");
     return axios
       .get(`${API_URL}/account/getUserProfile`, {
         params: {},
       })
       .then((response) => {
-        console.log("Response from getUserProfile", response.data);
+        // console.log("Response from getUserProfile", response.data);
         setAccountState(response.data);
       })
       .catch(() => {
@@ -70,6 +64,11 @@ export const ContextProvider = (props) => {
     );
   };
 
+  /*
+  ---------------
+  FbChecklist
+  ---------------
+  */
   //function to get Fb Checklist questions
   const getFbChecklistQuestions = () => {
     AuthenticationService.getStoredAxiosInterceptor();
@@ -90,7 +89,11 @@ export const ContextProvider = (props) => {
       params: { type: "FB" },
     });
   };
-
+  /*
+  ---------------
+  FbReport
+  ---------------
+  */
   //function to submit FbChecklist report to compute the score
   const submitFbReport = useCallback((tenantid, fbreport) => {
     console.log(fbreport);
@@ -111,9 +114,9 @@ export const ContextProvider = (props) => {
       )
       .then((response) => {
         console.log(response);
-        if (response.status === 200) {
-          return <Redirect to={`/tenant/${tenantid}`} />;
-        }
+        // if (response.status === 200) {
+        //   return <Redirect to={`/tenant/${tenantid}`} />;
+        // }
       })
       .catch(() => {
         console.log("Failed FB report submission");
@@ -149,9 +152,9 @@ export const ContextProvider = (props) => {
   };
 
   /*
-  --------------- 
-  Home Auditor
-  ---------------
+  --------------------- 
+  Home Auditor & Tenant
+  ---------------------
   */
 
   //function to get all the audits done given auditor's username
@@ -159,6 +162,13 @@ export const ContextProvider = (props) => {
     AuthenticationService.getStoredAxiosInterceptor();
     return axios.get(`${API_URL}/report/getReportIDs`, {
       params: { username: userName, type: "ALL" },
+    });
+  };
+  //function to get all the audits given tenant id
+  const getAuditsTenant = (tenantid) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getReportIDs`, {
+      params: { user_id: tenantid, type: "ALL" },
     });
   };
 
@@ -325,6 +335,7 @@ export const ContextProvider = (props) => {
         getAudits,
         getReport,
         filterAudits,
+        getAuditsTenant,
       }}
     >
       {props.children}
