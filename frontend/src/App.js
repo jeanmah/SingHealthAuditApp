@@ -1,7 +1,7 @@
 //import logo from "./logo.svg";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import AuditorHome from "./pages/AuditorHome";
+
 import Account from "./pages/Account";
 import Tenant from "./pages/Tenant";
 import Error from "./pages/Error";
@@ -12,10 +12,7 @@ import AuthenticatedRoute from "./components/testJwt/AuthenticatedRoute";
 import LoginComponent from "./components/testJwt/Login";
 import HomeAuditor from "./pages/HomeAuditor";
 import Loading from "./pages/Loading";
-// import FbCategoryB from "./pages/fbChecklistPages/FbCategoryB";
-// import FbCategoryC from "./pages/fbChecklistPages/FbCategoryC";
-// import FbCategoryD from "./pages/fbChecklistPages/FbCategoryD";
-// import FbCategoryE from "./pages/fbChecklistPages/FbCategoryE";
+import AuditReport from "./pages/AuditReport";
 import { ContextProvider } from "./Context";
 import TenantHome from "./pages/TenantHome";
 import ManagerHome from "./pages/ManagerHome";
@@ -63,6 +60,11 @@ function App() {
             exact
             path="/tenant/fbChecklist/:tenantId"
             component={FbChecklist}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/report/:reportId"
+            component={AuditReport}
           />
           <AuthenticatedRoute exact path="/store" component={Store} />
           <AuthenticatedRoute exact path="/chat" component={Chat} />

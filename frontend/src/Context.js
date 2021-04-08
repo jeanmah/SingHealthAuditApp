@@ -149,9 +149,9 @@ export const ContextProvider = (props) => {
   };
 
   /*
-  --------------- 
-  Home Auditor
-  ---------------
+  --------------------- 
+  Home Auditor & Tenant
+  ----------------------
   */
 
   //function to get all the audits done given auditor's username
@@ -162,9 +162,23 @@ export const ContextProvider = (props) => {
     });
   };
 
+  const getTenantAudits = (tenantid) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getReportIDs`, {
+      params: { user_id: tenantid, type: "ALL" },
+    });
+  };
+
   const getReport = (reportId) => {
     AuthenticationService.getStoredAxiosInterceptor();
     return axios.get(`${API_URL}/report/getReport`, {
+      params: { report_id: parseInt(reportId) },
+    });
+  };
+
+  const getReportStats = (reportId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getReportStatistics`, {
       params: { report_id: parseInt(reportId) },
     });
   };
@@ -325,6 +339,8 @@ export const ContextProvider = (props) => {
         getAudits,
         getReport,
         filterAudits,
+        getTenantAudits,
+        getReportStats,
       }}
     >
       {props.children}

@@ -20,6 +20,7 @@ import FastfoodIcon from "@material-ui/icons/Fastfood";
 import StoreIcon from "@material-ui/icons/Store";
 import LocalHospitalIcon from "@material-ui/icons/LocalHospital";
 import Grid from "@material-ui/core/Grid";
+import ReceiptIcon from "@material-ui/icons/Receipt";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,12 +50,14 @@ const useStyles = makeStyles((theme) => ({
 function Tenant() {
   //get tenantid from url
   const { tenantId } = useParams();
-  console.log(tenantId);
+  // console.log(tenantId);
   //tenant state
   const [tenantState, setTenantState] = useState();
-  const [open, setOpen] = useState(false);
+  const [tenantAudits, setTenantAudits] = useState();
+  const [openChecklist, setOpenChecklist] = useState(false);
+  const [openPrevAudits, setOpenPrevAudits] = useState(false);
   //Context: getUserInfo method
-  const { getUserInfo } = useContext(Context);
+  const { getUserInfo, getTenantAudits, getReport } = useContext(Context);
 
   const classes = useStyles();
 
@@ -67,15 +70,53 @@ function Tenant() {
       .catch(() => {
         console.log("Failed to retrieve tenant info");
       });
+
+    async function getResponse() {
+      try {
+        const reportIdArray = await getTenantAudits(tenantId).then(
+          (response) => {
+            return [
+              ...response.data.CLOSED.past_audits,
+              response.data.LATEST.toString(),
+            ];
+          }
+        );
+        console.log(reportIdArray);
+        //initialize array to store all objects of report info
+        let reportInfoArray = [];
+
+        for (let i = 0; i < reportIdArray.length; i++) {
+          let reportInfo = await getReport(reportIdArray[i]).then(
+            (response) => {
+              return response.data;
+            }
+          );
+          reportInfoArray.push(reportInfo);
+        }
+        console.log(reportInfoArray);
+        if (reportInfoArray.length === reportIdArray.length) {
+          setTenantAudits(reportInfoArray);
+        }
+
+        //set state of audits to be an array of report info objects
+        // setAuditsState(reportInfoArray);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getResponse();
   }, []);
 
-  const handleClick = () => {
-    setOpen(!open);
+  const handleChecklistClick = () => {
+    setOpenChecklist(!openChecklist);
+  };
+  const handlePrevAuditsClick = () => {
+    setOpenPrevAudits(!openPrevAudits);
   };
 
   return (
     <div>
-      {tenantState ? (
+      {tenantState && tenantAudits ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -93,15 +134,55 @@ function Tenant() {
                 </ListItemIcon>
                 <ListItemText primary="View Chats" />
               </ListItem>
-              <ListItem button divider={true} className={classes.listItem}>
+              <ListItem
+                button
+                onClick={handlePrevAuditsClick}
+                divider={true}
+                className={classes.listItem}
+              >
                 <ListItemIcon>
                   <HistoryIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="View Previous Audits" />
+                {openPrevAudits ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
+              <Collapse in={openPrevAudits} timeout="auto" unmountOnExit>
+                {tenantAudits.map((audit, index) => {
+                  const {
+                    open_date,
+                    overall_score,
+                    report_id,
+                    report_type,
+                    overall_status,
+                  } = audit;
+                  return (
+                    <Link to={`/tenant/report/${report_id}`}>
+                      <List component="div" disablePadding>
+                        <ListItem button className={classes.nested}>
+                          <ListItemIcon>
+                            <ReceiptIcon color="secondary" />
+                          </ListItemIcon>
+                          {report_type === "FB" && (
+                            <ListItemText
+                              primary={`F&B Checklist conducted on ${new Date(
+                                open_date
+                              ).toString()}`}
+                              secondary={
+                                overall_status === 0
+                                  ? `Score: ${overall_score} (UNRESOLVED)`
+                                  : `Score: ${overall_score}`
+                              }
+                            />
+                          )}
+                        </ListItem>
+                      </List>
+                    </Link>
+                  );
+                })}
+              </Collapse>
               <ListItem
                 button
-                onClick={handleClick}
+                onClick={handleChecklistClick}
                 divider={true}
                 className={classes.listItem}
               >
@@ -109,9 +190,10 @@ function Tenant() {
                   <AssignmentTurnedInIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="Select Checklist" />
-                {open ? <ExpandLess /> : <ExpandMore />}
+                {openChecklist ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
-              <Collapse in={open} timeout="auto" unmountOnExit>
+
+              <Collapse in={openChecklist} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <Link to={`/tenant/fbChecklist/${tenantId}`}>
                     <ListItem button className={classes.nested}>

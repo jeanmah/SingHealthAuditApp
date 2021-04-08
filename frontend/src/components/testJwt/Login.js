@@ -1,10 +1,22 @@
 import React, { Component, useState } from "react";
-import { Grid, Link, Paper, CssBaseline, Box, Typography, Avatar, Button, TextField, FormControlLabel, Checkbox } from "@material-ui/core";
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-// import red from '@material-ui/core/colors/red';
+import {
+  Grid,
+  Link,
+  Paper,
+  CssBaseline,
+  Box,
+  Typography,
+  Avatar,
+  Button,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+} from "@material-ui/core";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import singhealthBackground from "../../images/singhealth_building.png";
 
 import AuthenticationService from "../../AuthenticationService";
-import useStyles from '../../../src/styles';
+import useStyles from "../../../src/styles";
 import { useHistory } from "react-router";
 
 function Login() {
@@ -18,13 +30,17 @@ function Login() {
 
   const DisplayMessage = () => {
     if (hasLoginFailedState) {
-      return <Typography align="center" color="secondary">Invalid Credentials</Typography>
+      return (
+        <Typography align="center" color="secondary">
+          Invalid Credentials
+        </Typography>
+      );
     } else if (showSuccessMessageState) {
-      return <Typography>Login Successful</Typography>
+      return <Typography>Login Successful</Typography>;
     } else {
       return null;
     }
-  }
+  };
 
   function loginClicked() {
     console.log(usernameState);
@@ -53,7 +69,7 @@ function Login() {
         setShowSuccessMessageState(false);
         setHasLoginFailedState(true);
       });
-  };
+  }
 
   return (
     <Grid container component="main" className={styles.root}>
@@ -127,8 +143,7 @@ function Login() {
         </div>
       </Grid>
     </Grid>
-  )
-
+  );
 }
 
 class LoginComponent extends Component {
