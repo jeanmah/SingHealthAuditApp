@@ -41,7 +41,7 @@ export default function CenteredTabs() {
     getTenantAudits,
     getUserInfoNoParams,
     getReport,
-
+    getClosedTenantAudits,
     tenantState,
     setTenantState,
   } = useContext(Context);
@@ -60,11 +60,11 @@ export default function CenteredTabs() {
           return response.data.acc_id;
         });
         // console.log(tenantId);
-        if (category === "RESOLVED") {
+        if (category === "OVERDUE") {
           const reportIdArray = await getTenantAudits(tenantId).then(
             (response) => {
               console.log(response);
-              return response.data.CLOSED;
+              return response.data.OVERDUE;
             }
           );
           //initialize array to store all objects of report info
@@ -137,22 +137,22 @@ export default function CenteredTabs() {
       <StyledTabs value={value} onChange={handleChange} centered>
         <StyledTab
           onClick={() => {
+            filterAudits("COMPLETED");
+          }}
+          label="COMPLETED"
+        />
+        <StyledTab
+          onClick={() => {
             filterAudits("UNRESOLVED");
           }}
           label="UNRESOLVED"
         />
         <StyledTab
           onClick={() => {
-            filterAudits("RESOLVED");
-          }}
-          label="RESOLVED"
-        />
-        {/* <StyledTab
-          onClick={() => {
             filterAudits("OVERDUE");
           }}
           label="OVERDUE"
-        /> */}
+        />
       </StyledTabs>
     </Paper>
   );

@@ -22,17 +22,14 @@ function TenantHome() {
           console.log(response);
           return response.data.acc_id;
         });
+        console.log(tenantId);
         const reportIdArray = await getTenantAudits(tenantId).then(
           (response) => {
             console.log(response);
-            return [
-              ...response.data.CLOSED.past_audits,
-              response.data.LATEST.toString(),
-            ];
+            // return [response.data.LATEST, ...response.data.CLOSED];
           }
         );
-        console.log(reportIdArray);
-        // initialize array to store all objects of report info
+        //initialize array to store all objects of report info
         let reportInfoArray = [];
 
         for (let i = 0; i < reportIdArray.length; i++) {
@@ -43,8 +40,8 @@ function TenantHome() {
           );
           reportInfoArray.push(reportInfo);
         }
-        console.log(reportInfoArray);
         if (reportInfoArray.length === reportIdArray.length) {
+          console.log(reportInfoArray);
           setTenantState(reportInfoArray);
         }
       } catch (err) {

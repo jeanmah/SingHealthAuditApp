@@ -174,10 +174,10 @@ export const ContextProvider = (props) => {
     });
   };
 
-  // const geClosedTenantAudits = (tenantid) => {
+  // const getClosedTenantAudits = (tenantid) => {
   //   AuthenticationService.getStoredAxiosInterceptor();
   //   return axios.get(`${API_URL}/report/getReportIDs`, {
-  //     params: { user_id: tenantid, type: "LATEST" },
+  //     params: { user_id: tenantid, type: "CLOSED" },
   //   });
   // };
 
@@ -358,7 +358,7 @@ export const ContextProvider = (props) => {
         getUserInfoNoParams,
         getAudits,
         getReport,
-        // geClosedTenantAudits,
+        // getClosedTenantAudits,
         getTenantAudits,
         getReportStats,
         getReportEntry,
