@@ -435,6 +435,12 @@ public class ReportController {
 			report_ids.put(ResourceString.GETREPORT_FILTER_LATEST, tenant.getLatest_audit());
 			logger.info("latest audit tenant {}", tenant.getLatest_audit());
 		}
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL)
+				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
+			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
+			outstandingAuditIds.add(tenant.getLatest_audit());
+			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
+		}
 		return report_ids;
 	}
 	
