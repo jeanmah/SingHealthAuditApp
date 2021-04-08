@@ -64,24 +64,40 @@ function Tenant() {
   useEffect(() => {
     getUserInfo(tenantId)
       .then((response) => {
-        console.log(response);
+        // console.log(response);
         setTenantState(response.data);
       })
       .catch(() => {
         console.log("Failed to retrieve tenant info");
       });
 
+    // console.log(tenantId);
+
     async function getResponse() {
       try {
         const reportIdArray = await getTenantAudits(tenantId).then(
           (response) => {
-            return [
-              ...response.data.CLOSED.past_audits,
-              response.data.LATEST.toString(),
-            ];
+            console.log(response);
+            if (response.data.LATEST === -1 && response.data.OVERDUE === -1) {
+              return [...response.data.CLOSED.past_audits];
+            }
+            if (response.data.LATEST === -1) {
+              return [
+                ...response.data.CLOSED.past_audits,
+                response.data.OVERDUE,
+              ];
+            }
+            if (response.data.OVERDUE === -1) {
+              return [
+                ...response.data.CLOSED.past_audits,
+                response.data.LATEST,
+              ];
+            }
+
+            // return [response.data.LATEST, ...response.data.CLOSED];
           }
         );
-        console.log(reportIdArray);
+        // console.log(reportIdArray);
         //initialize array to store all objects of report info
         let reportInfoArray = [];
 
@@ -93,13 +109,10 @@ function Tenant() {
           );
           reportInfoArray.push(reportInfo);
         }
-        console.log(reportInfoArray);
         if (reportInfoArray.length === reportIdArray.length) {
+          console.log(reportInfoArray);
           setTenantAudits(reportInfoArray);
         }
-
-        //set state of audits to be an array of report info objects
-        // setAuditsState(reportInfoArray);
       } catch (err) {
         console.log(err);
       }

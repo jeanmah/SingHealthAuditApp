@@ -26,9 +26,26 @@ function TenantHome() {
         const reportIdArray = await getTenantAudits(tenantId).then(
           (response) => {
             console.log(response);
+            if (response.data.LATEST === -1 && response.data.OVERDUE === -1) {
+              return [...response.data.CLOSED.past_audits];
+            }
+            if (response.data.LATEST === -1) {
+              return [
+                ...response.data.CLOSED.past_audits,
+                response.data.OVERDUE,
+              ];
+            }
+            if (response.data.OVERDUE === -1) {
+              return [
+                ...response.data.CLOSED.past_audits,
+                response.data.LATEST,
+              ];
+            }
+
             // return [response.data.LATEST, ...response.data.CLOSED];
           }
         );
+        console.log(reportIdArray);
         //initialize array to store all objects of report info
         let reportInfoArray = [];
 

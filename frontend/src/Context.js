@@ -23,13 +23,13 @@ export const ContextProvider = (props) => {
 
   const getAccountInfo = () => {
     AuthenticationService.getStoredAxiosInterceptor();
-    console.log("this is calling getAccountInfo");
+    // console.log("this is calling getAccountInfo");
     return axios
       .get(`${API_URL}/account/getUserProfile`, {
         params: {},
       })
       .then((response) => {
-        console.log("Response from getUserProfile", response.data);
+        // console.log("Response from getUserProfile", response.data);
         setAccountState(response.data);
       })
       .catch(() => {
