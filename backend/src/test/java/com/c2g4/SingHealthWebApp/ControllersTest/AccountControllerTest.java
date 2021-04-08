@@ -7,7 +7,6 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONObject;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 
 import java.util.ArrayList;
