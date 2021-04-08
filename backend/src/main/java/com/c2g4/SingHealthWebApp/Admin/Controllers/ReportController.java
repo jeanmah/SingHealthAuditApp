@@ -311,19 +311,21 @@ public class ReportController {
 		ObjectNode jNode = objectMapper.createObjectNode();
 		
 		//Get failed entries
-		List<Integer> failed_entry_ids = new ArrayList<>();
+		ArrayNode failed_entry_ids = objectMapper.createArrayNode();
+//		List<Integer> failed_entry_ids = new ArrayList<>();
 		for(ReportEntry entry:builder.getEntries()) {
 			if(entry.getStatus()==Component_Status.FAIL) {
 				failed_entry_ids.add(entry.getEntry_id());
 			}
 		}
-		
-		try {
-			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		
+
+//		try {
+//			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
+//		} catch (JsonProcessingException e) {
+//			e.printStackTrace();
+//		}
+		jNode.put("Failed_Entries", failed_entry_ids);
+
 		//Get score
 		jNode.put("Score", builder.getOverall_score());
 		
