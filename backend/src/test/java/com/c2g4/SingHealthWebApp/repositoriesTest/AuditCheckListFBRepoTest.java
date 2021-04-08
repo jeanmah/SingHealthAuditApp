@@ -30,12 +30,61 @@ public class AuditCheckListFBRepoTest {
 
     @Test
     public void getAllQuestions(){
-        List<AuditCheckListFBModel> auditCheckListFBModels = createAuditChecklistList();
-        for(AuditCheckListFBModel a:auditCheckListFBModels){
-            auditCheckListFBRepo.save(a);
-        }
+        List<AuditCheckListFBModel> auditCheckListFBModels = createAndSaveList();
         List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getAllQuestions();
+        assert(auditCheckListFBModels.size()==actualList.size());
+        for(int i=0;i<auditCheckListFBModels.size();i++){
+            assert(compareQuestions(auditCheckListFBModels.get(i),actualList.get(i)));
+        }
     }
+
+    @Test
+    public void getAllQuestionsNoQuestions(){
+        List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getAllQuestions();
+        assert(actualList.size()==0);
+    }
+
+    @Test
+    public void getQuestion(){
+        List<AuditCheckListFBModel> expectedModels = createAndSaveList();
+        AuditCheckListFBModel actual = auditCheckListFBRepo.getQuestion(expectedModels.get(0).getFb_qn_id());
+        assert(compareQuestions(expectedModels.get(0),actual));
+    }
+
+    @Test
+    public void getQuestionNotFound(){
+        AuditCheckListFBModel actual = auditCheckListFBRepo.getQuestion(-10);
+        assert(actual ==null);
+    }
+
+    @Test
+    public void getQuestionByCategory(){
+        String thisCat = "thisCat";
+        createAndSaveList();
+        List<AuditCheckListFBModel> auditCheckListFBModelsThisCat = createAndSaveList(thisCat);
+        List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getQuestionByCategory(thisCat);
+        assert(auditCheckListFBModelsThisCat.size()==actualList.size());
+        for(int i=0;i<actualList.size();i++){
+            assert(compareQuestions(actualList.get(i),actualList.get(i)));
+        }
+    }
+
+    @Test
+    public void getQuestionByCategoryNoQuestions(){
+        List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getAllQuestions();
+        assert(actualList.size()==0);
+    }
+
+//    @Query("SELECT * FROM FBCheckList WHERE category = :category")
+//    List<AuditCheckListFBModel> getQuestionByCategory(@Param("category") String category);
+//
+//    @Override
+//    @Query("SELECT category FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
+//    String getCategoryByQnID(@Param("fb_qn_id") int fb_qn_id);
+//
+//    @Override
+//    @Query("SELECT weight FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
+//    double getWeightByQnID(@Param("fb_qn_id") int fb_qn_id);
 
     private boolean compareQuestions(AuditCheckListFBModel expected, AuditCheckListFBModel actual){
         boolean id = expected.getFb_qn_id()==actual.getFb_qn_id();
@@ -47,42 +96,33 @@ public class AuditCheckListFBRepoTest {
         return id && cat && subcat && weight && req && subreq;
     }
 
-    private List<AuditCheckListFBModel> createAuditChecklistList(){
+    private List<AuditCheckListFBModel> createAuditChecklistList(String category){
         List<AuditCheckListFBModel> auditCheckListFBModels = new ArrayList<>();
         for(int i=0;i<3;i++){
-            auditCheckListFBModels.add(createChecklist());
+            auditCheckListFBModels.add(createChecklist(category));
         }
         return auditCheckListFBModels;
     }
+    private List<AuditCheckListFBModel> createAndSaveList(){
+        return  createAndSaveList(CATEGORY);
+    }
+    private List<AuditCheckListFBModel> createAndSaveList(String category){
+        List<AuditCheckListFBModel> auditCheckListFBModels = createAuditChecklistList(category);
+        List<AuditCheckListFBModel> auditCheckListFBModelsUpdated = new ArrayList<>();
+        for (AuditCheckListFBModel auditCheckListFBModel : auditCheckListFBModels) {
+            auditCheckListFBModelsUpdated.add(auditCheckListFBRepo.save(auditCheckListFBModel));
+        }
+        return auditCheckListFBModelsUpdated;
+    }
 
-    private AuditCheckListFBModel createChecklist(){
+    private AuditCheckListFBModel createChecklist(String category){
         AuditCheckListFBModel auditCheckListFBModel = new AuditCheckListFBModel();
         auditCheckListFBModel.setFb_qn_id(0);
-        auditCheckListFBModel.setCategory(CATEGORY);
-        auditCheckListFBModel.setSub_category(CATEGORY);
+        auditCheckListFBModel.setCategory(category);
+        auditCheckListFBModel.setSub_category(category);
         auditCheckListFBModel.setWeight(0);
         auditCheckListFBModel.setRequirement("REQUIREMENT");
         auditCheckListFBModel.setSub_requirement("REQUIREMENT");
         return auditCheckListFBModel;
     }
-
-
-//    @Query("SELECT * FROM FBCheckList")
-//    List<AuditCheckListFBModel> getAllQuestions();
-//
-//    @Query("SELECT * FROM FBCheckList WHERE qn_id =:qn_id")
-//    AuditCheckListNFBModel getQuestion(@Param("qn_id") int qn_id);
-//
-//    @Query("SELECT * FROM FBCheckList WHERE category = :category")
-//    List<AuditCheckListFBModel> getQuestionByCategory(@Param("category") String category);
-//
-//    //Consider create a question class that stores all this info
-//    //Might be more efficient for the DB by avoiding excessive queries
-//    @Override
-//    @Query("SELECT category FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
-//    String getCategoryByQnID(@Param("fb_qn_id") int fb_qn_id);
-//
-//    @Override
-//    @Query("SELECT weight FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
-//    double getWeightByQnID(@Param("fb_qn_id") int fb_qn_id);
 }
