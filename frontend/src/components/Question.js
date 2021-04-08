@@ -130,6 +130,7 @@ function Question({ fb_qn_id, requirement, labelId }) {
   };
   //function to update fb report state upon clicking save
   const handleSave = () => {
+    alert(`Input saved for question ${parseInt(fb_qn_id)}`);
     let today = new Date();
     switch (severity) {
       case "1":

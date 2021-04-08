@@ -93,10 +93,16 @@ function Tenant() {
                 response.data.LATEST,
               ];
             }
+            return [
+              ...response.data.CLOSED.past_audits,
+              response.data.LATEST,
+              response.data.OVERDUE,
+            ];
 
             // return [response.data.LATEST, ...response.data.CLOSED];
           }
         );
+        console.log(reportIdArray);
         // console.log(reportIdArray);
         //initialize array to store all objects of report info
         let reportInfoArray = [];
@@ -109,6 +115,7 @@ function Tenant() {
           );
           reportInfoArray.push(reportInfo);
         }
+
         if (reportInfoArray.length === reportIdArray.length) {
           console.log(reportInfoArray);
           setTenantAudits(reportInfoArray);

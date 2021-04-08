@@ -111,9 +111,9 @@ export const ContextProvider = (props) => {
       )
       .then((response) => {
         console.log(response);
-        if (response.status === 200) {
-          return <Redirect to={`/tenant/${tenantid}`} />;
-        }
+        // if (response.status === 200) {
+        //   return <Redirect to={`/tenant/${tenantid}`} />;
+        // }
       })
       .catch(() => {
         console.log("Failed FB report submission");
