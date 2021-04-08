@@ -66,7 +66,7 @@ function App() {
             path="/tenant/report/:reportId"
             component={AuditReport}
           />
-          <AuthenticatedRoute exact path="/store" component={Store} />
+          <AuthenticatedRoute exact path="/t/store" component={Store} />
           <AuthenticatedRoute exact path="/chat" component={Chat} />
           <AuthenticatedRoute exact path="/error" component={Error} />
         </Switch>

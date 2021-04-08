@@ -94,7 +94,7 @@ export const tenantNavLinks = [
   },
   {
     id: 3,
-    url: "/store",
+    url: "/t/store",
     text: "My Store",
   },
   {

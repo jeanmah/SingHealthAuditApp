@@ -9,9 +9,7 @@ function ManagerHome() {
   return (
     <main>
       <Navbar />
-      <div>
-        This is manager homepage
-      </div>
+      <div>This is manager homepage</div>
     </main>
   );
 }

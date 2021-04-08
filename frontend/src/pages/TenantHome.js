@@ -41,7 +41,11 @@ function TenantHome() {
                 response.data.LATEST,
               ];
             }
-
+            return [
+              ...response.data.CLOSED.past_audits,
+              response.data.LATEST,
+              response.data.OVERDUE,
+            ];
             // return [response.data.LATEST, ...response.data.CLOSED];
           }
         );

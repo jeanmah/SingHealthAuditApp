@@ -185,7 +185,7 @@ function Question({ fb_qn_id, requirement, labelId }) {
           aria-controls="additional-actions1-content"
           id="additional-actions1-header"
         >
-          <ListItem button>
+          <ListItem>
             <ListItemText id={fb_qn_id} primary={`${requirement}`} />
             <Checkbox
               // edge="end"
