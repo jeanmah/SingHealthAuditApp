@@ -428,9 +428,14 @@ public class ReportController {
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, tenant.getPast_audits());
+			JsonNode pastAudits = tenant.getPast_audits();
+			if(!pastAudits.has(ResourceString.TENANT_PAST_AUDITS_JSON_KEY)) {
+				ObjectNode pastAuditNode = objectmapper.createObjectNode();
+				pastAuditNode.put(ResourceString.TENANT_PAST_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+				pastAudits = pastAuditNode;
+			}
+			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, pastAudits);
 			logger.info("past audit tenant {}", tenant.getPast_audits().asText());
-
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_LATEST)) {
@@ -441,11 +446,12 @@ public class ReportController {
 				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
 			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
 			int latest_audit = tenant.getLatest_audit();
+
 			if(latest_audit!=-1){
 				outstandingAuditIds.add(latest_audit);
-				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
+				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds).get(0));
 			} else{
-				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,objectmapper.createObjectNode());
+				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,-1);
 			}
 		}
 		return report_ids;
@@ -458,11 +464,19 @@ public class ReportController {
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 			  || type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			 report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
+			ObjectNode completed_audits = (ObjectNode) auditor.getCompleted_audits();
+			if(!completed_audits.has(ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY)) {
+				completed_audits.put(ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+			}
+			 report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED,completed_audits);
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 			  || type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
-			 report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, auditor.getOutstanding_audit_ids());
+			ObjectNode outstandingAuditIds = (ObjectNode) auditor.getOutstanding_audit_ids();
+			if(!outstandingAuditIds.has(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY)) {
+				outstandingAuditIds.put(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+			}
+			 report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, outstandingAuditIds);
 			 logger.info("outstanding {}", auditor.getOutstanding_audit_ids());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
