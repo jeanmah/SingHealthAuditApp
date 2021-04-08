@@ -56,7 +56,7 @@ public class AccountRepoTest {
 
     @Test
     public void findByUsername() {
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         AccountModel actualModel = accountRepo.findByUsername(USERNAME);
         assert (accountIdentical(expectedAccount,actualModel));
@@ -76,7 +76,7 @@ public class AccountRepoTest {
 
     @Test
     public void findByAccId() {
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         AccountModel actualModel = accountRepo.findByAccId(expectedAccount.getAccount_id());
         assert (accountIdentical(expectedAccount,actualModel));
@@ -90,7 +90,7 @@ public class AccountRepoTest {
 
     @Test
     public void getRoleFromUsername() {
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         String role = accountRepo.getRoleFromUsername(USERNAME);
         System.out.println(role);
@@ -114,7 +114,7 @@ public class AccountRepoTest {
     public void getAllAccounts() {
         List<AccountModel> expectedAccounts = new ArrayList<>();
         for(int i=0;i<4;i++){
-            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i));
+            AccountModel expectedAccount = CommonRepoTestFunctions.createAccount(i, USERNAME+i,"email"+i,String.valueOf(i));
             expectedAccount = accountRepo.save(expectedAccount);
             expectedAccounts.add(expectedAccount);
         }
@@ -133,7 +133,7 @@ public class AccountRepoTest {
 
     @Test
     public void getAccIdFromNames() {
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         int acc_id = accountRepo.getAccIdFromNames(FIRSTNAME,LASTNAME);
         assert (acc_id == expectedAccount.getAccount_id());
@@ -173,7 +173,7 @@ public class AccountRepoTest {
     public void getAllAccountsByBranchId() {
         List<AccountModel> expectedAccounts = new ArrayList<>();
         for(int i=0;i<4;i++){
-            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i));
+            AccountModel expectedAccount = CommonRepoTestFunctions.createAccount(i, USERNAME+i,"email"+i,String.valueOf(i));
             expectedAccount = accountRepo.save(expectedAccount);
             expectedAccounts.add(expectedAccount);
         }
@@ -199,11 +199,11 @@ public class AccountRepoTest {
     public void getAllTenantAccountsByBranchId() {
         List<AccountModel> tenantAccounts = new ArrayList<>();
         for(int i=0;i<4;i++){
-            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
+            AccountModel expectedAccount = CommonRepoTestFunctions.createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
             accountRepo.save(expectedAccount);
         }
         for(int i=6;i<9;i++){
-            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.TENANT_ROLE_KEY);
+            AccountModel expectedAccount = CommonRepoTestFunctions.createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.TENANT_ROLE_KEY);
             expectedAccount = accountRepo.save(expectedAccount);
             tenantAccounts.add(expectedAccount);
         }
@@ -217,7 +217,7 @@ public class AccountRepoTest {
     @Test
     public void getAllTenantAccountsByBranchIdNotFound() {
         for(int i=0;i<4;i++){
-            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
+            AccountModel expectedAccount = CommonRepoTestFunctions.createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
             accountRepo.save(expectedAccount);
         }
         List<AccountModel> actualModels = accountRepo.getAllTenantAccountsByBranchId(BRANCHID);
@@ -226,7 +226,7 @@ public class AccountRepoTest {
     @Test
     public void getAllTenantAccountsByBranchIdNULl() {
         for(int i=0;i<4;i++){
-            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
+            AccountModel expectedAccount = CommonRepoTestFunctions.createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
             accountRepo.save(expectedAccount);
         }
         List<AccountModel> actualModels = accountRepo.getAllTenantAccountsByBranchId(null);
@@ -235,7 +235,7 @@ public class AccountRepoTest {
 
     @Test
     public void changePasswordByAccId() {
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         accountRepo.changePasswordByAccId(expectedAccount.getAccount_id(),"newPassword");
         AccountModel retrievedModel = accountRepo.findByAccId(expectedAccount.getAccount_id());
@@ -244,7 +244,7 @@ public class AccountRepoTest {
 
     @Test
     public void changePasswordByAccIdPasswordNull() {
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         try {
             accountRepo.changePasswordByAccId(expectedAccount.getAccount_id(), null);
@@ -266,7 +266,7 @@ public class AccountRepoTest {
         String newLN = "newLastName";
         String newE = "newEmail";
         String newHp ="newHP";
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
         AccountModel retrievedModel = accountRepo.findByAccId(expectedAccount.getAccount_id());
@@ -284,7 +284,7 @@ public class AccountRepoTest {
         String newLN = "newLastName";
         String newE = "newEmail";
         String newHp ="newHP";
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         try {
             accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
@@ -300,7 +300,7 @@ public class AccountRepoTest {
         String newLN = "newLastName";
         String newE = "newEmail";
         String newHp ="newHP";
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         try {
             accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
@@ -316,7 +316,7 @@ public class AccountRepoTest {
         String newLN = null;
         String newE = "newEmail";
         String newHp ="newHP";
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         try {
             accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
@@ -332,7 +332,7 @@ public class AccountRepoTest {
         String newLN = "newLastName";
         String newE = null;
         String newHp ="newHP";
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         try {
             accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
@@ -348,7 +348,7 @@ public class AccountRepoTest {
         String newLN = "newLastName";
         String newE = "newEmail";
         String newHp = null;
-        AccountModel expectedAccount = createAccount();
+        AccountModel expectedAccount = CommonRepoTestFunctions.createAccount();
         expectedAccount = accountRepo.save(expectedAccount);
         try {
             accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
@@ -377,37 +377,5 @@ public class AccountRepoTest {
         boolean branch_id = accountModel1.getBranch_id().equals(accountModel2.getBranch_id());
         return acc_id && employee_id && username && password && firstname && lastname && email && hp && role_id && branch_id;
     }
-
-    private AccountModel createAccount(){
-        return createAccount(USERNAME);
-    }
-
-    private AccountModel createAccount(String username){
-        return createAccount(0,username,"email","90");
-    }
-
-    private AccountModel createAccount(int employeeId, String username, String email, String hp){
-        return createAccount(employeeId, username, email, hp, ResourceString.AUDITOR_ROLE_KEY);
-    }
-
-    private AccountModel createAccount(int employeeId, String username, String email, String hp,String rold_id){
-        AccountModel accountModel = new AccountModel();
-        accountModel.setAccount_id(0);
-        accountModel.setEmployee_id(employeeId);
-        accountModel.setUsername(username);
-        accountModel.setPassword(PASSWORD);
-        accountModel.setFirst_name(FIRSTNAME);
-        accountModel.setLast_name(LASTNAME);
-        accountModel.setEmail(email);
-        accountModel.setHp(hp);
-        accountModel.setRole_id(rold_id);
-        accountModel.setBranch_id(BRANCHID);
-        return accountModel;
-    }
-
-
-
-
-
 
 }
