@@ -5,6 +5,7 @@ import Box from "@material-ui/core/Box";
 import Navbar from "../Navbar";
 import { makeStyles } from "@material-ui/core/styles";
 import { Context } from "../Context";
+import Loading from "./Loading";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -17,6 +18,7 @@ function AuditReport() {
   const { reportId } = useParams();
   const { getReportStats, getReportEntry } = useContext(Context);
   const classes = useStyles();
+  const [failedEntries, setFailedEntries] = useState();
 
   useEffect(() => {
     async function getResponse() {
@@ -24,20 +26,24 @@ function AuditReport() {
         const entryArray = await getReportStats(reportId).then((response) => {
           return response.data.Failed_Entries;
         });
-        console.log(entryArray);
+        // console.log(entryArray);
 
         let entryInfoArray = [];
 
         for (let i = 0; i < entryArray.length; i++) {
-          console.log(entryArray[i]);
-          console.log(reportId);
+          // console.log(entryArray[i]);
+          // console.log(reportId);
           let info = await getReportEntry(reportId, entryArray[i]).then(
             (response) => {
-              console.log(response);
+              // console.log(response);
               return response;
             }
           );
-          console.log(info);
+          entryInfoArray.push(info);
+        }
+        if (entryInfoArray.length === entryArray.length) {
+          console.log(entryInfoArray);
+          setFailedEntries(entryInfoArray);
         }
       } catch (err) {
         console.error(err);
@@ -48,10 +54,17 @@ function AuditReport() {
 
   return (
     <div>
-      <Navbar />
-      <Box className={classes.header} textAlign="center" boxShadow={1}>
-        <Typography variant="h5">Report</Typography>
-      </Box>
+      {failedEntries ? (
+        <>
+          <Navbar />
+          <Box className={classes.header} textAlign="center" boxShadow={1}>
+            <Typography variant="h5">Report Non-Compliance Overview</Typography>
+          </Box>
+          <Box className={classes.reportBasicInfo}></Box>
+        </>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 }
