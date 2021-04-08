@@ -1,25 +1,58 @@
 package com.c2g4.SingHealthWebApp.repositoriesTest;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
+import com.c2g4.SingHealthWebApp.Admin.Models.CompletedAuditModel;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.AopInvocationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureJdbc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureJdbc
 public class AccountRepoTest {
-    @Resource
+    @Autowired
     private AccountRepo accountRepo;
+    @Autowired
+    private ManagerRepo managerRepo;
+    @Autowired
+    private AuditorRepo auditorRepo;
+    @Autowired
+    private TenantRepo tenantRepo;
+    @Autowired
+    private CompletedAuditRepo completedAuditRepo;
+    @Autowired
+    private OpenAuditRepo openAuditRepo;
 
     private static final int ACCOUNT_ID = 9000;
     private static final String USERNAME = "USERNAME";
     private static final String PASSWORD = "PASSWORD";
+    private static final String FIRSTNAME = "FIRSTNAME";
+    private static final String LASTNAME = "LASTNAME";
+    private static final String BRANCHID = "CGH";
+
+    @BeforeEach
+    public void clearRepo(){
+        CommonRepoTestFunctions.clearAllTables(accountRepo, managerRepo,
+                auditorRepo, tenantRepo, completedAuditRepo, openAuditRepo);
+    }
+
 
     @Test
     public void findByUsername() {
@@ -28,6 +61,308 @@ public class AccountRepoTest {
         AccountModel actualModel = accountRepo.findByUsername(USERNAME);
         assert (accountIdentical(expectedAccount,actualModel));
     }
+
+    @Test
+    public void findByUsernameNotFound(){
+        AccountModel actualModel = accountRepo.findByUsername(USERNAME);
+        assert(actualModel==null);
+    }
+
+    @Test
+    public void findByUsernameNullUsername(){
+        AccountModel actualModel = accountRepo.findByUsername(null);
+        assert(actualModel==null);
+    }
+
+    @Test
+    public void findByAccId() {
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        AccountModel actualModel = accountRepo.findByAccId(expectedAccount.getAccount_id());
+        assert (accountIdentical(expectedAccount,actualModel));
+    }
+
+    @Test
+    public void findByAccIdNotFound(){
+        AccountModel actualModel = accountRepo.findByAccId(ACCOUNT_ID);
+        assert(actualModel==null);
+    }
+
+    @Test
+    public void getRoleFromUsername() {
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        String role = accountRepo.getRoleFromUsername(USERNAME);
+        System.out.println(role);
+        System.out.println(expectedAccount.getUsername());
+        assert(role.equals(expectedAccount.getRole_id()));
+    }
+
+    @Test
+    public void getRoleFromUsernameNotFound(){
+        String role = accountRepo.getRoleFromUsername(USERNAME);
+        assert (role == null);
+    }
+
+    @Test
+    public void getRoleFromUsernameNULL(){
+        String role = accountRepo.getRoleFromUsername(null);
+        assert (role == null);
+    }
+
+    @Test
+    public void getAllAccounts() {
+        List<AccountModel> expectedAccounts = new ArrayList<>();
+        for(int i=0;i<4;i++){
+            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i));
+            expectedAccount = accountRepo.save(expectedAccount);
+            expectedAccounts.add(expectedAccount);
+        }
+        List<AccountModel> actualModels = accountRepo.getAllAccounts();
+        assert (actualModels.size()==expectedAccounts.size());
+        for(int i = 0;i<actualModels.size();i++) {
+            assert (accountIdentical(expectedAccounts.get(i),actualModels.get(i)));
+        }
+    }
+
+    @Test
+    public void getAllAccountsNoAccounts(){
+        List<AccountModel> actualModels = accountRepo.getAllAccounts();
+        assert(actualModels.size()==0);
+    }
+
+    @Test
+    public void getAccIdFromNames() {
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        int acc_id = accountRepo.getAccIdFromNames(FIRSTNAME,LASTNAME);
+        assert (acc_id == expectedAccount.getAccount_id());
+    }
+
+    @Test
+    public void getAccIdFromNamesNotFound(){
+        try {
+            int acc_id = accountRepo.getAccIdFromNames(FIRSTNAME, LASTNAME);
+        } catch (AopInvocationException e){
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void getAccIdFromNamesFNameNull(){
+        try {
+            int acc_id = accountRepo.getAccIdFromNames(null, LASTNAME);
+        } catch (AopInvocationException e){
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void getAccIdFromNamesLNameNull(){
+        try {
+            int acc_id = accountRepo.getAccIdFromNames(FIRSTNAME, null);
+        } catch (AopInvocationException e){
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void getAllAccountsByBranchId() {
+        List<AccountModel> expectedAccounts = new ArrayList<>();
+        for(int i=0;i<4;i++){
+            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i));
+            expectedAccount = accountRepo.save(expectedAccount);
+            expectedAccounts.add(expectedAccount);
+        }
+        List<AccountModel> actualModels = accountRepo.getAllAccountsByBranchId(BRANCHID);
+        assert (actualModels.size()==expectedAccounts.size());
+        for(int i = 0;i<actualModels.size();i++) {
+            assert (accountIdentical(expectedAccounts.get(i),actualModels.get(i)));
+        }
+    }
+
+    @Test
+    public void getAllAccountsByBranchIdNotFound() {
+        List<AccountModel> actualModels = accountRepo.getAllAccountsByBranchId(BRANCHID);
+        assert (actualModels.size()==0);
+    }
+    @Test
+    public void getAllAccountsByBranchIdNull() {
+        List<AccountModel> actualModels = accountRepo.getAllAccountsByBranchId(null);
+        assert (actualModels.size()==0);
+    }
+
+    @Test
+    public void getAllTenantAccountsByBranchId() {
+        List<AccountModel> tenantAccounts = new ArrayList<>();
+        for(int i=0;i<4;i++){
+            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
+            accountRepo.save(expectedAccount);
+        }
+        for(int i=6;i<9;i++){
+            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.TENANT_ROLE_KEY);
+            expectedAccount = accountRepo.save(expectedAccount);
+            tenantAccounts.add(expectedAccount);
+        }
+        List<AccountModel> actualModels = accountRepo.getAllTenantAccountsByBranchId(BRANCHID);
+        assert (actualModels.size()==tenantAccounts.size());
+        for(int i = 0;i<actualModels.size();i++) {
+            assert (accountIdentical(tenantAccounts.get(i),actualModels.get(i)));
+        }
+    }
+
+    @Test
+    public void getAllTenantAccountsByBranchIdNotFound() {
+        for(int i=0;i<4;i++){
+            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
+            accountRepo.save(expectedAccount);
+        }
+        List<AccountModel> actualModels = accountRepo.getAllTenantAccountsByBranchId(BRANCHID);
+        assert (actualModels.size()==0);
+    }
+    @Test
+    public void getAllTenantAccountsByBranchIdNULl() {
+        for(int i=0;i<4;i++){
+            AccountModel expectedAccount = createAccount(i, USERNAME+i,"email"+i,String.valueOf(i),ResourceString.AUDITOR_ROLE_KEY);
+            accountRepo.save(expectedAccount);
+        }
+        List<AccountModel> actualModels = accountRepo.getAllTenantAccountsByBranchId(null);
+        assert (actualModels.size()==0);
+    }
+
+    @Test
+    public void changePasswordByAccId() {
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        accountRepo.changePasswordByAccId(expectedAccount.getAccount_id(),"newPassword");
+        AccountModel retrievedModel = accountRepo.findByAccId(expectedAccount.getAccount_id());
+        assert (retrievedModel.getPassword().equals("newPassword"));
+    }
+
+    @Test
+    public void changePasswordByAccIdPasswordNull() {
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        try {
+            accountRepo.changePasswordByAccId(expectedAccount.getAccount_id(), null);
+        } catch (DataIntegrityViolationException e){
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void changePasswordByAccIdAccountNotFound() {
+        accountRepo.changePasswordByAccId(-10,"new_password");
+    }
+
+    @Test
+    public void changeAccountFields() {
+        String newU = "newUsername";
+        String newFN = "newFirstName";
+        String newLN = "newLastName";
+        String newE = "newEmail";
+        String newHp ="newHP";
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
+        AccountModel retrievedModel = accountRepo.findByAccId(expectedAccount.getAccount_id());
+        assert(retrievedModel.getUsername().equals(newU));
+        assert(retrievedModel.getFirst_name().equals(newFN));
+        assert(retrievedModel.getLast_name().equals(newLN));
+        assert(retrievedModel.getEmail().equals(newE));
+        assert(retrievedModel.getHp().equals(newHp));
+    }
+
+    @Test
+    public void changeAccountFieldsNullUsername() {
+        String newU = null;
+        String newFN = "newFirstName";
+        String newLN = "newLastName";
+        String newE = "newEmail";
+        String newHp ="newHP";
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        try {
+            accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
+        } catch (DataIntegrityViolationException e){
+            return;
+        }
+        fail();
+    }
+    @Test
+    public void changeAccountFieldsNullFN() {
+        String newU = "newUsername";
+        String newFN = null;
+        String newLN = "newLastName";
+        String newE = "newEmail";
+        String newHp ="newHP";
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        try {
+            accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
+        } catch (DataIntegrityViolationException e){
+            return;
+        }
+        fail();
+    }
+    @Test
+    public void changeAccountFieldsNullLN() {
+        String newU = "newUsername";
+        String newFN = "newFirstName";
+        String newLN = null;
+        String newE = "newEmail";
+        String newHp ="newHP";
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        try {
+            accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
+        } catch (DataIntegrityViolationException e){
+            return;
+        }
+        fail();
+    }
+    @Test
+    public void changeAccountFieldsNullEmail() {
+        String newU = "newUsername";
+        String newFN = "newFirstName";
+        String newLN = "newLastName";
+        String newE = null;
+        String newHp ="newHP";
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        try {
+            accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
+        } catch (DataIntegrityViolationException e){
+            return;
+        }
+        fail();
+    }
+    @Test
+    public void changeAccountFieldsNullHP() {
+        String newU = "newUsername";
+        String newFN = "newFirstName";
+        String newLN = "newLastName";
+        String newE = "newEmail";
+        String newHp = null;
+        AccountModel expectedAccount = createAccount();
+        expectedAccount = accountRepo.save(expectedAccount);
+        try {
+            accountRepo.changeAccountFields(expectedAccount.getAccount_id(),newU,newFN,newLN,newE,newHp);
+        } catch (DataIntegrityViolationException e){
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void changeAccountFieldsAccountNotFound() {
+        accountRepo.changePasswordByAccId(-10,"new_password");
+    }
+
 
     private boolean accountIdentical(AccountModel accountModel1,AccountModel accountModel2 ){
         boolean acc_id = accountModel1.getAccount_id() == accountModel2.getAccount_id();
@@ -44,18 +379,35 @@ public class AccountRepoTest {
     }
 
     private AccountModel createAccount(){
+        return createAccount(USERNAME);
+    }
+
+    private AccountModel createAccount(String username){
+        return createAccount(0,username,"email","90");
+    }
+
+    private AccountModel createAccount(int employeeId, String username, String email, String hp){
+        return createAccount(employeeId, username, email, hp, ResourceString.AUDITOR_ROLE_KEY);
+    }
+
+    private AccountModel createAccount(int employeeId, String username, String email, String hp,String rold_id){
         AccountModel accountModel = new AccountModel();
         accountModel.setAccount_id(0);
-        accountModel.setEmployee_id(0);
-        accountModel.setUsername(USERNAME);
+        accountModel.setEmployee_id(employeeId);
+        accountModel.setUsername(username);
         accountModel.setPassword(PASSWORD);
-        accountModel.setFirst_name("FIRSTNAME");
-        accountModel.setLast_name("LASTNAME");
-        accountModel.setEmail("email");
-        accountModel.setHp("909");
-        accountModel.setRole_id(ResourceString.AUDITOR_ROLE_KEY);
-        accountModel.setBranch_id("*");
+        accountModel.setFirst_name(FIRSTNAME);
+        accountModel.setLast_name(LASTNAME);
+        accountModel.setEmail(email);
+        accountModel.setHp(hp);
+        accountModel.setRole_id(rold_id);
+        accountModel.setBranch_id(BRANCHID);
         return accountModel;
     }
+
+
+
+
+
 
 }
