@@ -183,6 +183,13 @@ export const ContextProvider = (props) => {
     });
   };
 
+  const getReportEntry = (reportId, entryId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getReportEntry`, {
+      params: { report_id: parseInt(reportId), entry_id: entryId },
+    });
+  };
+
   const filterAudits = (category) => {
     console.log(auditsState);
   };
@@ -341,6 +348,7 @@ export const ContextProvider = (props) => {
         filterAudits,
         getTenantAudits,
         getReportStats,
+        getReportEntry,
       }}
     >
       {props.children}

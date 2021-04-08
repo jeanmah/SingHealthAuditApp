@@ -15,16 +15,30 @@ const useStyles = makeStyles((theme) => ({
 
 function AuditReport() {
   const { reportId } = useParams();
-  const { getReportStats } = useContext(Context);
+  const { getReportStats, getReportEntry } = useContext(Context);
   const classes = useStyles();
 
   useEffect(() => {
     async function getResponse() {
       try {
-        const request = await getReportStats(reportId).then((response) => {
-          return response;
+        const entryArray = await getReportStats(reportId).then((response) => {
+          return response.data.Failed_Entries;
         });
-        console.log(request);
+        console.log(entryArray);
+
+        let entryInfoArray = [];
+
+        for (let i = 0; i < entryArray.length; i++) {
+          console.log(entryArray[i]);
+          console.log(reportId);
+          let info = await getReportEntry(reportId, entryArray[i]).then(
+            (response) => {
+              console.log(response);
+              return response;
+            }
+          );
+          console.log(info);
+        }
       } catch (err) {
         console.error(err);
       }

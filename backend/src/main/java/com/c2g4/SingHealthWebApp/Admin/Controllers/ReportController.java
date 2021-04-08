@@ -418,15 +418,8 @@ public class ReportController {
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-<<<<<<< HEAD
-				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-
-			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
-
-=======
 			  || type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
 			 report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
->>>>>>> 3d6b3df7575b55cebc44d68516145c7233c88f07
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 			  || type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
