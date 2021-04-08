@@ -17,6 +17,7 @@ function HomeAuditor() {
     async function getResponse() {
       try {
         const reportIdArray = await getAudits(username).then((response) => {
+          console.log(response);
           return [
             ...response.data.CLOSED.completed_audits,
             ...response.data.OPEN.outstanding_audits,
