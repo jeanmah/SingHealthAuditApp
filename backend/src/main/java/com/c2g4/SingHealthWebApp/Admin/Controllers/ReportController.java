@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +29,15 @@ import com.c2g4.SingHealthWebApp.Admin.Report.OpenReport;
 import com.c2g4.SingHealthWebApp.Admin.Report.Report;
 import com.c2g4.SingHealthWebApp.Admin.Report.ReportBuilder;
 import com.c2g4.SingHealthWebApp.Admin.Report.ReportEntry;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListFBRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListNFBRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListSMARepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.CompletedAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -38,6 +45,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
@@ -406,26 +414,26 @@ public class ReportController {
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
+			  || type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
+			 report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, auditor.getOutstanding_audit_ids());
-			logger.info("outstanding {}", auditor.getOutstanding_audit_ids());
+			  || type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
+			 report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, auditor.getOutstanding_audit_ids());
+			 logger.info("outstanding {}", auditor.getOutstanding_audit_ids());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_APPEALED)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_APPEALED, auditor.getAppealed_audits());
+			  || type.matches(ResourceString.GETREPORT_FILTER_APPEALED)) {
+			 report_ids.put(ResourceString.GETREPORT_FILTER_APPEALED, auditor.getAppealed_audits());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
-			ArrayNode outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
-					.get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
-			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
+			  || type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
+			 ArrayNode outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
+			   .get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
+			 report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
 		}
 		return report_ids;
-	}
+	 }
 
 	private ArrayNode getOverDueAudits(ArrayNode outstandingAuditIds){
 		ObjectMapper objectmapper = new ObjectMapper();

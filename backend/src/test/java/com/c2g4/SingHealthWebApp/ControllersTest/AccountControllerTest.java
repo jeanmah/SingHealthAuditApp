@@ -7,11 +7,13 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONObject;
+
 import static org.mockito.BDDMockito.given;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
-import org.springframework.web.context.WebApplicationContext;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
