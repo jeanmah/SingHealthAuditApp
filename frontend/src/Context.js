@@ -148,6 +148,11 @@ export const ContextProvider = (props) => {
     });
   };
 
+  const getUserInfoNoParams = () => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/account/getUserProfile`);
+  };
+
   /*
   --------------------- 
   Home Auditor & Tenant
@@ -168,6 +173,13 @@ export const ContextProvider = (props) => {
       params: { user_id: tenantid, type: "ALL" },
     });
   };
+
+  // const geClosedTenantAudits = (tenantid) => {
+  //   AuthenticationService.getStoredAxiosInterceptor();
+  //   return axios.get(`${API_URL}/report/getReportIDs`, {
+  //     params: { user_id: tenantid, type: "LATEST" },
+  //   });
+  // };
 
   const getReport = (reportId) => {
     AuthenticationService.getStoredAxiosInterceptor();
@@ -190,9 +202,9 @@ export const ContextProvider = (props) => {
     });
   };
 
-  const filterAudits = (category) => {
-    console.log(auditsState);
-  };
+  // const filterAudits = (category) => {
+  //   console.log(auditsState);
+  // };
 
   /*
   =============== 
@@ -207,7 +219,7 @@ export const ContextProvider = (props) => {
   //state to keep track of audit
   const [auditsState, setAuditsState] = useState();
   //state to keep track of all tenants
-  const [tenantsState, setTenantsState] = useState();
+  const [tenantState, setTenantState] = useState();
   //state for fbChecklist
 
   //state for institutions
@@ -276,57 +288,57 @@ export const ContextProvider = (props) => {
   // };
 
   //function to reset tenant's fb checklist checked values
-  const resetTenantFbChecklist = (tenantId) => {
-    const tenantObject = tenantsState.find(
-      (tenant) => tenant.tenantid === tenantId
-    );
-    //fbchecklist property for a tenant
-    const tenantFbChecklist = tenantObject.fbChecklist;
-    //reset each checked to false
-    tenantFbChecklist.forEach((question) => {
-      question.checked = false;
-    });
-    // //get tenants array without tenantObject
-    // const remainingTenants = tenantsState.filter((tenant) => {
-    //   return tenant.tenantid !== tenantId;
-    // });
-    // //update state with newTenantObject
-    // setTenantsState([...remainingTenants, tenantObject]);
-  };
+  // const resetTenantFbChecklist = (tenantId) => {
+  //   const tenantObject = tenantsState.find(
+  //     (tenant) => tenant.tenantid === tenantId
+  //   );
+  //   //fbchecklist property for a tenant
+  //   const tenantFbChecklist = tenantObject.fbChecklist;
+  //   //reset each checked to false
+  //   tenantFbChecklist.forEach((question) => {
+  //     question.checked = false;
+  //   });
+  //   // //get tenants array without tenantObject
+  //   // const remainingTenants = tenantsState.filter((tenant) => {
+  //   //   return tenant.tenantid !== tenantId;
+  //   // });
+  //   // //update state with newTenantObject
+  //   // setTenantsState([...remainingTenants, tenantObject]);
+  // };
 
   //functions to update tenant comment property
-  const updateTenantComment = (tenantId, questionId) => {
-    //find object with specific tenantId
-    const tenantObject = tenantsState.find((tenant) => {
-      return tenant.tenantid === tenantId;
-    });
-    //fbchecklist property for a tenant
-    const tenantFbChecklist = tenantObject.fbChecklist;
-    //find question within the array of questions
-    const checklistQuestion = tenantFbChecklist.find((question) => {
-      return question.id === questionId;
-    });
-    //update checked property
-    checklistQuestion.comment = comment;
-    console.log(tenantId, questionId);
-    console.log(tenantObject);
-    console.log(tenantsState);
-  };
+  // const updateTenantComment = (tenantId, questionId) => {
+  //   //find object with specific tenantId
+  //   const tenantObject = tenantsState.find((tenant) => {
+  //     return tenant.tenantid === tenantId;
+  //   });
+  //   //fbchecklist property for a tenant
+  //   const tenantFbChecklist = tenantObject.fbChecklist;
+  //   //find question within the array of questions
+  //   const checklistQuestion = tenantFbChecklist.find((question) => {
+  //     return question.id === questionId;
+  //   });
+  //   //update checked property
+  //   checklistQuestion.comment = comment;
+  //   console.log(tenantId, questionId);
+  //   console.log(tenantObject);
+  //   console.log(tenantsState);
+  // };
 
   return (
     <Context.Provider
       value={{
         // openQuestionModal,
         // closeQuestionModal,
-        tenantsState,
-        setTenantsState,
+        tenantState,
+        setTenantState,
         auditsState,
         setAuditsState,
-        resetTenantFbChecklist,
+        // resetTenantFbChecklist,
 
         comment,
         setComment,
-        updateTenantComment,
+        // updateTenantComment,
         getFbChecklistQuestions,
 
         accountState,
@@ -343,9 +355,10 @@ export const ContextProvider = (props) => {
         submitFbReport,
         getInstitutionTenants,
         getUserInfo,
+        getUserInfoNoParams,
         getAudits,
         getReport,
-        filterAudits,
+        // geClosedTenantAudits,
         getTenantAudits,
         getReportStats,
         getReportEntry,
