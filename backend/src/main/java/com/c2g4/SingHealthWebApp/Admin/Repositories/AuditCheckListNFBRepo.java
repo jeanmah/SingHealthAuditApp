@@ -20,8 +20,8 @@ public interface AuditCheckListNFBRepo extends CrudRepository<AuditCheckListNFBM
     @Query("SELECT * FROM NFBCheckList")
     List<AuditCheckListNFBModel> getAllQuestions();
     
-    @Query("SELECT * FROM NFBCheckList WHERE qn_id =:qn_id")
-    AuditCheckListNFBModel getQuestion(@Param("qn_id") int qn_id);
+    @Query("SELECT * FROM NFBCheckList WHERE nfb_qn_id =:nfb_qn_id")
+    AuditCheckListNFBModel getQuestion(@Param("nfb_qn_id") int nfb_qn_id);
     
     @Query("SELECT * from NFBCheckList where category = :category")
     List<AuditCheckListNFBModel> getQuestionByCategory(@Param("category") String category);
@@ -31,7 +31,7 @@ public interface AuditCheckListNFBRepo extends CrudRepository<AuditCheckListNFBM
     //Might be better for the DB
     @Override
 	@Query("SELECT category FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
-    String getCategoryByQnID(@Param("fb_qn_id") int category);
+    String getCategoryByQnID(@Param("nfb_qn_id") int category);
 
     @Override
     @Query("SELECT weight FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")

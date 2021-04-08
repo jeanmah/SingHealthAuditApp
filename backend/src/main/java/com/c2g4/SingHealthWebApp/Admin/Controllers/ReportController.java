@@ -440,8 +440,13 @@ public class ReportController {
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL)
 				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
 			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
-			outstandingAuditIds.add(tenant.getLatest_audit());
-			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
+			int latest_audit = tenant.getLatest_audit();
+			if(latest_audit!=-1){
+				outstandingAuditIds.add(latest_audit);
+				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
+			} else{
+				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,objectmapper.createObjectNode());
+			}
 		}
 		return report_ids;
 	}
@@ -466,9 +471,13 @@ public class ReportController {
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 			  || type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
-			 ArrayNode outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
-			   .get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
-			 report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
+			JsonNode outstandingAudits = auditor.getOutstanding_audit_ids();
+			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
+			if(outstandingAudits.has(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY)) {
+				outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
+						.get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
+			}
+			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
 		}
 		return report_ids;
 	 }
