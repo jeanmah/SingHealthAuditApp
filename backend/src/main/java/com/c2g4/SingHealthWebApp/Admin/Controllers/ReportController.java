@@ -481,6 +481,37 @@ public class ReportController {
 		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
 
+//	@GetMapping("/report/getRectificationEntryOfQn")
+//	public ResponseEntity<?> getRectificationEntryOfQn(@RequestParam int report_id,
+//													   @RequestParam int tenant_id,
+//													   @RequestParam int qn_id){
+//		ObjectMapper objectMapper = new ObjectMapper();
+//		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+//		if(builder == null) {
+//			return ResponseEntity.notFound().build();
+//		}
+//		List<ReportEntry> entries = null;
+//
+//		for(ReportEntry reportEntry: builder.getEntries()){
+//			if(reportEntry.getQn_id() ==qn_id){
+//				entries.add(reportEntry);
+//			}
+//		}
+//		List<ReportEntry> rectifiedEntries;
+//
+////		entries.add()
+//
+////		ObjectNode entryOutput = addAdditionalEntryFields(entry,builder.getReportType());
+////		return ResponseEntity.ok(entryOutput);
+//
+//
+////		hasRectification: true/false
+////		entry: null or the entry
+//
+//	}
+
+
+
 	private AccountModel convertUserDetailsToAccount(UserDetails callerUser){
 		logger.info("CALLER USER USERNAME {}",callerUser.getUsername());
 		return accountRepo.findByUsername(callerUser.getUsername());
