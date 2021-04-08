@@ -33,7 +33,7 @@ public interface AccountRepo extends CrudRepository<AccountModel, Integer>{
     @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id")
     List<AccountModel> getAllAccountsByBranchId(@Param("branch_id") String branch_id);
 
-    @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id AND role_id= Tenant")
+    @Query("SELECT * FROM Accounts WHERE branch_id= :branch_id AND role_id= \"Tenant\"")
     List<AccountModel> getAllTenantAccountsByBranchId(@Param("branch_id") String branch_id);
 
     @Modifying

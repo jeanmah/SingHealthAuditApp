@@ -1,10 +1,12 @@
 package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.c2g4.SingHealthWebApp.Admin.Models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 import com.c2g4.SingHealthWebApp.Admin.Report.ClosedReport;
 import com.c2g4.SingHealthWebApp.Admin.Report.Component_Status;
 import com.c2g4.SingHealthWebApp.Admin.Report.CustomReportEntryDeserializer;
@@ -47,6 +45,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
@@ -137,6 +137,9 @@ public class ReportController {
         
         try {
             entryList = objectMapper.readValue(checklist, customClassCollection);
+            for(ReportEntry entry: entryList){
+            	entry.setFrom_account_id(auditor_id);
+			}
         } catch (JsonProcessingException e) {
             logger.warn("JSON PROCESSING EXCEPTION {} POST",report_type);
             e.printStackTrace();
@@ -192,6 +195,9 @@ public class ReportController {
 	        try {
 	            List<ReportEntry> tentries = objectMapper.readValue(strEntry, customClassCollection);
 	            entries = new ArrayList<>(tentries);
+				for(ReportEntry entry: entries){
+					entry.setFrom_account_id(callerAccount.getAccount_id());
+				}
 	        } catch (JsonProcessingException e) {
 	            logger.warn("JSON PROCESSING EXCEPTION {} POST");
 	            return ResponseEntity.badRequest().body(null);
@@ -199,6 +205,8 @@ public class ReportController {
 		}else {
 			try {
 				ReportEntry entry = objectMapper.readValue(strEntry, ReportEntry.class);
+				logger.info("UPDATE QUESTION SET FROM ID {}",callerAccount.getAccount_id());
+				entry.setFrom_account_id(callerAccount.getAccount_id());
 				entries.add(entry);
 			} catch (JsonMappingException e) {
 				e.printStackTrace();
@@ -311,19 +319,15 @@ public class ReportController {
 		ObjectNode jNode = objectMapper.createObjectNode();
 		
 		//Get failed entries
-		List<Integer> failed_entry_ids = new ArrayList<>();
+		ArrayNode failed_entry_ids = objectMapper.createArrayNode();
 		for(ReportEntry entry:builder.getEntries()) {
 			if(entry.getStatus()==Component_Status.FAIL) {
 				failed_entry_ids.add(entry.getEntry_id());
 			}
 		}
-		
-		try {
-			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		
+
+		jNode.put("Failed_Entries", failed_entry_ids);
+
 		//Get score
 		jNode.put("Score", builder.getOverall_score());
 		
@@ -341,9 +345,37 @@ public class ReportController {
 		if(builder == null) {
 			return ResponseEntity.notFound().build();
 		}
-		ReportEntry entry = builder.getEntries().get(entry_id);
-		
-		return ResponseEntity.ok(entry);
+		ReportEntry entry = null;
+		for(ReportEntry reportEntry: builder.getEntries()){
+			if(reportEntry.getEntry_id() ==entry_id){
+				entry = reportEntry;
+			}
+		}
+		if (entry == null) {
+			logger.warn("entry not found");
+			return ResponseEntity.badRequest().body("entry "+entry_id+" not found");
+		}
+
+		ObjectNode entryOutput = addAdditionalEntryFields(entry,builder.getReportType());
+		return ResponseEntity.ok(entryOutput);
+	}
+
+	private ObjectNode addAdditionalEntryFields(ReportEntry entry, String reportType){
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode entryOutput = objectMapper.valueToTree(entry);
+		String requirement = "";
+		if(reportType.equals(ResourceString.FB_KEY)){
+			AuditCheckListFBModel auditCheckListModel = auditCheckListFBRepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		} else if(reportType.equals(ResourceString.NFB_KEY)){
+			AuditCheckListNFBModel auditCheckListModel = auditCheckListNFBRepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		} else {
+			AuditCheckListSMAModel auditCheckListModel = auditCheckListSMARepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		}
+		entryOutput.put("Requirement",requirement);
+		return entryOutput;
 	}
 	
 	@GetMapping("/report/getReportIDs")
@@ -396,30 +428,55 @@ public class ReportController {
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, tenant.getPast_audits());
+			JsonNode pastAudits = tenant.getPast_audits();
+			if(!pastAudits.has(ResourceString.TENANT_PAST_AUDITS_JSON_KEY)) {
+				ObjectNode pastAuditNode = objectmapper.createObjectNode();
+				pastAuditNode.put(ResourceString.TENANT_PAST_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+				pastAudits = pastAuditNode;
+			}
+			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, pastAudits);
 			logger.info("past audit tenant {}", tenant.getPast_audits().asText());
-
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_LATEST)) {
 			report_ids.put(ResourceString.GETREPORT_FILTER_LATEST, tenant.getLatest_audit());
 			logger.info("latest audit tenant {}", tenant.getLatest_audit());
 		}
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL)
+				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
+			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
+			int latest_audit = tenant.getLatest_audit();
+
+			if(latest_audit!=-1){
+				outstandingAuditIds.add(latest_audit);
+				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds).get(0));
+			} else{
+				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,-1);
+			}
+		}
 		return report_ids;
 	}
 	
 	private JsonNode getAuditorReportIds(int auditor_id, String type) {
 		AuditorModel auditor = auditorRepo.getAuditorById(auditor_id);
-		logger.info("auditor {}",auditor.getAcc_id());
+
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 			  || type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			 report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
+			ObjectNode completed_audits = (ObjectNode) auditor.getCompleted_audits();
+			if(!completed_audits.has(ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY)) {
+				completed_audits.put(ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+			}
+			 report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED,completed_audits);
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 			  || type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
-			 report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, auditor.getOutstanding_audit_ids());
+			ObjectNode outstandingAuditIds = (ObjectNode) auditor.getOutstanding_audit_ids();
+			if(!outstandingAuditIds.has(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY)) {
+				outstandingAuditIds.put(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+			}
+			 report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, outstandingAuditIds);
 			 logger.info("outstanding {}", auditor.getOutstanding_audit_ids());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
@@ -428,9 +485,13 @@ public class ReportController {
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 			  || type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
-			 ArrayNode outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
-			   .get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
-			 report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
+			JsonNode outstandingAudits = auditor.getOutstanding_audit_ids();
+			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
+			if(outstandingAudits.has(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY)) {
+				outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
+						.get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
+			}
+			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
 		}
 		return report_ids;
 	 }
@@ -451,7 +512,9 @@ public class ReportController {
 		return overdueAudits;
 	}
 	
-	@GetMapping("/report/print")
+
+
+	@PostMapping("/report/print")
 	public ResponseEntity<?> printURLRequest(HttpServletRequest request){
 		String strRequest = request.getRequestURL().toString() + "?" + request.getQueryString();
 		String strRequest2 = request.getParameterNames().toString();
@@ -460,10 +523,46 @@ public class ReportController {
 		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
 
+	@GetMapping("/report/getRectificationEntryOfQn")
+	public ResponseEntity<?> getRectificationEntryOfQn(@RequestParam int report_id,
+													   @RequestParam int tenant_id,
+													   @RequestParam int qn_id){
+		ObjectMapper objectMapper = new ObjectMapper();
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+		List<ReportEntry> entries = new ArrayList<>();
+
+		for(ReportEntry reportEntry: builder.getEntries()){
+			logger.info("Entry qn {} from account{}",reportEntry.getQn_id(),reportEntry.getFrom_account_id());
+			if(reportEntry.getQn_id() ==qn_id && reportEntry.getFrom_account_id() == tenant_id){
+				entries.add(reportEntry);
+			}
+		}
+		ObjectNode root = objectMapper.createObjectNode();
+		ArrayNode entriesArrayNode = objectMapper.createArrayNode();
+		if(entries.size()==0){
+			root.put("hasRectification",false);
+			root.put("entries", entriesArrayNode);
+		} else {
+			root.put("hasRectification",true);
+			for(ReportEntry re: entries){
+				ObjectNode entryOutput = addAdditionalEntryFields(re,builder.getReportType());
+				entriesArrayNode.add(entryOutput);
+			}
+			root.put("entries", entriesArrayNode);
+		}
+		return ResponseEntity.ok(root);
+	}
+
+
+
 	private AccountModel convertUserDetailsToAccount(UserDetails callerUser){
 		logger.info("CALLER USER USERNAME {}",callerUser.getUsername());
 		return accountRepo.findByUsername(callerUser.getUsername());
 	}
+
 	
 	
 }

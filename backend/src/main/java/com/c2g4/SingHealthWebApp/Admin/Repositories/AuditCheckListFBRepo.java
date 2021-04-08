@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 
 /**
  * Repository of SQL queries to interact with the AuditCheckListFB Table
@@ -20,8 +19,10 @@ public interface AuditCheckListFBRepo extends CrudRepository<AuditCheckListFBMod
     @Query("SELECT * FROM FBCheckList")
     List<AuditCheckListFBModel> getAllQuestions();
     
-    @Query("SELECT * FROM FBCheckList WHERE qn_id =:qn_id")
-    AuditCheckListFBModel getQuestion(@Param("qn_id") int qn_id);
+
+    @Query("SELECT * FROM FBCheckList WHERE fb_qn_id =:fb_qn_id")
+    AuditCheckListFBModel getQuestion(@Param("fb_qn_id") int fb_qn_id);
+
 	
     @Query("SELECT * FROM FBCheckList WHERE category = :category")
     List<AuditCheckListFBModel> getQuestionByCategory(@Param("category") String category);
