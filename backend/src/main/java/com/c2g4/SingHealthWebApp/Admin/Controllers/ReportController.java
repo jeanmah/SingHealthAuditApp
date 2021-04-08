@@ -344,14 +344,18 @@ public class ReportController {
 			logger.warn("entry not found");
 			return ResponseEntity.badRequest().body("entry "+entry_id+" not found");
 		}
+
+		ObjectNode entryOutput = addAdditionalEntryFields(entry,builder.getReportType());
+		return ResponseEntity.ok(entryOutput);
+	}
+
+	private ObjectNode addAdditionalEntryFields(ReportEntry entry, String reportType){
 		ObjectMapper objectMapper = new ObjectMapper();
 		ObjectNode entryOutput = objectMapper.valueToTree(entry);
-		String reportType = builder.getReportType();
 		String requirement = "";
 		if(reportType.equals(ResourceString.FB_KEY)){
 			AuditCheckListFBModel auditCheckListModel = auditCheckListFBRepo.getQuestion(entry.getQn_id());
 			requirement = auditCheckListModel.getRequirement();
-
 		} else if(reportType.equals(ResourceString.NFB_KEY)){
 			AuditCheckListNFBModel auditCheckListModel = auditCheckListNFBRepo.getQuestion(entry.getQn_id());
 			requirement = auditCheckListModel.getRequirement();
@@ -359,10 +363,8 @@ public class ReportController {
 			AuditCheckListSMAModel auditCheckListModel = auditCheckListSMARepo.getQuestion(entry.getQn_id());
 			requirement = auditCheckListModel.getRequirement();
 		}
-
 		entryOutput.put("Requirement",requirement);
-
-		return ResponseEntity.ok(entryOutput);
+		return entryOutput;
 	}
 	
 	@GetMapping("/report/getReportIDs")
