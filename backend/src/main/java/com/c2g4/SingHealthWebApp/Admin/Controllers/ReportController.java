@@ -312,18 +312,12 @@ public class ReportController {
 		
 		//Get failed entries
 		ArrayNode failed_entry_ids = objectMapper.createArrayNode();
-//		List<Integer> failed_entry_ids = new ArrayList<>();
 		for(ReportEntry entry:builder.getEntries()) {
 			if(entry.getStatus()==Component_Status.FAIL) {
 				failed_entry_ids.add(entry.getEntry_id());
 			}
 		}
 
-//		try {
-//			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
-//		} catch (JsonProcessingException e) {
-//			e.printStackTrace();
-//		}
 		jNode.put("Failed_Entries", failed_entry_ids);
 
 		//Get score
@@ -343,8 +337,16 @@ public class ReportController {
 		if(builder == null) {
 			return ResponseEntity.notFound().build();
 		}
-		ReportEntry entry = builder.getEntries().get(entry_id);
-		
+		ReportEntry entry = null;
+		for(ReportEntry reportEntry: builder.getEntries()){
+			if(reportEntry.getEntry_id() ==entry_id){
+				entry = reportEntry;
+			}
+		}
+		if (entry == null) {
+			logger.warn("entry not found");
+			return ResponseEntity.badRequest().body("entry "+entry_id+" not found");
+		}
 		return ResponseEntity.ok(entry);
 	}
 	
