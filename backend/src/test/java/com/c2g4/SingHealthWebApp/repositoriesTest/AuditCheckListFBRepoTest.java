@@ -5,13 +5,22 @@ import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureJdbc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
+@Transactional
+@SpringBootTest
+@AutoConfigureJdbc
 public class AuditCheckListFBRepoTest {
     @Autowired
     private AuditCheckListFBRepo auditCheckListFBRepo;
@@ -64,27 +73,54 @@ public class AuditCheckListFBRepoTest {
         List<AuditCheckListFBModel> auditCheckListFBModelsThisCat = createAndSaveList(thisCat);
         List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getQuestionByCategory(thisCat);
         assert(auditCheckListFBModelsThisCat.size()==actualList.size());
-        for(int i=0;i<actualList.size();i++){
-            assert(compareQuestions(actualList.get(i),actualList.get(i)));
+        for (AuditCheckListFBModel auditCheckListFBModel : actualList) {
+            assert (compareQuestions(auditCheckListFBModel, auditCheckListFBModel));
         }
     }
 
     @Test
     public void getQuestionByCategoryNoQuestions(){
-        List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getAllQuestions();
+        List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getQuestionByCategory(CATEGORY);
         assert(actualList.size()==0);
     }
 
-//    @Query("SELECT * FROM FBCheckList WHERE category = :category")
-//    List<AuditCheckListFBModel> getQuestionByCategory(@Param("category") String category);
-//
-//    @Override
-//    @Query("SELECT category FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
-//    String getCategoryByQnID(@Param("fb_qn_id") int fb_qn_id);
-//
-//    @Override
-//    @Query("SELECT weight FROM FBCheckList WHERE fb_qn_id= :fb_qn_id")
-//    double getWeightByQnID(@Param("fb_qn_id") int fb_qn_id);
+    @Test
+    public void getQuestionByCategoryNULLCat(){
+        List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getQuestionByCategory(null);
+        assert(actualList.size()==0);
+    }
+
+    @Test
+    public void getCategoryByQnID(){
+        List<AuditCheckListFBModel> auditCheckListFBModels = createAndSaveList();
+        String actual = auditCheckListFBRepo.getCategoryByQnID(auditCheckListFBModels.get(0).getFb_qn_id());
+        assert(actual.equals(auditCheckListFBModels.get(0).getCategory()));
+    }
+
+    @Test
+    public void getCategoryByQnIDNotFound(){
+        List<AuditCheckListFBModel> auditCheckListFBModels = createAndSaveList();
+        String actual = auditCheckListFBRepo.getCategoryByQnID(-10);
+        assert(actual==null);
+    }
+
+    @Test
+    public void getWeightByQnID(){
+        List<AuditCheckListFBModel> auditCheckListFBModels = createAndSaveList();
+        double actual = auditCheckListFBRepo.getWeightByQnID(auditCheckListFBModels.get(0).getFb_qn_id());
+        assert(actual == auditCheckListFBModels.get(0).getWeight());
+    }
+
+    @Test
+    public void getWeightByQnIDNotFound(){
+        List<AuditCheckListFBModel> auditCheckListFBModels = createAndSaveList();
+        try {
+            double actual = auditCheckListFBRepo.getWeightByQnID(-10);
+        } catch (AopInvocationException e){
+            return;
+        }
+        fail();
+    }
 
     private boolean compareQuestions(AuditCheckListFBModel expected, AuditCheckListFBModel actual){
         boolean id = expected.getFb_qn_id()==actual.getFb_qn_id();
