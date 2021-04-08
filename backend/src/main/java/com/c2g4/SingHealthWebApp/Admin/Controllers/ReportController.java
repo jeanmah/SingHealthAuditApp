@@ -449,7 +449,9 @@ public class ReportController {
 
 			if(latest_audit!=-1){
 				outstandingAuditIds.add(latest_audit);
-				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds).get(0));
+				ArrayNode overdue = getOverDueAudits(outstandingAuditIds);
+				if(overdue.size()==0) report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,-1);
+				else report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds).get(0));
 			} else{
 				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,-1);
 			}

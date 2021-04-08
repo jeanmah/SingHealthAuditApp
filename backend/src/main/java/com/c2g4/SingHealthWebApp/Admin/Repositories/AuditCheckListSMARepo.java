@@ -13,20 +13,20 @@ import java.util.List;
  */
 @Repository
 public interface AuditCheckListSMARepo extends CrudRepository<AuditCheckListSMAModel, Integer>, AuditCheckListRepo {
-    @Query("SELECT * FROM NFBCheckList")
+    @Query("SELECT * FROM SMACheckList")
     List<AuditCheckListSMAModel> getAllQuestions();
 
-    @Query("SELECT * FROM NFBCheckList WHERE qn_id =:qn_id")
-    AuditCheckListSMAModel getQuestion(@Param("qn_id") int qn_id);
+    @Query("SELECT * FROM SMACheckList WHERE sma_qn_id =:sma_qn_id")
+    AuditCheckListSMAModel getQuestion(@Param("sma_qn_id") int qn_id);
 
-    @Query("SELECT * from NFBCheckList where category = :category")
+    @Query("SELECT * from SMACheckList where category = :category")
     List<AuditCheckListSMAModel> getQuestionByCategory(@Param("category") String category);
 
     @Override
-    @Query("SELECT category FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
-    String getCategoryByQnID(@Param("fb_qn_id") int category);
+    @Query("SELECT category FROM SMACheckList WHERE sma_qn_id= :sma_qn_id")
+    String getCategoryByQnID(@Param("sma_qn_id") int category);
 
     @Override
-    @Query("SELECT weight FROM NFBCheckList WHERE nfb_qn_id= :nfb_qn_id")
-    double getWeightByQnID(@Param("nfb_qn_id") int category);
+    @Query("SELECT weight FROM SMACheckList WHERE sma_qn_id= :sma_qn_id")
+    double getWeightByQnID(@Param("sma_qn_id") int category);
 }
