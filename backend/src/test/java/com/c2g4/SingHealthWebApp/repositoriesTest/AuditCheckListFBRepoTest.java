@@ -71,6 +71,8 @@ public class AuditCheckListFBRepoTest {
         String thisCat = "thisCat";
         createAndSaveList();
         List<AuditCheckListFBModel> auditCheckListFBModelsThisCat = createAndSaveList(thisCat);
+        System.out.println(auditCheckListFBModelsThisCat.size());
+        System.out.println(auditCheckListFBModelsThisCat.get(0).getFb_qn_id());
         List<AuditCheckListFBModel> actualList = auditCheckListFBRepo.getQuestionByCategory(thisCat);
         assert(auditCheckListFBModelsThisCat.size()==actualList.size());
         for (AuditCheckListFBModel auditCheckListFBModel : actualList) {
