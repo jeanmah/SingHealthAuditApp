@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.c2g4.SingHealthWebApp.Admin.Models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
-import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 import com.c2g4.SingHealthWebApp.Admin.Report.ClosedReport;
 import com.c2g4.SingHealthWebApp.Admin.Report.Component_Status;
 import com.c2g4.SingHealthWebApp.Admin.Report.CustomReportEntryDeserializer;
@@ -349,7 +346,27 @@ public class ReportController {
 			logger.warn("entry not found");
 			return ResponseEntity.badRequest().body("entry "+entry_id+" not found");
 		}
-		return ResponseEntity.ok(entry);
+
+		ObjectNode entryOutput = addAdditionalEntryFields(entry,builder.getReportType());
+		return ResponseEntity.ok(entryOutput);
+	}
+
+	private ObjectNode addAdditionalEntryFields(ReportEntry entry, String reportType){
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode entryOutput = objectMapper.valueToTree(entry);
+		String requirement = "";
+		if(reportType.equals(ResourceString.FB_KEY)){
+			AuditCheckListFBModel auditCheckListModel = auditCheckListFBRepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		} else if(reportType.equals(ResourceString.NFB_KEY)){
+			AuditCheckListNFBModel auditCheckListModel = auditCheckListNFBRepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		} else {
+			AuditCheckListSMAModel auditCheckListModel = auditCheckListSMARepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		}
+		entryOutput.put("Requirement",requirement);
+		return entryOutput;
 	}
 	
 	@GetMapping("/report/getReportIDs")
