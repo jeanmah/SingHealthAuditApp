@@ -21,7 +21,7 @@ public interface AuditCheckListFBRepo extends CrudRepository<AuditCheckListFBMod
     List<AuditCheckListFBModel> getAllQuestions();
     
     @Query("SELECT * FROM FBCheckList WHERE qn_id =:qn_id")
-    AuditCheckListNFBModel getQuestion(@Param("qn_id") int qn_id);
+    AuditCheckListFBModel getQuestion(@Param("qn_id") int qn_id);
 	
     @Query("SELECT * FROM FBCheckList WHERE category = :category")
     List<AuditCheckListFBModel> getQuestionByCategory(@Param("category") String category);
