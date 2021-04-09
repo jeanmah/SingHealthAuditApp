@@ -50,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
 function Store() {
   const [openChecklist, setOpenChecklist] = useState(false);
   const [openPrevAudits, setOpenPrevAudits] = useState(false);
+  const [tenantInfo, setTenantInfo] = useState();
   //Context: getUserInfo method
   const {
     tenantState,
@@ -66,32 +67,16 @@ function Store() {
       try {
         const tenantId = await getUserInfoNoParams().then((response) => {
           console.log(response);
+          setTenantInfo(response.data);
           return response.data.acc_id;
         });
         console.log(tenantId);
         const reportIdArray = await getTenantAudits(tenantId).then(
           (response) => {
-            console.log(response);
-            if (response.data.LATEST === -1 && response.data.OVERDUE === -1) {
+            if (response.data.LATEST === -1) {
               return [...response.data.CLOSED.past_audits];
             }
-            if (response.data.LATEST === -1) {
-              return [
-                ...response.data.CLOSED.past_audits,
-                response.data.OVERDUE,
-              ];
-            }
-            if (response.data.OVERDUE === -1) {
-              return [
-                ...response.data.CLOSED.past_audits,
-                response.data.LATEST,
-              ];
-            }
-            return [
-              ...response.data.CLOSED.past_audits,
-              response.data.LATEST,
-              response.data.OVERDUE,
-            ];
+            return [response.data.LATEST, ...response.data.CLOSED.past_audits];
           }
         );
         console.log(reportIdArray);
@@ -126,11 +111,11 @@ function Store() {
 
   return (
     <div>
-      {tenantState ? (
+      {tenantState && tenantInfo ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
-            <Typography variant="h5">{tenantState.store_name}</Typography>
+            <Typography variant="h5">{tenantInfo.store_name}</Typography>
           </Box>
           <Grid container className={classes.root}>
             <List
@@ -151,9 +136,9 @@ function Store() {
                 className={classes.listItem}
               >
                 <ListItemIcon>
-                  <HistoryIcon color="primary" />
+                  <AssignmentTurnedInIcon color="primary" />
                 </ListItemIcon>
-                <ListItemText primary="View Previous Audits" />
+                <ListItemText primary="View Audits" />
                 {openPrevAudits ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
               <Collapse in={openPrevAudits} timeout="auto" unmountOnExit>
@@ -166,7 +151,7 @@ function Store() {
                     overall_status,
                   } = audit;
                   return (
-                    <Link to={`/tenant/report/${report_id}`}>
+                    <Link to={`/t/report/${report_id}`}>
                       <List component="div" disablePadding>
                         <ListItem button className={classes.nested}>
                           <ListItemIcon>
@@ -190,7 +175,7 @@ function Store() {
                   );
                 })}
               </Collapse>
-              <ListItem
+              {/* <ListItem
                 button
                 onClick={handleChecklistClick}
                 divider={true}
@@ -225,7 +210,7 @@ function Store() {
                     <ListItemText primary="Conduct Safe Managment Audit" />
                   </ListItem>
                 </List>
-              </Collapse>
+              </Collapse> */}
             </List>
           </Grid>
         </>

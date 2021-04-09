@@ -1,5 +1,5 @@
-import React, { useEffect, useContext } from "react";
-import { Link } from 'react-router-dom';
+import React, { useEffect, useContext, useState } from "react";
+import { Link } from "react-router-dom";
 import { Typography, Button } from "@material-ui/core";
 import axios from "axios";
 
@@ -7,83 +7,108 @@ import { Context } from "../Context";
 import Navbar from "../Navbar";
 import useStyles from "../styles";
 import { FormGroup } from "@material-ui/core";
+import ChatCards from "../components/ChatCards";
+import ChatEntriesCards from "../components/ChatEntriesCard";
 
 function Chat() {
-
   const {
+    setAllChatsOfUserState,
     allChatsOfUserState,
-    getAllChatsOfUser
+    getAllChatsOfUser,
+    setChatEntriesOfUserState,
+    chatEntriesOfUserState,
+    getChatEntriesOfUser,
+    postCreateNewChat,
   } = useContext(Context);
 
+  const [allChatsState, setAllChatsState] = useState([]);
+  const styles = useStyles();
+  const chatsArray = [];
+  const chatEntriesArray = [];
+  const chatsEntriesDict = {};
+
+  const parentChatId = "2";
+  const numLastestChatEntries = "1";
+
   useEffect(() => {
-    getAllChatsOfUser();
+    //getAllChatsOfUser();
+    async function getResponse() {
+      try {
+        await getAllChatsOfUser().then((response) => {
+          console.log("allChatsOfUser: " + response.data);
+          response.data.map((chat) => {
+            //console.log(chat);
+            let newChat = {};
+            newChat.chat_id = chat.chat_id;
+            newChat.tenant_id = chat.tenant_id;
+            newChat.auditor_id = chat.auditor_id;
+            if (chat.messages.messages) {
+              newChat.messages = [...chat.messages.messages];
+            } else {
+              newChat.messages = ["No message"];
+            }
+            chatsArray.push(newChat);
+            console.log(newChat);
+          });
+          console.log(chatsArray);
+          setAllChatsOfUserState(chatsArray);
+        });
+      } catch {
+        console.log("Failed to retrive allChatsOfUser");
+      }
+
+      try {
+        await getChatEntriesOfUser(parentChatId).then((response) => {
+          console.log("chatEntriesOfUser: " + response.data);
+          console.log(response.data[0]);
+          console.log(response.data[1]);
+          response.data.map((entry) => {
+            console.log(entry);
+            chatEntriesArray.push(entry);
+          });
+          console.log("chatEntriedArray: " + chatEntriesArray);
+          setChatEntriesOfUserState(chatEntriesArray);
+          console.log("chatEntriesState: " + chatEntriesOfUserState);
+        });
+      } catch {
+        console.log("Failed to retrive chatEntriesOfUser");
+      }
+    }
+    getResponse();
   }, []);
 
-  const styles = useStyles();
+  console.log(allChatsOfUserState);
+  const tenant_id = "1005";
+  const auditor_id = "1003";
 
-  // allChatsOfUserState.map(chat => {
-  //   console.log("chat: " + chat);
-  //   console.log("chat ID: " + chat.chat_id);
-  //   console.log("auditor ID: " + chat.auditor_id);
-  //   console.log("tenant ID: " + chat.tenant_id);
-  //   console.log("messages: " + chat.messages);
-  // })
-
-  const ChatInfo = (props) => {
-    return (
-      <div>
-        <div>Chat ID: {props.chat_id}</div>
-        <div>Tenant ID: {props.tenant_id}</div>
-        <div>Auditor ID: {props.auditor_id}</div>
-        <div>Messages: {props.messages}</div>
-      </div>   
-    );
-  };
+  function handleClick() {
+    postCreateNewChat(auditor_id, tenant_id);
+  }
 
   return (
     <main className={styles.main}>
       <Navbar />
       <br />
-      <Typography variant="h3" align="center">Chat</Typography>
+      <Typography variant="h3" align="center">
+        Chat
+      </Typography>
       <Button
-        className={styles.buttons}
         align="center"
         variant="outlined"
         color="primary"
+        className={styles.buttons}
         fullWidth
-        onClick={() => {
-          console.log("chatState: " + allChatsOfUserState);
-          console.log("firstChat: " + allChatsOfUserState[0]);
-          console.log("firstChatID: " + allChatsOfUserState[0].chat_id);
-        }}
       >
-        Get All Chats of User
+        New Chat
       </Button>
-
-      <div>
-        {allChatsOfUserState.map((chat, index) => {
-          console.log("Chats in chat page: " + chat.chat_id);
-          console.log("Chat info: " + chat);
-          return (
-            <ChatInfo key={index}
-              chat_id={chat.chat_id}
-              tenant_id={chat.tenant_id}
-              auditor_id={chat.auditor_id}
-              messages={chat.messages}
-            />
-          )
-        })}
-      </div>
-
-      {/* <ChatInfo 
-        chat_id={allChatsOfUserState[0].chat_id}
-        tenant_id={allChatsOfUserState[0].tenant_id}
-        auditor_id={allChatsOfUserState[0].auditor_id}
-        messages={allChatsOfUserState[0].messages}
-      /> */}
-
+      <br />
+      <br />
+      <Typography align="center">All Chats of the User</Typography>
+      <ChatCards />
+      <br />
+      <br />
     </main>
-  )
+  );
 }
 
 export default Chat;

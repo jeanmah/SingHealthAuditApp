@@ -20,6 +20,39 @@ export const ContextProvider = (props) => {
   FbChecklist
   ---------------
   */
+  const getChatEntriesOfUser = (chatId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log("This is calling getChatEntriesOfUser");
+    console.log(typeof parseInt(chatId));
+    // console.log(typeof parseInt(numLastestEntries));
+    return axios.get(`${API_URL}/chat/getChatEntriesOfUser`, {
+      params: {
+        parentChatId: parseInt(chatId),
+        //numLastestChatEntries: parseInt(numLastestChatEntries),
+      },
+    });
+  };
+
+  const postCreateNewChat = (auditor_id, tenant_id) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    // console.log("This is calling postCreateNewChat");
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append("auditor_id", parseInt(auditor_id));
+    formdata.append("tenant_id", parseInt(tenant_id));
+    return axios
+      .post(`${API_URL}/chat/postCreateNewChat`, formdata, {
+        headers: {
+          "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+        },
+      })
+      .then((response) => {
+        // console.log(response);
+      })
+      .catch(() => {
+        console.log("Failed new chat creation");
+      });
+  };
 
   const getAccountInfo = () => {
     AuthenticationService.getStoredAxiosInterceptor();
@@ -119,6 +152,42 @@ export const ContextProvider = (props) => {
         console.log("Failed FB report submission");
       });
   });
+
+  const submitReportUpdate = (report_id, group_update, remarks, report) => {
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append("entry", JSON.stringify(report));
+    return axios
+      .post(`${API_URL}/report/postReportUpdate`, formdata, {
+        headers: {
+          "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+        },
+        params: {
+          report_id: report_id,
+          group_update: group_update,
+          remarks: remarks,
+        },
+        // params: { type: "FB", tenant_id: t_id, remarks: "" },
+        // data: formdata,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch(() => {
+        console.log("Failed report update");
+      });
+  };
+
+  const getTenantRectification = (report_id, tenant_id, qn_id) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getRectificationEntryOfQn`, {
+      params: {
+        report_id: parseInt(report_id),
+        tenant_id: parseInt(tenant_id),
+        qn_id: parseInt(qn_id),
+      },
+    });
+  };
 
   /*
   ---------------
@@ -362,6 +431,10 @@ export const ContextProvider = (props) => {
         getTenantAudits,
         getReportStats,
         getReportEntry,
+        submitReportUpdate,
+        getTenantRectification,
+        getChatEntriesOfUser,
+        postCreateNewChat,
       }}
     >
       {props.children}
