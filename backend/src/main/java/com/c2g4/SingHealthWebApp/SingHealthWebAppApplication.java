@@ -10,6 +10,8 @@ public class SingHealthWebAppApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SingHealthWebAppApplication.class, args);
+		
+		
 	}
 
 }

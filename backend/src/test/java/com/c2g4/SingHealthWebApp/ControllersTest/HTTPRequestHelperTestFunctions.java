@@ -1,5 +1,13 @@
 package com.c2g4.SingHealthWebApp.ControllersTest;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -8,14 +16,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class HTTPRequestHelperTestFunctions {
     public static ResultActions performGetRequest(MockMvc mvc, String requestURL, HashMap<String,String> params) throws Exception {
@@ -33,7 +33,10 @@ public class HTTPRequestHelperTestFunctions {
     public static void getHttpOk(MockMvc mvc, String requestURL, HashMap<String,String> params, int jsonSize, String compareJson) throws Exception {
         ResultActions resultActions = performGetRequest(mvc, requestURL,params);
         resultActions.andExpect(status().isOk());
-        if(jsonSize!=-1) resultActions.andExpect(jsonPath("$",hasSize(jsonSize)));
+        if(jsonSize!=-1) {
+        	System.out.println("HELLOO");
+        	resultActions.andExpect(jsonPath("$",hasSize(jsonSize)));
+        } 
         if(compareJson!=null){
             resultActions.andExpect(content().json(compareJson));
         }

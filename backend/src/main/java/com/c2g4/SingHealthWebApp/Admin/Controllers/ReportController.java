@@ -46,6 +46,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import javax.servlet.http.HttpServletRequest;
+
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
 public class ReportController {
@@ -459,7 +461,7 @@ public class ReportController {
 	
 	private JsonNode getAuditorReportIds(int auditor_id, String type) {
 		AuditorModel auditor = auditorRepo.getAuditorById(auditor_id);
-		logger.info("auditor {}",auditor.getAcc_id());
+
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
@@ -512,7 +514,9 @@ public class ReportController {
 		return overdueAudits;
 	}
 	
-	@GetMapping("/report/print")
+
+
+	@PostMapping("/report/print")
 	public ResponseEntity<?> printURLRequest(HttpServletRequest request){
 		String strRequest = request.getRequestURL().toString() + "?" + request.getQueryString();
 		String strRequest2 = request.getParameterNames().toString();
@@ -560,6 +564,7 @@ public class ReportController {
 		logger.info("CALLER USER USERNAME {}",callerUser.getUsername());
 		return accountRepo.findByUsername(callerUser.getUsername());
 	}
+
 	
 	
 }

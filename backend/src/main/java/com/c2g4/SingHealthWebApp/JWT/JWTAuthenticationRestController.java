@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 
 @RestController
-@CrossOrigin(origins= "http://localhost:3000")
+@CrossOrigin(origins= {"http://localhost:3000","http://localhost:3002" })
 public class JWTAuthenticationRestController {
 
     @Value("${com.c2g4.singHealthAudit.jwt.http.request.header}")
@@ -51,7 +51,7 @@ public class JWTAuthenticationRestController {
     @PostMapping(value = "${com.c2g4.singHealthAudit.jwt.get.token.uri}")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JWTTokenRequest authenticationRequest)
             throws AuthenticationException {
-
+        logger.warn("HEREEEE");
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         logger.warn("AUTHENTICATED");
 
