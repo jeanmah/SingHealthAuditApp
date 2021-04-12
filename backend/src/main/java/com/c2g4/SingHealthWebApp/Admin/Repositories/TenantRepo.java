@@ -23,9 +23,6 @@ public interface TenantRepo extends CrudRepository<TenantModel, Integer> {
     @Query("SELECT * FROM Tenant WHERE acc_id = :acc_id LIMIT 1")
     TenantModel getTenantById(@Param("acc_id") int acc_id);
 
-    @Query("SELECT past_audits FROM Tenant WHERE acc_id= :acc_id")
-    String getPastAuditById(@Param("acc_id") int acc_id);
-
     @Query("SELECT latest_audit FROM Tenant WHERE acc_id= :acc_id")
     int getOpenAuditById(@Param("acc_id") int acc_id);
 
