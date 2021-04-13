@@ -1,7 +1,13 @@
 package com.c2g4.SingHealthWebApp.Admin.Models;
 
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.util.Date;
+import java.util.Calendar;
 
 /**
  * Object Model/Representation of an entry of the SQL Account Table
@@ -22,6 +28,10 @@ public class AccountModel {
     private String hp;
     private String role_id;
     private String branch_id;
+    private int failed_login_attempts;
+    private int is_locked;
+    private Date lock_start_datetime;
+
 	public int getAccount_id() {
 		return account_id;
 	}
@@ -82,4 +92,66 @@ public class AccountModel {
 	public void setBranch_id(String branch_id) {
 		this.branch_id = branch_id;
 	}
+
+	public int getFailed_login_attempts() {
+		return failed_login_attempts;
+	}
+
+	public void setFailed_login_attempts(int failed_login_attempts) {
+		this.failed_login_attempts = failed_login_attempts;
+	}
+
+
+	public void setIs_locked(int is_locked) {
+		this.is_locked = is_locked;
+	}
+
+	@JsonIgnore
+	public Date getLock_start_datetime() {
+		return lock_start_datetime;
+	}
+
+	public void setLock_start_datetime(Date lock_start_datetime) {
+		this.lock_start_datetime = lock_start_datetime;
+	}
+
+	@JsonIgnore
+	public boolean isIs_locked(){
+		if(is_locked==0) {
+			if(failed_login_attempts>=5){
+				is_locked =1;
+			}
+			return is_locked==1;
+		}
+		Calendar now = Calendar.getInstance(); //now
+		System.out.println("now"+now.getTime());
+		System.out.println(lock_start_datetime);
+
+		Calendar lock_start_datetime_cal = Calendar.getInstance();
+		System.out.println("lock_start_datetime_cal "+lock_start_datetime_cal.getTime());
+
+		lock_start_datetime_cal.setTime(lock_start_datetime);
+		System.out.println("lock_start_datetime_cal "+lock_start_datetime_cal.getTime());
+
+		//lock for 5min
+		lock_start_datetime_cal.add(Calendar.MINUTE,2);
+		if(lock_start_datetime_cal.getTime().before(now.getTime())){
+			System.out.println("reset attempts 0");
+			failed_login_attempts=0;
+			is_locked = 0;
+//			accountRepo.changeFailedLoginAndLockAttemptsByUsername(username,failed_login_attempts,is_locked,null);
+		}
+		return is_locked==1;
+	}
+
+	@JsonIgnore
+	public int incrementLockAttempts(){
+		return ++failed_login_attempts;
+	}
+
+	public void resetLockAttempts(){
+		failed_login_attempts = 0;
+	}
+
+
 }

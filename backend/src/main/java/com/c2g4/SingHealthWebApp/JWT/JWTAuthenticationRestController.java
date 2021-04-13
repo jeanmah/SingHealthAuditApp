@@ -1,21 +1,23 @@
 package com.c2g4.SingHealthWebApp.JWT;
 
+import java.util.Calendar;
+import java.sql.Date;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,7 +56,7 @@ public class JWTAuthenticationRestController {
         logger.warn("HEREEEE");
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         logger.warn("AUTHENTICATED");
-
+        accountRepo.changeFailedLoginAndLockAttemptsByUsername(authenticationRequest.getUsername(),0,0,null);
         final UserDetails userDetails = appUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
         final String accountType = accountRepo.getRoleFromUsername(authenticationRequest.getUsername());
@@ -91,10 +93,30 @@ public class JWTAuthenticationRestController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
-        } catch (DisabledException e) {
-            throw new AuthenticationException("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
+        } catch (InternalAuthenticationServiceException | DisabledException e){
             throw new AuthenticationException("INVALID_CREDENTIALS", e);
+        } catch (BadCredentialsException e) {
+            if(accountRepo.findByUsername(username)!=null){
+                incrementLock(username);
+            }
+            throw new AuthenticationException("INVALID_CREDENTIALS", e);
+        } catch (Exception e){
+            throw new AuthenticationException("UNKNOWN ERROR", e);
+        }
+    }
+
+    private void incrementLock(String username){
+        AccountModel callerAcc = accountRepo.findByUsername(username);
+        boolean isLocked = callerAcc.isIs_locked();
+        int attempts = callerAcc.incrementLockAttempts();
+        System.out.println("attempts "+attempts);
+
+        if(attempts==5){
+            java.util.Date currTime = Calendar.getInstance(TimeZone.getTimeZone("SGT")).getTime();
+            logger.info("now {}",currTime);
+            accountRepo.changeFailedLoginAndLockAttemptsByUsername(callerAcc.getUsername(),callerAcc.getFailed_login_attempts(),1,currTime);
+        } else if(attempts<5){
+            accountRepo.changeFailedLoginAndLockAttemptsByUsername(callerAcc.getUsername(),callerAcc.getFailed_login_attempts(),0,null);
         }
     }
 }

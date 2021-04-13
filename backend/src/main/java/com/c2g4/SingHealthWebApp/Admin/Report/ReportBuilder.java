@@ -2,23 +2,34 @@ package com.c2g4.SingHealthWebApp.Admin.Report;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 
-import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditModelBuilder;
 import com.c2g4.SingHealthWebApp.Admin.Models.CompletedAuditModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListFBRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListNFBRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListSMARepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.CompletedAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 /**
@@ -585,7 +596,7 @@ public class ReportBuilder {
 				continue;
 			}
 
-			if(entry.getStatus() ==Component_Status.FAIL){
+			if(entry.getStatus() == Component_Status.FAIL){
 				Date dueDate = entry.getDueDate();
 				logger.info("Component status {}, due date {}, time {}",entry.getStatus(),dueDate,dueDate.toLocalDate());
 				if(calendar.getTime().after(dueDate)){
