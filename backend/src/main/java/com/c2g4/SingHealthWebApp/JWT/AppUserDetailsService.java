@@ -3,6 +3,7 @@ package com.c2g4.SingHealthWebApp.JWT;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.c2g4.SingHealthWebApp.JWT.BruteForce.LoginAttemptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,28 @@ import org.springframework.stereotype.Service;
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 public class AppUserDetailsService implements UserDetailsService{
     @Autowired
     private AccountRepo accountRepo;
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+    @Autowired
+    private LoginAttemptService loginAttemptService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public UserDetails loadUserByUsername(String s) throws DisabledException, UsernameNotFoundException {
+        final String clientIP = extractIPFromClient();
+        logger.info("IP ADDRESS {}", clientIP);
+
+        if (loginAttemptService.isBlocked(clientIP)) {
+            logger.warn("USER IP {} BLOCKED",clientIP);
+            throw new RuntimeException("IP address blocked");
+        }
+
         AccountModel accountModel;
         logger.warn("LOADUSERBYUSERAME");
 
@@ -50,5 +65,13 @@ public class AppUserDetailsService implements UserDetailsService{
         return userDetails;
     }
 
+    private String extractIPFromClient() {
+        //X-Forwarded-For: clientIpAddress, proxy1, proxy2
+        String xfHeader = httpServletRequest.getHeader("X-Forwarded-For");
+        if (xfHeader == null){
+            return httpServletRequest.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
+    }
 
 }
