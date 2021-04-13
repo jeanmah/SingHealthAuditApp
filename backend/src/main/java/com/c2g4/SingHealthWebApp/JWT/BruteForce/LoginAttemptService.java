@@ -26,6 +26,11 @@ public class LoginAttemptService {
 
     public void clearIPFromCache(String key) {
         attemptsCache.invalidate(key);
+        try {
+            System.out.println("clear attempts cache "+ attemptsCache.get(key));
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public void putIPInCache(String key) {
@@ -38,7 +43,7 @@ public class LoginAttemptService {
         attempts++;
         attemptsCache.put(key, attempts);
         try {
-            System.out.println("attempts cache "+ attemptsCache.get(key));
+            System.out.println("put attempts cache "+ attemptsCache.get(key));
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
