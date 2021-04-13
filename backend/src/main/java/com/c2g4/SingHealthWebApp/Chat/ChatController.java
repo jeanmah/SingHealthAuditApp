@@ -120,9 +120,10 @@ public class ChatController {
      * if either ids do not correspond to an existing tenant/auditor
      */
     @PostMapping("/chat/postCreateNewChat")
-    public ResponseEntity<?> postCreateNewChat(@RequestPart(value = "auditor_id") int auditor_id,
-                                               @RequestPart(value = "tenant_id") int tenant_id){
+    public ResponseEntity<?> postCreateNewChat(@RequestParam(value = "auditor_id") int auditor_id,
+                                               @RequestParam(value = "tenant_id") int tenant_id){
 
+        System.out.println("Testing");
         if(!tenantRepo.existsById(tenant_id)) return ResponseEntity.badRequest().body("tenant account not found");
         if(!auditorRepo.existsById(auditor_id)) return ResponseEntity.badRequest().body("auditor account not found");
         ChatModel chatModel = new ChatModel(0,tenant_id,auditor_id,(JsonNode)objectMapper.createObjectNode());

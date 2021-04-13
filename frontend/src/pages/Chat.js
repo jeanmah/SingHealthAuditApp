@@ -1,89 +1,74 @@
-import React, { useEffect, useContext } from "react";
-import { Link } from 'react-router-dom';
-import { Typography, Button } from "@material-ui/core";
-import axios from "axios";
-
-import { Context } from "../Context";
-import Navbar from "../Navbar";
-import useStyles from "../styles";
 import { FormGroup } from "@material-ui/core";
+import { Typography, Button } from "@material-ui/core";
+import React, { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
+
+import { Context } from '../Context';
+import useStyles from "../styles";
 
 function Chat() {
-
-  const {
-    allChatsOfUserState,
-    getAllChatsOfUser
-  } = useContext(Context);
-
+  const { chatId } = useParams(); // typeof chatId: String
+  const [chatEntriesState, setChatEntriesState] = useState([]);
+  const { getChatEntriesOfUser, postChatEntry } = useContext(Context);
+  const styles = useStyles();
+  
   useEffect(() => {
-    getAllChatsOfUser();
+    async function getResponse() {
+      try{
+        await getChatEntriesOfUser(chatId).then((response) => {
+          //console.log("Chat: allChatsOfUser: " + response.data);
+          setChatEntriesState(response.data);
+          //console.log("state: " + chatEntriesState);
+        })
+      } catch {
+        console.log("Failed to retrive allChatsOfUser");
+      }
+    };
+    getResponse();
   }, []);
 
-  const styles = useStyles();
-
-  // allChatsOfUserState.map(chat => {
-  //   console.log("chat: " + chat);
-  //   console.log("chat ID: " + chat.chat_id);
-  //   console.log("auditor ID: " + chat.auditor_id);
-  //   console.log("tenant ID: " + chat.tenant_id);
-  //   console.log("messages: " + chat.messages);
-  // })
-
-  const ChatInfo = (props) => {
-    return (
-      <div>
-        <div>Chat ID: {props.chat_id}</div>
-        <div>Tenant ID: {props.tenant_id}</div>
-        <div>Auditor ID: {props.auditor_id}</div>
-        <div>Messages: {props.messages}</div>
-      </div>   
-    );
-  };
+  function handleClick() {
+    let parentChatId = 3;
+    let subject = "Testing Post Chat Entry";
+    let messageBody = "Test, test, test...";
+    let attachments = "";
+    console.log("This is calling postNewChatEntry");
+    //postChatEntry();
+  }
 
   return (
-    <main className={styles.main}>
-      <Navbar />
+    <main>
+      <Typography variant="h3" align='center'>Chat</Typography>
+      <Typography align='center'>Chat ID: {chatId}</Typography>
       <br />
-      <Typography variant="h3" align="center">Chat</Typography>
+      {chatEntriesState.map((entry, index) => {
+        return (
+          <React.Fragment key={index}>
+            <FormGroup>
+              <Typography>Chat Entry ID: {entry.chat_entry_id}</Typography>
+              <Typography>Subject:{entry.subject}</Typography>
+              <Typography>Sender ID: {entry.sender_id}</Typography>
+              <Typography>Time: {entry.time}</Typography>
+              <Typography>Date: {entry.date}</Typography>
+              <Typography>Message Body: {entry.messageBody}</Typography>
+              <Typography>Attachments: {entry.attachments}</Typography>
+              <br />
+            </FormGroup>
+          </React.Fragment>
+        )
+      })}
       <Button
         className={styles.buttons}
         align="center"
         variant="outlined"
-        color="primary"
         fullWidth
-        onClick={() => {
-          console.log("chatState: " + allChatsOfUserState);
-          console.log("firstChat: " + allChatsOfUserState[0]);
-          console.log("firstChatID: " + allChatsOfUserState[0].chat_id);
-        }}
+        color="primary"
+        onClick={() => handleClick()}
       >
-        Get All Chats of User
+        Create New Message
       </Button>
-
-      <div>
-        {allChatsOfUserState.map((chat, index) => {
-          console.log("Chats in chat page: " + chat.chat_id);
-          console.log("Chat info: " + chat);
-          return (
-            <ChatInfo key={index}
-              chat_id={chat.chat_id}
-              tenant_id={chat.tenant_id}
-              auditor_id={chat.auditor_id}
-              messages={chat.messages}
-            />
-          )
-        })}
-      </div>
-
-      {/* <ChatInfo 
-        chat_id={allChatsOfUserState[0].chat_id}
-        tenant_id={allChatsOfUserState[0].tenant_id}
-        auditor_id={allChatsOfUserState[0].auditor_id}
-        messages={allChatsOfUserState[0].messages}
-      /> */}
-
     </main>
   )
-}
+};
 
 export default Chat;

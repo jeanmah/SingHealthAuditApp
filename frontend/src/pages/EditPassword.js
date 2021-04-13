@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { Redirect } from "react-router-dom";
 import { Typography, Button, TextField, FormGroup } from "@material-ui/core";
 import axios from "axios";
 
@@ -24,6 +25,7 @@ function EditPassword() {
       postPasswordChange(newPassword);
       console.log("Password change updated.")
     }
+    //return <Redirect to="/"/>
   }
 
   function postPasswordChange(newPassword) {

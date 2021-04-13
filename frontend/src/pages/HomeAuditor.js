@@ -24,6 +24,7 @@ function HomeAuditor() {
           ];
         });
         //initialize array to store all objects of report info
+        console.log("reportIDArray: " + reportIdArray);
         let reportInfoArray = [];
 
         for (let i = 0; i < reportIdArray.length; i++) {
@@ -35,6 +36,7 @@ function HomeAuditor() {
           );
           reportInfoArray.push(reportInfo);
         }
+        console.log("reportInfoArray: " + reportInfoArray);
 
         //set state of audits to be an array of report info objects
         setAuditsState(reportInfoArray);

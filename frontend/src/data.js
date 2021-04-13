@@ -66,7 +66,7 @@ export const auditorNavLinks = [
   },
   {
     id: 2,
-    url: "/chat",
+    url: "/allChats",
     text: "Chat",
   },
   {
@@ -89,7 +89,7 @@ export const tenantNavLinks = [
   },
   {
     id: 2,
-    url: "/chat",
+    url: "/allChats",
     text: "Chat",
   },
   {

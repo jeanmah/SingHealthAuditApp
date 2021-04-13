@@ -40,35 +40,92 @@ export const ContextProvider = (props) => {
   const getAllChatsOfUser = () => {
     AuthenticationService.getStoredAxiosInterceptor();
     console.log("This is calling getAllChatsOfUser");
-    return (
-      axios
-        .get(`${API_URL}/chat/getAllChatsOfUser`, {
-          params: {},
-        })
-        .then((response) => {
-          console.log("Response from getAllChatsOfUser", response.data);
-          setAllChatsOfUserState(response.data);
-        })
-        // .then((response) => {
-        //   console.log("Response from getAllChatsOfUser", response.data);
-        //   // Since the response.data is an array of chats, use map() to push chats into the state one by one
-        //   response.data.map(chat => {
-        //     setAllChatsOfUserState([]); // Before pushing, clear the original state
-        //     console.log("Pushing new chat: " + chat.chat_id);
-        //     const chats = allChatsOfUserState;
-        //     chats.push(chat);
-        //     setAllChatsOfUserState(chats);
-        //   })
-        //   console.log("All chats pushed: " + allChatsOfUserState);
-        //   console.log("Type of allChatsOfUserState: " + typeof allChatsOfUserState);
-        //   console.log("Chat in chats: " + allChatsOfUserState[0]);
-        //   console.log("Chat in chats: " + allChatsOfUserState[0].chat_id);
-        // })
-        .catch(() => {
-          console.log("allChatsOfUser retrieval failed");
-        })
-    );
+    return axios
+      .get(`${API_URL}/chat/getAllChatsOfUser`, {
+        params: {},
+      });
   };
+
+  const getChatEntriesOfUser = (chatId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log("This is calling getChatEntriesOfUser");
+    //console.log(typeof parseInt(chatId));
+    //console.log(typeof parseInt(numLastestEntries));
+    return axios
+      .get(`${API_URL}/chat/getChatEntriesOfUser`, {
+        params: {
+          parentChatId: parseInt(chatId),
+          //numLastestChatEntries: parseInt(numLastestChatEntries),
+        },
+      });
+  };
+
+  // function to post a new chat with another user
+  const postCreateNewChat = useCallback((auditor_id, tenant_id) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log(auditor_id);
+    console.log(tenant_id);
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append('auditor_id', auditor_id);
+    formdata.append('tenant_id', tenant_id);
+    return axios
+      .post(
+        `${API_URL}/chat/postCreateNewChat?auditor_id=${auditor_id}&tenant_id=${tenant_id}`, {
+          params: {
+            auditor_id: parseInt(auditor_id),
+            tenant_id: parseInt(tenant_id),
+          }
+        }
+        // formdata,
+        // {
+        //   // headers: {
+        //   //   "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+        //   // },
+        // }
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch(() => {
+        console.log("Failed new chat creation");
+      });
+  });
+
+  // function to post a new chat entry (message) in an existing chat
+  const postChatEntry = useCallback((parentChatId, subject, messageBody, attachments) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append("parentChatId", parentChatId); // Integer
+    formdata.append("subject", subject); // String
+    formdata.append("messageBody", messageBody); // String
+    formdata.append("attachments", attachments); // JsonNode with JsonArray of attachment strings, key should be "attachments"
+    return axios
+      .post(
+        `${API_URL}/chat/postChatEntry`,
+        // `${API_URL}/chat/postChatEntry?auditor_id=${auditor_id}&tenant_id=${tenant_id}`, {
+        //   params: {
+        //     parentChatId: parentChatId,
+        //     subject: subject,
+        //     messageBody: messageBody,
+        //     attachments: attachments,
+        //   }
+        // }
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch(() => {
+        console.log("Failed new chat creation");
+      });
+  });
 
   //function to get Fb Checklist questions
   const getFbChecklistQuestions = () => {
@@ -228,6 +285,8 @@ export const ContextProvider = (props) => {
   const [accountState, setAccountState] = useState([]);
   //state for chats of user
   const [allChatsOfUserState, setAllChatsOfUserState] = useState([]);
+  //state for chat entries of a chat
+  const [chatEntriesOfUserState, setChatEntriesOfUserState] = useState([]);
   //state of comments in modal
   const [comment, setComment] = useState("");
 
@@ -348,6 +407,12 @@ export const ContextProvider = (props) => {
         allChatsOfUserState,
         setAllChatsOfUserState,
         getAllChatsOfUser,
+        postCreateNewChat,
+
+        chatEntriesOfUserState,
+        setChatEntriesOfUserState,
+        getChatEntriesOfUser,
+        postChatEntry,
 
         fbReportState,
         setFbReportState,

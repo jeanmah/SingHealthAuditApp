@@ -19,6 +19,7 @@ import ManagerHome from "./pages/ManagerHome";
 import Store from "./pages/Store";
 import EditAccount from "./pages/EditAccount";
 import EditPassword from "./pages/EditPassword";
+import AllChats from "./pages/AllChats";
 import Chat from "./pages/Chat";
 
 function App() {
@@ -31,43 +32,18 @@ function App() {
           <AuthenticatedRoute exact path="/home/t" component={TenantHome} />
           <AuthenticatedRoute exact path="/home/m" component={ManagerHome} />
           <AuthenticatedRoute exact path="/account" component={Account} />
-          <AuthenticatedRoute
-            exact
-            path="/edit_account"
-            component={EditAccount}
-          />
-          <AuthenticatedRoute
-            exact
-            path="/edit_password"
-            component={EditPassword}
-          />
-          <AuthenticatedRoute
-            exact
-            path="/institutions"
-            component={Institutions}
-          />
-          <AuthenticatedRoute
-            exact
-            path="/institution/:institutionName"
-            component={Institution}
-          />
-          <AuthenticatedRoute
-            exact
-            path="/tenant/:tenantId"
-            component={Tenant}
-          />
-          <AuthenticatedRoute
-            exact
-            path="/tenant/fbChecklist/:tenantId"
-            component={FbChecklist}
-          />
-          <AuthenticatedRoute
-            exact
-            path="/tenant/report/:reportId"
-            component={AuditReport}
-          />
+          <AuthenticatedRoute exact path="/edit_account" component={EditAccount} />
+          <AuthenticatedRoute exact path="/edit_password" component={EditPassword} />
+          <AuthenticatedRoute exact path="/institutions" component={Institutions} />
+          <AuthenticatedRoute exact path="/institution/:institutionName" component={Institution} />
+          <AuthenticatedRoute exact path="/tenant/:tenantId" component={Tenant} />
+          <AuthenticatedRoute exact path="/tenant/fbChecklist/:tenantId" component={FbChecklist} />
+          <AuthenticatedRoute exact path="/tenant/report/:reportId" component={AuditReport} />
           <AuthenticatedRoute exact path="/store" component={Store} />
-          <AuthenticatedRoute exact path="/chat" component={Chat} />
+
+          <AuthenticatedRoute exact path="/allChats" component={AllChats} />
+          <AuthenticatedRoute exact path="/chat/:chatId" component={Chat}/>
+
           <AuthenticatedRoute exact path="/error" component={Error} />
         </Switch>
       </ContextProvider>
