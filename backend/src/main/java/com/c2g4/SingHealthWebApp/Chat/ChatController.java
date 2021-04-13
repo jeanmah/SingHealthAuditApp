@@ -120,11 +120,13 @@ public class ChatController {
      * if either ids do not correspond to an existing tenant/auditor
      */
     @PostMapping("/chat/postCreateNewChat")
-    public ResponseEntity<?> postCreateNewChat(@RequestPart(value = "auditor_id") int auditor_id,
-                                               @RequestPart(value = "tenant_id") int tenant_id){
+    public ResponseEntity<?> postCreateNewChat(@RequestParam(value = "auditor_id") int auditor_id,
+                                               @RequestParam(value = "tenant_id") int tenant_id){
 
         if(!tenantRepo.existsById(tenant_id)) return ResponseEntity.badRequest().body("tenant account not found");
         if(!auditorRepo.existsById(auditor_id)) return ResponseEntity.badRequest().body("auditor account not found");
+        ChatModel existingChatmodel = chatRepo.findChatByUsers(auditor_id,tenant_id);
+        if(existingChatmodel!=null) return ResponseEntity.badRequest().body("EXISTING:"+existingChatmodel.getChat_id());
         ChatModel chatModel = new ChatModel(0,tenant_id,auditor_id,(JsonNode)objectMapper.createObjectNode());
         chatModel = chatRepo.save(chatModel);
         return ResponseEntity.ok(chatModel.getChat_id());
@@ -143,7 +145,7 @@ public class ChatController {
      */
     @PostMapping("/chat/postChatEntry")
     public ResponseEntity<?> postChatEntry(@AuthenticationPrincipal UserDetails callerUser,
-                                           @RequestPart(value = "parentChatId") int parentChatId,
+                                           @RequestParam(value = "parentChatId") int parentChatId,
                                            @RequestPart(value = "subject") String subject,
                                            @RequestPart(value = "messageBody") String messageBody,
                                            @RequestPart(value = "attachments") JsonNode attachments){

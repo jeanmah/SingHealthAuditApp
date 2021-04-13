@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -24,7 +25,7 @@ public class AppUserDetailsService implements UserDetailsService{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String s) throws DisabledException, UsernameNotFoundException {
         AccountModel accountModel;
         logger.warn("LOADUSERBYUSERAME");
 
@@ -35,11 +36,19 @@ public class AppUserDetailsService implements UserDetailsService{
             throw new UsernameNotFoundException(String.format("The username %s doesn't exist", s));
         }
 
+        if(accountModel.isIs_locked()){
+            logger.warn("USERNAME LOCKED");
+            throw new DisabledException(String.format("Username %s has been locked after multiple login attempts",s));
+        }
+
         logger.warn(String.format("USERNAME %s FOUND IN DATABASE",s));
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(accountModel.getRole_id()));
         UserDetails userDetails = new User(accountModel.getUsername(), accountModel.getPassword(), authorities);
+
         return userDetails;
     }
+
+
 }

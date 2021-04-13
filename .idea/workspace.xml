@@ -5,22 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0dccf774-ae68-4882-a661-022e7b1f268c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Context.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Context.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Navbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Navbar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/HomeAuditorCards.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/HomeAuditorCards.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/HomeAuditorTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/HomeAuditorTabs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/InstitutionsCards.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/InstitutionsCards.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Modal.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/data.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/data.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FbChecklist.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FbChecklist.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/HomeAuditor.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/HomeAuditor.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/fbChecklistPages/FbCategoryB.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/fbChecklistPages/FbCategoryC.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/fbChecklistPages/FbCategoryD.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/fbChecklistPages/FbCategoryE.js" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_13_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_2_2.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +27,10 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/backend/external jars/selenium-java-3.141.59/libs" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.3678161" />
   </component>
   <component name="RunManager">
     <configuration name="SingHealthWebAppApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
