@@ -2,6 +2,7 @@ package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -529,33 +530,93 @@ public class ReportController {
 	public ResponseEntity<?> getRectificationEntryOfQn(@RequestParam int report_id,
 													   @RequestParam int tenant_id,
 													   @RequestParam int qn_id){
+		if(!tenantRepo.existsById(tenant_id)) return ResponseEntity.badRequest().body("tenant id not a tenant");
 		ObjectMapper objectMapper = new ObjectMapper();
 		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
 		if(builder == null) {
 			return ResponseEntity.notFound().build();
 		}
-		List<ReportEntry> entries = new ArrayList<>();
+		List<ReportEntry> entries = getRelevantRectificationEntries(builder.getEntries(),qn_id,tenant_id);
+		if(entries.size()==1) entries.clear();
+		else{
+			Comparator<ReportEntry> compareByDateTime = new Comparator<ReportEntry>() {
+				@Override
+				public int compare(ReportEntry r1, ReportEntry r2) {
+					int dateCompare = r1.getDate().compareTo(r2.getDate());
+					if(dateCompare==0){
+						return r1.getTime().compareTo(r2.getTime());
+					}
+					return dateCompare;
+				}
+			};
+			entries.sort(compareByDateTime);
+			entries.remove(0);
+		}
 
-		for(ReportEntry reportEntry: builder.getEntries()){
-			logger.info("Entry qn {} from account{}",reportEntry.getQn_id(),reportEntry.getFrom_account_id());
-			if(reportEntry.getQn_id() ==qn_id && reportEntry.getFrom_account_id() == tenant_id){
+		ObjectNode root = rectificationEntriesOutput(entries,builder.getReportType());
+		return ResponseEntity.ok(root);
+	}
+
+	@GetMapping("/report/getAuditorRectificationResponseOfQn")
+	public ResponseEntity<?> getAuditorRectificationResponseOfQn(@RequestParam int report_id,
+																 @RequestParam int auditor_id,
+																 @RequestParam int qn_id){
+		if(!auditorRepo.existsById(auditor_id)) return ResponseEntity.badRequest().body("auditor id not a auditor");
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+		List<ReportEntry> entries = getRelevantRectificationEntries(builder.getEntries(),qn_id,auditor_id);
+		if(entries.size()==1) entries.clear();
+		else{
+			Comparator<ReportEntry> compareByDateTime = new Comparator<ReportEntry>() {
+				@Override
+				public int compare(ReportEntry r1, ReportEntry r2) {
+					int dateCompare = r1.getDate().compareTo(r2.getDate());
+					if(dateCompare==0){
+						return r1.getTime().compareTo(r2.getTime());
+					}
+					return dateCompare;
+				}
+			};
+			entries.sort(compareByDateTime);
+			entries.remove(0);
+		}
+
+		ObjectNode root = rectificationEntriesOutput(entries,builder.getReportType());
+		return ResponseEntity.ok(root);
+	}
+
+
+	private List<ReportEntry> getRelevantRectificationEntries(List<ReportEntry> allEntries,
+													   int qn_id, int acc_id) {
+		List<ReportEntry> entries = new ArrayList<>();
+		for (ReportEntry reportEntry : allEntries) {
+			logger.info("Entry qn {} from account{}", reportEntry.getQn_id(), reportEntry.getFrom_account_id());
+			if (reportEntry.getQn_id() == qn_id && reportEntry.getFrom_account_id() == acc_id) {
 				entries.add(reportEntry);
 			}
 		}
+		return entries;
+	}
+	private ObjectNode rectificationEntriesOutput(List<ReportEntry> entries,String reportType){
+
+		ObjectMapper objectMapper = new ObjectMapper();
 		ObjectNode root = objectMapper.createObjectNode();
 		ArrayNode entriesArrayNode = objectMapper.createArrayNode();
+
 		if(entries.size()==0){
 			root.put("hasRectification",false);
 			root.put("entries", entriesArrayNode);
 		} else {
 			root.put("hasRectification",true);
 			for(ReportEntry re: entries){
-				ObjectNode entryOutput = addAdditionalEntryFields(re,builder.getReportType());
+				ObjectNode entryOutput = addAdditionalEntryFields(re,reportType);
 				entriesArrayNode.add(entryOutput);
 			}
 			root.put("entries", entriesArrayNode);
 		}
-		return ResponseEntity.ok(root);
+		return root;
 	}
 
 
