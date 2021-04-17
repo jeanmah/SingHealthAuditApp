@@ -452,13 +452,13 @@ public class ReportController {
 		if(foundReportEntry==null) return ResponseEntity.badRequest().body(null);
 
 		try {
-			jNode.put("date", objectMapper.writeValueAsString(foundReportEntry.getDate()));
-			jNode.put("time", objectMapper.writeValueAsString(foundReportEntry.getTime()));
-			jNode.put("original_remarks", objectMapper.writeValueAsString(foundReportEntry.getRemarks()));
-			jNode.put("severity", objectMapper.writeValueAsString(foundReportEntry.getSeverity()));
-			jNode.put("current_qn_status", objectMapper.writeValueAsString(lastReportEntry.getStatus()));
+			jNode.put("date", objectMapper.valueToTree(foundReportEntry.getDate()));
+			jNode.put("time", foundReportEntry.getTime().toString());
+			jNode.put("original_remarks", foundReportEntry.getRemarks());
+			jNode.put("severity", objectMapper.valueToTree(foundReportEntry.getSeverity()));
+			jNode.put("current_qn_status", String.valueOf(lastReportEntry.getStatus()));
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().body(null);
 		}

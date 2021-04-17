@@ -305,6 +305,13 @@ export const ContextProvider = (props) => {
     });
   };
 
+  const getQuestionInfo = (reportId, questionId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getQuestionInfo`, {
+      params: { report_id: parseInt(reportId), qn_id: parseInt(questionId) },
+    });
+  };
+
   // const filterAudits = (category) => {
   //   console.log(auditsState);
   // };
@@ -488,6 +495,7 @@ export const ContextProvider = (props) => {
         getUserInfoNoParams,
         getAudits,
         getReport,
+        getQuestionInfo,
         // getClosedTenantAudits,
         getTenantAudits,
         getReportStats,

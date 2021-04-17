@@ -7,7 +7,7 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-
+import Box from "@material-ui/core/Box";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
@@ -18,6 +18,10 @@ import { Typography } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 
 const useStyles = makeStyles((theme) => ({
+  titleResolved: {
+    padding: theme.spacing(0, 2, 0, 2),
+    color: "#F15A22",
+  },
   commentBox: {
     maxWidth: 800,
     width: "100%",
@@ -80,28 +84,54 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function TenantReportCard({
-  remarks,
-  entry_id,
+  original_remarks,
+  qn_id,
   requirement,
   timeframe,
   report_id,
   tenant_id,
+  current_qn_status,
+  severity,
 }) {
   const classes = useStyles();
   const [comment, setComment] = useState("");
   //selected file state
   // const [selectedFile, setSelectedFile] = useState();
   const [imageState, setImageState] = useState([]);
+  const [tenantResponse, setTenantResponse] = useState();
 
   //state to check if file is selected
   // const [isFilePicked, setIsFilePicked] = useState(false);
 
   const {
-    fbReportState,
-    setFbReportState,
     getReportEntry,
     submitReportUpdate,
+    getTenantRectification,
   } = useContext(Context);
+
+  //call when component mounts
+  useEffect(() => {
+    async function getResponse() {
+      try {
+        //GET REPORT TYPE
+
+        //GET TENANT RECTIFICATION RESPONSES
+        getTenantRectification(report_id, tenant_id, qn_id)
+          .then((response) => {
+            console.log(response.data.entries);
+
+            setTenantResponse(response.data.entries);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        // console.log(tenantEntry);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getResponse();
+  }, []);
 
   //function to update comment state
   const handleComment = (e) => {
@@ -139,29 +169,63 @@ function TenantReportCard({
   //   console.log(event.target.files[0]);
   //   setIsFilePicked(true);
   // };
+  const createEntry = (
+    questionId,
+    currentStatus,
+    image,
+    remark,
+    severityLevel
+  ) => {
+    let array = [];
+    array.push({
+      qn_id: questionId,
+      status: currentStatus,
+      severity: severityLevel,
+      remarks: remark,
+      images: image,
+    });
+    return array;
+  };
 
   //handle submit
   const handleSubmit = () => {
     // console.log(testState);
     console.log(imageState);
 
-    async function getEntry() {
-      const entry = await getReportEntry(report_id, entry_id).then(
-        (response) => {
-          console.log(response.data);
-          return response.data;
-        }
-      );
-
-      submitReportUpdate(report_id, false, "", {
-        ...entry,
-        images: [imageState],
-        remarks: comment,
+    async function submitAsync() {
+      const entry = await createEntry(
+        qn_id,
+        current_qn_status,
+        imageState,
+        comment,
+        severity
+      ).then((response) => {
+        return response;
       });
+
+      submitReportUpdate(report_id, false, "", entry);
 
       alert("Rectification submitted. Pending Approval");
     }
-    getEntry();
+    submitAsync();
+
+    // async function getEntry() {
+    //   const entry = await getReportEntry(report_id, entry_id).then(
+    //     (response) => {
+    //       console.log(response.data);
+    //       return response.data;
+    //     }
+    //   );
+
+    // submitReportUpdate(report_id, false, "", {
+    //   ...entry,
+    //   images: [imageState],
+    //   remarks: comment,
+    // });
+
+    // alert("Rectification submitted. Pending Approval");
+    // }
+    // getEntry();
   };
 
   return (
@@ -174,7 +238,12 @@ function TenantReportCard({
         // id={`additional-actions1-header${entry_id}`}
       >
         <ListItem>
-          <ListItemText id={entry_id} primary={requirement} />
+          <ListItemText id={qn_id} primary={requirement} />
+          {current_qn_status === "PASS" && (
+            <ListItemText className={classes.titleResolved}>
+              <Typography variant="button">Resolved</Typography>
+            </ListItemText>
+          )}
         </ListItem>
       </AccordionSummary>
       <AccordionDetails className={classes.dropdownMain}>
@@ -184,7 +253,7 @@ function TenantReportCard({
             variant="button"
             className={classes.topText}
           >
-            REMARKS: {remarks}
+            REMARKS: {original_remarks}
           </Typography>
 
           <Typography
@@ -195,6 +264,7 @@ function TenantReportCard({
             RECTIFICATION PERIOD: {timeframe}
           </Typography>
         </div>
+
         <div className={classes.tenantInstructions}>
           <Avatar src="/broken-image.jpg" className={classes.avatar} />
           <Typography color="textPrimary" className={classes.textTenant}>
@@ -215,9 +285,9 @@ function TenantReportCard({
           <input
             // accept="image/*"
             className={classes.input}
-            id={`icon-button-file${entry_id}`}
+            id={`icon-button-file${qn_id}`}
             // id="icon-button-file"
-            name={`file${entry_id}`}
+            name={`file${qn_id}`}
             type="file"
             // value={null}
             // name="picture"
@@ -229,7 +299,7 @@ function TenantReportCard({
             }}
           />
           <label
-            htmlFor={`icon-button-file${entry_id}`}
+            htmlFor={`icon-button-file${qn_id}`}
             // htmlFor="icon-button-file"
             className={classes.camera}
           >
@@ -245,6 +315,38 @@ function TenantReportCard({
             </IconButton>
           </label>
         </div>
+        {tenantResponse.map((response) => {
+          const { remarks, images } = response;
+
+          return (
+            <>
+              <Box className={classes.tenantResponseContainer} boxShadow={2}>
+                <div className={classes.tenantResponse}>
+                  <Avatar src="/broken-image.jpg" className={classes.avatar} />
+                  <Typography
+                    color="textPrimary"
+                    className={classes.textTenant}
+                  >
+                    Your Previous Response(s):
+                  </Typography>
+                </div>
+
+                <Typography
+                  color="textPrimary"
+                  // variant="h8"
+                  className={classes.tenantTextResponse}
+                  variant="caption"
+                >
+                  {remarks}
+                </Typography>
+
+                {images.length !== 0 && (
+                  <img src={images[0]} className={classes.image}></img>
+                )}
+              </Box>
+            </>
+          );
+        })}
         <div className={classes.buttonContainer}>
           <Button
             className={classes.button}

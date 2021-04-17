@@ -32,15 +32,12 @@ const useStyles = makeStyles((theme) => ({
 
 function TenantReport() {
   const { reportId } = useParams();
-  const {
-    getReportStats,
-    getReportEntry,
-    getFbChecklistQuestions,
-    createFbReportState,
-    getUserInfoNoParams,
-  } = useContext(Context);
+  const { getReportStats, getUserInfoNoParams, getQuestionInfo } = useContext(
+    Context
+  );
   const classes = useStyles();
-  const [failedEntries, setFailedEntries] = useState();
+  const [questions, setQuestions] = useState();
+  // const [failedEntries, setFailedEntries] = useState();
   const [tenantid, setTenantId] = useState();
 
   useEffect(() => {
@@ -51,30 +48,55 @@ function TenantReport() {
           setTenantId(response.data.acc_id);
         });
 
-        //attain failed entries
-        const entryArray = await getReportStats(reportId).then((response) => {
-          console.log(response);
-          return response.data.Failed_Entries;
-        });
-        // console.log(entryArray);
+        const questionsArray = await getReportStats(reportId).then(
+          (response) => {
+            console.log(response);
+            return response.data.FailedQuestions;
+          }
+        );
 
-        let entryInfoArray = [];
+        let questionInfoArray = [];
 
-        for (let i = 0; i < entryArray.length; i++) {
-          // console.log(entryArray[i]);
-          // console.log(reportId);
-          let info = await getReportEntry(reportId, entryArray[i]).then(
+        for (let j = 0; j < questionsArray.length; j++) {
+          let qnInfo = await getQuestionInfo(reportId, questionsArray[j]).then(
             (response) => {
-              // console.log(response);
+              console.log("im here");
+              console.log(response);
               return response;
             }
           );
-          entryInfoArray.push(info);
+          questionInfoArray.push(qnInfo);
         }
-        if (entryInfoArray.length === entryArray.length) {
-          console.log(entryInfoArray);
-          setFailedEntries(entryInfoArray);
+
+        if (questionInfoArray.length === questionsArray.length) {
+          console.log(questionInfoArray);
+          setQuestions(questionInfoArray);
         }
+
+        // //attain failed entries
+        // const entryArray = await getReportStats(reportId).then((response) => {
+        //   console.log(response);
+        //   return response.data.Failed_Entries;
+        // });
+        // // console.log(entryArray);
+
+        // let entryInfoArray = [];
+
+        // for (let i = 0; i < entryArray.length; i++) {
+        //   // console.log(entryArray[i]);
+        //   // console.log(reportId);
+        //   let info = await getReportEntry(reportId, entryArray[i]).then(
+        //     (response) => {
+        //       // console.log(response);
+        //       return response;
+        //     }
+        //   );
+        //   entryInfoArray.push(info);
+        // }
+        // if (entryInfoArray.length === entryArray.length) {
+        //   console.log(entryInfoArray);
+        //   setFailedEntries(entryInfoArray);
+        // }
       } catch (err) {
         console.error(err);
       }
@@ -84,7 +106,7 @@ function TenantReport() {
 
   return (
     <div>
-      {failedEntries ? (
+      {questions && tenantid ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -92,8 +114,8 @@ function TenantReport() {
           </Box>
           <Box className={classes.reportBasicInfo}></Box>
           <div className={classes.root}>
-            {failedEntries.map((entry) => {
-              const { data } = entry;
+            {questions.map((question) => {
+              const { data } = question;
               let severity = data.severity / 1000000;
               severity = Math.floor(severity);
               let timeframe = "";
@@ -115,18 +137,16 @@ function TenantReport() {
                   break;
               }
               return (
-                <>
-                  {data.from_account_id !== tenantid && (
-                    <TenantReportCard
-                      remarks={data.remarks}
-                      entry_id={data.entry_id}
-                      requirement={data.Requirement}
-                      timeframe={timeframe}
-                      report_id={reportId}
-                      tenant_id={tenantid}
-                    />
-                  )}
-                </>
+                <TenantReportCard
+                  original_remarks={data.original_remarks}
+                  qn_id={data.qn_id}
+                  requirement={data.requirement}
+                  timeframe={timeframe}
+                  report_id={reportId}
+                  tenant_id={tenantid}
+                  current_qn_status={data.current_qn_status}
+                  severity={data.severity}
+                />
               );
             })}
           </div>
