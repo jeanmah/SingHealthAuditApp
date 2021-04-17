@@ -102,6 +102,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>2.4.3</version>
+<<<<<<< HEAD
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -128,6 +129,20 @@
 			<version>2.4.5</version>
 		</dependency>
 	</dependencies>
+=======
+     	</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+    </dependencies>
+>>>>>>> 1d710d3909070c77c508e138e9d519970509c856
 
 	<build>
 		<plugins>
@@ -149,4 +164,5 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
 </project>

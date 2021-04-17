@@ -1,5 +1,6 @@
 package com.c2g4.SingHealthWebApp.JWT;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 
 public class JWTTokenRequest implements Serializable {
@@ -33,5 +34,6 @@ public class JWTTokenRequest implements Serializable {
         public void setPassword(String password) {
             this.password = password;
         }
-    }
+
+}
 

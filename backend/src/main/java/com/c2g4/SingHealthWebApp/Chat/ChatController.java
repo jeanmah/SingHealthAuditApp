@@ -120,11 +120,13 @@ public class ChatController {
      * if either ids do not correspond to an existing tenant/auditor
      */
     @PostMapping("/chat/postCreateNewChat")
-    public ResponseEntity<?> postCreateNewChat(@RequestPart(value = "auditor_id") int auditor_id,
-                                               @RequestPart(value = "tenant_id") int tenant_id){
+    public ResponseEntity<?> postCreateNewChat(@RequestParam(value = "auditor_id") int auditor_id,
+                                               @RequestParam(value = "tenant_id") int tenant_id){
 
         if(!tenantRepo.existsById(tenant_id)) return ResponseEntity.badRequest().body("tenant account not found");
         if(!auditorRepo.existsById(auditor_id)) return ResponseEntity.badRequest().body("auditor account not found");
+        ChatModel existingChatmodel = chatRepo.findChatByUsers(auditor_id,tenant_id);
+        if(existingChatmodel!=null) return ResponseEntity.badRequest().body("EXISTING:"+existingChatmodel.getChat_id());
         ChatModel chatModel = new ChatModel(0,tenant_id,auditor_id,(JsonNode)objectMapper.createObjectNode());
         chatModel = chatRepo.save(chatModel);
         return ResponseEntity.ok(chatModel.getChat_id());
@@ -134,19 +136,15 @@ public class ChatController {
      * saves a chat entry of the callerUser and updates the Parent Chat
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal
      * @param parentChatId int, the id of the parent chat
-     * @param subject String, the subject of the chat
-     * @param messageBody String, the message body of the chat
-     * @param attachments JsonNode, with JsonArray of attachment strings, key should be "attachments"
+     * @param messageContents String, the message contents of the chat with keys {subject,messageBody,attachments}
      * @return HTTP Ok the saved chat entry id as an int,
      * HTTP bad request if parent chat not found,
      * HTTP UNAUTHORIZED if the user does not have access to the chat
      */
     @PostMapping("/chat/postChatEntry")
     public ResponseEntity<?> postChatEntry(@AuthenticationPrincipal UserDetails callerUser,
-                                           @RequestPart(value = "parentChatId") int parentChatId,
-                                           @RequestPart(value = "subject") String subject,
-                                           @RequestPart(value = "messageBody") String messageBody,
-                                           @RequestPart(value = "attachments") JsonNode attachments){
+                                           @RequestParam(value = "parentChatId") int parentChatId,
+                                           @RequestPart(value = "messageContents") String messageContents){
 
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount == null) {
@@ -160,9 +158,21 @@ public class ChatController {
         if(!checkChatAuthorization(chatModel,callerAccount)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized, chat does not belong to user");
         }
-        int chatEntryId = saveChatEntry(chatModel,callerAccount.getAccount_id(),subject,messageBody,attachments);
-        if(chatEntryId==Integer.MIN_VALUE) return ResponseEntity.badRequest().body("chat cannot be saved");
-        return ResponseEntity.ok(chatEntryId);
+
+        try {
+            ObjectNode messageContentsJson = (ObjectNode) objectMapper.readTree(messageContents);
+            String subject = messageContentsJson.get("subject").asText();
+            String messageBody = messageContentsJson.get("messageBody").asText();
+            JsonNode attachments = messageContentsJson.get("attachments");
+            int chatEntryId = saveChatEntry(chatModel,callerAccount.getAccount_id(),subject,messageBody,attachments);
+            if(chatEntryId==Integer.MIN_VALUE) return ResponseEntity.badRequest().body("chat cannot be saved");
+            return ResponseEntity.ok(chatEntryId);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("cannot get contents from messageContents");
+        }
+
+
     }
 
     /**
