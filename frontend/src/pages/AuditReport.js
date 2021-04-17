@@ -46,7 +46,8 @@ function AuditReport() {
           setTenantId(response.data.tenant_id);
         });
 
-        //attain rectification entries
+        //attain failed questions
+        // const failedQuestionsArray = await
 
         //attain failed entries
         const entryArray = await getReportStats(reportId).then((response) => {
