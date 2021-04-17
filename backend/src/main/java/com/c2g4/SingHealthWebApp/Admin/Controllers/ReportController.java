@@ -330,16 +330,11 @@ public class ReportController {
 		List<Integer> failedQuestions =  new ArrayList<>();
 		List<Integer> resolvedQuestions =  new ArrayList<>();
 		List<Integer> currentFailedQuestions =  new ArrayList<>();
-
+		getFailedQuestions(builder.getEntries(),failedQuestions,resolvedQuestions,currentFailedQuestions);
 		jNode.put("Failed_Entries", failed_entry_ids);
-		try {
-			jNode.put("FailedQuestions", objectMapper.writeValueAsString(failedQuestions));
-			jNode.put("ResolvedQuestions", objectMapper.writeValueAsString(resolvedQuestions));
-			jNode.put("CurrentFailedQuestions", objectMapper.writeValueAsString(currentFailedQuestions));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().body(null);
-		}
+		jNode.put("FailedQuestions", objectMapper.valueToTree(failedQuestions));
+		jNode.put("ResolvedQuestions", objectMapper.valueToTree(resolvedQuestions));
+		jNode.put("CurrentFailedQuestions", objectMapper.valueToTree(currentFailedQuestions));
 
 		//Get score
 		jNode.put("Score", builder.getOverall_score());
@@ -467,7 +462,6 @@ public class ReportController {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().body(null);
 		}
-
 
 		jNode.put("qn_id", qn_id);
 		JsonNode questionInfo = jNode;
@@ -633,11 +627,6 @@ public class ReportController {
 			return ResponseEntity.notFound().build();
 		}
 		List<ReportEntry> entries = getRelevantRectificationEntries(builder.getEntries(),qn_id,tenant_id);
-		if(entries.size()==1) entries.clear();
-		else{
-			sortEntries(entries);
-			entries.remove(0);
-		}
 
 		ObjectNode root = rectificationEntriesOutput(entries,builder.getReportType());
 		return ResponseEntity.ok(root);
