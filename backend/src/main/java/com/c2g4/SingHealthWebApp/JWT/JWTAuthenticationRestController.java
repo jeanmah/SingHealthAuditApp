@@ -51,10 +51,10 @@ public class JWTAuthenticationRestController {
 
 
     @PostMapping(value = "${com.c2g4.singHealthAudit.jwt.get.token.uri}")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JWTTokenRequest authenticationRequest)
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JWTTokenRequest authenticationRequest, HttpServletRequest httpServletRequest)
             throws AuthenticationException {
-        logger.warn("HEREEEE");
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        logger.info("HTTP SERVLET REQUEST {}",httpServletRequest);
+        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword(),httpServletRequest);
         logger.warn("AUTHENTICATED");
         accountRepo.changeFailedLoginAndLockAttemptsByUsername(authenticationRequest.getUsername(),0,0,null);
         final UserDetails userDetails = appUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
@@ -85,14 +85,15 @@ public class JWTAuthenticationRestController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
-    private void authenticate(String username, String password) {
+    private void authenticate(String username, String password, HttpServletRequest httpServletRequest) {
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
         logger.debug("in authenticate");
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,password);
+            authenticationToken.setDetails(httpServletRequest);
+            authenticationManager.authenticate(authenticationToken);
         } catch (InternalAuthenticationServiceException | DisabledException e){
             throw new AuthenticationException("INVALID_CREDENTIALS", e);
         } catch (BadCredentialsException e) {
@@ -100,9 +101,10 @@ public class JWTAuthenticationRestController {
                 incrementLock(username);
             }
             throw new AuthenticationException("INVALID_CREDENTIALS", e);
-        } catch (Exception e){
-            throw new AuthenticationException("UNKNOWN ERROR", e);
         }
+//        catch (Exception e){
+//            throw new AuthenticationException("UNKNOWN ERROR", e);
+//        }
     }
 
     private void incrementLock(String username){
