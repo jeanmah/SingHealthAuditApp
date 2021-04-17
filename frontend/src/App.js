@@ -8,6 +8,7 @@ import Error from "./pages/Error";
 import Institutions from "./pages/Institutions";
 import Institution from "./pages/Institution";
 import FbChecklist from "./pages/FbChecklist";
+import NonFbChecklist from "./pages/NonFbChecklist";
 import AuthenticatedRoute from "./components/testJwt/AuthenticatedRoute";
 import LoginComponent from "./components/testJwt/Login";
 import HomeAuditor from "./pages/HomeAuditor";
@@ -61,6 +62,11 @@ function App() {
             exact
             path="/tenant/fbChecklist/:tenantId"
             component={FbChecklist}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/nfbChecklist/:tenantId"
+            component={NonFbChecklist}
           />
           <AuthenticatedRoute
             exact

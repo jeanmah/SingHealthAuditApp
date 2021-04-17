@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import { Context } from "../Context";
@@ -85,13 +85,16 @@ function TenantReportCard({
   requirement,
   timeframe,
   report_id,
+  tenant_id,
 }) {
   const classes = useStyles();
   const [comment, setComment] = useState("");
   //selected file state
-  const [selectedFile, setSelectedFile] = useState();
+  // const [selectedFile, setSelectedFile] = useState();
+  const [imageState, setImageState] = useState([]);
+
   //state to check if file is selected
-  const [isFilePicked, setIsFilePicked] = useState(false);
+  // const [isFilePicked, setIsFilePicked] = useState(false);
 
   const {
     fbReportState,
@@ -103,15 +106,28 @@ function TenantReportCard({
   //function to update comment state
   const handleComment = (e) => {
     setComment(e.target.value);
-    // console.log(comment);
   };
-  // handle input file change
-  const handleChange = (event) => {
-    console.log(event.target.files[0]);
-    setSelectedFile(event.target.files[0]);
 
-    setIsFilePicked(true);
+  //function to handle input file change
+  const handleChange = (e) => {
+    const getBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    };
+
+    getBase64(e.target.files[0]).then((image) => {
+      setImageState(image);
+    });
   };
+
   // let input = document.getElementsByTagName("input")[0];
 
   // input.onclick = function () {
@@ -124,40 +140,24 @@ function TenantReportCard({
   //   setIsFilePicked(true);
   // };
 
-  const getBase64 = () => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(selectedFile);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
   //handle submit
   const handleSubmit = () => {
+    // console.log(testState);
+    console.log(imageState);
+
     async function getEntry() {
       const entry = await getReportEntry(report_id, entry_id).then(
         (response) => {
-          console.log(response);
+          console.log(response.data);
           return response.data;
         }
       );
-      if (selectedFile) {
-        getBase64().then((image) => {
-          console.log(image);
-          console.log(comment);
-          submitReportUpdate(report_id, false, "", {
-            ...entry,
-            image: image,
-            remarks: comment,
-          });
-        });
-      } else {
-        console.log(comment);
-        submitReportUpdate(report_id, false, "", {
-          ...entry,
-          remarks: comment,
-        });
-      }
+
+      submitReportUpdate(report_id, false, "", {
+        ...entry,
+        images: [imageState],
+        remarks: comment,
+      });
 
       alert("Rectification submitted. Pending Approval");
     }
@@ -171,6 +171,7 @@ function TenantReportCard({
         aria-label="Expand"
         aria-controls="additional-actions1-content"
         id="additional-actions1-header"
+        // id={`additional-actions1-header${entry_id}`}
       >
         <ListItem>
           <ListItemText id={entry_id} primary={requirement} />
@@ -214,9 +215,9 @@ function TenantReportCard({
           <input
             // accept="image/*"
             className={classes.input}
-            // id={`icon-button-file${entry_id}`}
-            id="icon-button-file"
-            name="file"
+            id={`icon-button-file${entry_id}`}
+            // id="icon-button-file"
+            name={`file${entry_id}`}
             type="file"
             // value={null}
             // name="picture"
@@ -228,8 +229,8 @@ function TenantReportCard({
             }}
           />
           <label
-            // htmlFor={`icon-button-file${entry_id}`}
-            htmlFor="icon-button-file"
+            htmlFor={`icon-button-file${entry_id}`}
+            // htmlFor="icon-button-file"
             className={classes.camera}
           >
             <IconButton
@@ -248,7 +249,9 @@ function TenantReportCard({
           <Button
             className={classes.button}
             size="large"
-            onClick={handleSubmit}
+            onClick={() => {
+              handleSubmit();
+            }}
             // color="secondary"
           >
             submit

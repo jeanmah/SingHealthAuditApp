@@ -37,17 +37,21 @@ function TenantReport() {
     getReportEntry,
     getFbChecklistQuestions,
     createFbReportState,
+    getUserInfoNoParams,
   } = useContext(Context);
   const classes = useStyles();
   const [failedEntries, setFailedEntries] = useState();
+  const [tenantid, setTenantId] = useState();
 
   useEffect(() => {
     async function getResponse() {
       try {
-        // getFbChecklistQuestions().then((response) => {
-        //   createFbReportState(response.data);
-        // });
+        //attain account id of tenant
+        getUserInfoNoParams().then((response) => {
+          setTenantId(response.data.acc_id);
+        });
 
+        //attain failed entries
         const entryArray = await getReportStats(reportId).then((response) => {
           console.log(response);
           return response.data.Failed_Entries;
@@ -61,7 +65,7 @@ function TenantReport() {
           // console.log(reportId);
           let info = await getReportEntry(reportId, entryArray[i]).then(
             (response) => {
-              console.log(response);
+              // console.log(response);
               return response;
             }
           );
@@ -111,13 +115,18 @@ function TenantReport() {
                   break;
               }
               return (
-                <TenantReportCard
-                  remarks={data.remarks}
-                  entry_id={data.entry_id}
-                  requirement={data.Requirement}
-                  timeframe={timeframe}
-                  report_id={reportId}
-                />
+                <>
+                  {data.from_account_id !== tenantid && (
+                    <TenantReportCard
+                      remarks={data.remarks}
+                      entry_id={data.entry_id}
+                      requirement={data.Requirement}
+                      timeframe={timeframe}
+                      report_id={reportId}
+                      tenant_id={tenantid}
+                    />
+                  )}
+                </>
               );
             })}
           </div>

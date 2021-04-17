@@ -21,13 +21,34 @@ const useStyles = makeStyles((theme) => ({
 
 function AuditReport() {
   const { reportId } = useParams();
-  const { getReportStats, getReportEntry } = useContext(Context);
+  const {
+    getReportStats,
+    getReportEntry,
+    getUserInfoNoParams,
+    getReport,
+  } = useContext(Context);
   const classes = useStyles();
   const [failedEntries, setFailedEntries] = useState();
+  const [auditorid, setAuditorId] = useState();
+  const [tenantid, setTenantId] = useState();
 
   useEffect(() => {
     async function getResponse() {
       try {
+        //attain auditor account id
+        getUserInfoNoParams().then((response) => {
+          setAuditorId(response.data.acc_id);
+        });
+
+        //attain tenant id based on the report
+        getReport(reportId).then((response) => {
+          console.log(response);
+          setTenantId(response.data.tenant_id);
+        });
+
+        //attain rectification entries
+
+        //attain failed entries
         const entryArray = await getReportStats(reportId).then((response) => {
           console.log(response);
           return response.data.Failed_Entries;
@@ -60,7 +81,7 @@ function AuditReport() {
 
   return (
     <div>
-      {failedEntries ? (
+      {failedEntries && auditorid && tenantid ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -91,15 +112,19 @@ function AuditReport() {
                   break;
               }
               return (
-                <AuditReportCard
-                  entry_id={data.entry_id}
-                  requirement={data.Requirement}
-                  remarks={data.remarks}
-                  timeframe={timeframe}
-                  report_id={reportId}
-                  tenant_id={data.from_account_id}
-                  qn_id={data.qn_id}
-                />
+                <>
+                  {data.from_account_id === auditorid && (
+                    <AuditReportCard
+                      entry_id={data.entry_id}
+                      requirement={data.Requirement}
+                      remarks={data.remarks}
+                      timeframe={timeframe}
+                      report_id={reportId}
+                      tenant_id={tenantid}
+                      qn_id={data.qn_id}
+                    />
+                  )}
+                </>
               );
             })}
           </div>

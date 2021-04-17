@@ -13,6 +13,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
   dropdownMain: {
@@ -51,6 +52,27 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.default,
   },
   avatar: {},
+  image: {
+    width: "70%",
+    padding: theme.spacing(3, 2, 2, 2),
+  },
+  button: {
+    width: 240,
+    // color: "#F15A22",
+    fontWeight: "medium",
+    backgroundColor: "#F15A22",
+  },
+  buttonContainer: {
+    padding: theme.spacing(2, 2, 2, 2),
+    display: "flex",
+
+    // justifyContent: "center",
+  },
+  // media: {
+  //   width: 100,
+  //   height: 100,
+  //   backgroundColor: theme.palette.background.default,
+  // },
 }));
 
 function AuditReportCard({
@@ -69,17 +91,27 @@ function AuditReportCard({
   //state to check if file is selected
   const [isFilePicked, setIsFilePicked] = useState(false);
   //state of tenant rectification
-  const [tenantRectification, setTenantRectification] = useState();
+  const [tenantRemarks, setTenantRemarks] = useState();
+  const [tenantRectificationImage, setTenantRectificationImage] = useState();
 
-  const { getTenantRectification } = useContext(Context);
+  const {
+    getTenantRectification,
+    getReportEntry,
+    submitReportUpdate,
+  } = useContext(Context);
 
   useEffect(() => {
     async function getResponse() {
       try {
         const tenantEntry = getTenantRectification(report_id, tenant_id, qn_id)
           .then((response) => {
-            console.log(response.data.entries[0].remarks);
-            setTenantRectification(response.data.entries[0].remarks);
+            console.log(response);
+            setTenantRemarks(response.data.entries[0].remarks);
+            if (response.data.entries[0].images.length === 1) {
+              setTenantRectificationImage(response.data.entries[0].images[0]);
+            } else {
+              setTenantRectificationImage("No image");
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -106,56 +138,96 @@ function AuditReportCard({
     setIsFilePicked(true);
   };
 
-  return (
-    <Accordion>
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-label="Expand"
-        aria-controls="additional-actions1-content"
-        id="additional-actions1-header"
-      >
-        <ListItem>
-          <ListItemText id={entry_id} primary={requirement} />
-        </ListItem>
-      </AccordionSummary>
-      <AccordionDetails className={classes.dropdownMain}>
-        <div className={classes.dropdownContainer}>
-          <Typography
-            color="textSecondary"
-            variant="button"
-            className={classes.topText}
-          >
-            REMARKS: {remarks}
-          </Typography>
+  const resolveNonCompliance = () => {
+    async function resolveAsync() {
+      const entry = await getReportEntry(report_id, entry_id).then(
+        (response) => {
+          console.log(response.data);
+          return response.data;
+        }
+      );
+      submitReportUpdate(report_id, false, "", {
+        ...entry,
+        status: true,
+      });
+    }
+    resolveAsync();
+  };
 
-          <Typography
-            color="textSecondary"
-            variant="button"
-            className={classes.textInfo}
+  return (
+    <>
+      {tenantRectificationImage && (
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-label="Expand"
+            aria-controls="additional-actions1-content"
+            id="additional-actions1-header"
           >
-            RECTIFICATION PERIOD: {timeframe}
-          </Typography>
-        </div>
-        <Box className={classes.tenantResponseContainer} boxShadow={2}>
-          <div className={classes.tenantResponse}>
-            <Avatar src="/broken-image.jpg" className={classes.avatar} />
-            <Typography color="textPrimary" className={classes.textTenant}>
-              Tenant Response:
-            </Typography>
-          </div>
-          {tenantRectification && (
-            <Typography
-              color="textPrimary"
-              // variant="h8"
-              className={classes.tenantTextResponse}
-              variant="caption"
-            >
-              {tenantRectification}
-            </Typography>
-          )}
-        </Box>
-      </AccordionDetails>
-    </Accordion>
+            <ListItem>
+              <ListItemText id={entry_id} primary={requirement} />
+            </ListItem>
+          </AccordionSummary>
+          <AccordionDetails className={classes.dropdownMain}>
+            <div className={classes.dropdownContainer}>
+              <Typography
+                color="textSecondary"
+                variant="button"
+                className={classes.topText}
+              >
+                YOUR REMARKS: {remarks}
+              </Typography>
+
+              <Typography
+                color="textSecondary"
+                variant="button"
+                className={classes.textInfo}
+              >
+                RECTIFICATION PERIOD: {timeframe}
+              </Typography>
+            </div>
+            <Box className={classes.tenantResponseContainer} boxShadow={2}>
+              <div className={classes.tenantResponse}>
+                <Avatar src="/broken-image.jpg" className={classes.avatar} />
+                <Typography color="textPrimary" className={classes.textTenant}>
+                  Tenant Response:
+                </Typography>
+              </div>
+              {tenantRemarks && (
+                <Typography
+                  color="textPrimary"
+                  // variant="h8"
+                  className={classes.tenantTextResponse}
+                  variant="caption"
+                >
+                  {tenantRemarks}
+                </Typography>
+              )}
+              {tenantRectificationImage !== "No image" && (
+                <img
+                  src={tenantRectificationImage}
+                  className={classes.image}
+                ></img>
+              )}
+            </Box>
+            <div className={classes.buttonContainer}>
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                size="large"
+                onClick={() => {
+                  resolveNonCompliance();
+                }}
+                // color="secondary"
+              >
+                resolve
+              </Button>
+            </div>
+          </AccordionDetails>
+        </Accordion>
+      )}{" "}
+    </>
   );
 }
 

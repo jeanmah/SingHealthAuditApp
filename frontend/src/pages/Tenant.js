@@ -209,12 +209,14 @@ function Tenant() {
                       <ListItemText primary="Conduct F&B Audit" />
                     </ListItem>
                   </Link>
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <StoreIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct Non-F&B Audit" />
-                  </ListItem>
+                  <Link to={`/tenant/nfbChecklist/${tenantId}`}>
+                    <ListItem button className={classes.nested}>
+                      <ListItemIcon>
+                        <StoreIcon color="secondary" />
+                      </ListItemIcon>
+                      <ListItemText primary="Conduct Non-F&B Audit" />
+                    </ListItem>
+                  </Link>
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
                       <LocalHospitalIcon color="secondary" />

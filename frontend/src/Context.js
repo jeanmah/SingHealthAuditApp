@@ -106,21 +106,25 @@ export const ContextProvider = (props) => {
   //function to get Fb Checklist questions
   const getFbChecklistQuestions = () => {
     AuthenticationService.getStoredAxiosInterceptor();
-    //   return axios
-    //     .get(`${API_URL}/report/getAllQuestions`, {
-    //       params: { type: "FB" },
-    //     })
-    //     .then((response) => {
-    //       setFbChecklistState(response.data);
-    //       createFbReportState(response.data);
-    //     })
-    //     .catch(() => {
-    //       console.log("fb checklist retrieval failed");
-    //     });
-    // }, []);
 
     return axios.get(`${API_URL}/report/getAllQuestions`, {
       params: { type: "FB" },
+    });
+  };
+
+  const getNonFbChecklistQuestions = () => {
+    AuthenticationService.getStoredAxiosInterceptor();
+
+    return axios.get(`${API_URL}/report/getAllQuestions`, {
+      params: { type: "NFB" },
+    });
+  };
+
+  const getSMAChecklistQuestions = () => {
+    AuthenticationService.getStoredAxiosInterceptor();
+
+    return axios.get(`${API_URL}/report/getAllQuestions`, {
+      params: { type: "NFB" },
     });
   };
 
@@ -133,6 +137,35 @@ export const ContextProvider = (props) => {
     return axios
       .post(
         `${API_URL}/report/postReportSubmission?type=FB&tenant_id=${tenantid}&remarks=`,
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+          // params: { type: "FB", tenant_id: t_id, remarks: "" },
+          // data: formdata,
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        // if (response.status === 200) {
+        //   return <Redirect to={`/tenant/${tenantid}`} />;
+        // }
+      })
+      .catch(() => {
+        console.log("Failed FB report submission");
+      });
+  });
+
+  //function to submit FbChecklist report to compute the score
+  const submitNonFbReport = useCallback((tenantid, nfbreport) => {
+    console.log(nfbreport);
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append("checklist", JSON.stringify(nfbreport));
+    return axios
+      .post(
+        `${API_URL}/report/postReportSubmission?type=NFB&tenant_id=${tenantid}&remarks=`,
         formdata,
         {
           headers: {
@@ -180,10 +213,11 @@ export const ContextProvider = (props) => {
 
   const getTenantRectification = (report_id, tenant_id, qn_id) => {
     AuthenticationService.getStoredAxiosInterceptor();
+    console.log(tenant_id);
     return axios.get(`${API_URL}/report/getRectificationEntryOfQn`, {
       params: {
         report_id: parseInt(report_id),
-        tenant_id: parseInt(tenant_id),
+        tenant_id: tenant_id,
         qn_id: parseInt(qn_id),
       },
     });
@@ -283,8 +317,10 @@ export const ContextProvider = (props) => {
   //FRONTEND STATES AND FUNCTIONS
   //state for report ids
   const [reportIdsState, setReportIdsState] = useState();
-  //state for report
+  //state for fb report
   const [fbReportState, setFbReportState] = useState([]);
+  //state for nfb report
+  const [nfbReportState, setNonFbReportState] = useState();
   //state to keep track of audit
   const [auditsState, setAuditsState] = useState();
   //state to keep track of all tenants
@@ -317,6 +353,24 @@ export const ContextProvider = (props) => {
     });
     //set fbreportstate to array
     setFbReportState(array);
+  }, []);
+
+  const createNonFbReportState = useCallback((checklist, response) => {
+    console.log(checklist);
+    //create temporary array
+    let array = [];
+    checklist.forEach((question) => {
+      const { nfb_qn_id } = question;
+      array.push({
+        qn_id: nfb_qn_id,
+        status: true,
+        severity: 0,
+        remarks: "",
+        images: "",
+      });
+    });
+    //set fbreportstate to array
+    setNonFbReportState(array);
   }, []);
 
   //function to update audits state
@@ -409,6 +463,13 @@ export const ContextProvider = (props) => {
         setComment,
         // updateTenantComment,
         getFbChecklistQuestions,
+        getNonFbChecklistQuestions,
+        createNonFbReportState,
+        nfbReportState,
+        setNonFbReportState,
+        submitNonFbReport,
+
+        getSMAChecklistQuestions,
 
         accountState,
         setAccountState,
