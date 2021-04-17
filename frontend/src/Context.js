@@ -87,31 +87,29 @@ export const ContextProvider = (props) => {
       .then((response) => {
         console.log(response);
       })
-      .catch(() => {
+      .catch((error) => {
         console.log("Failed new chat creation");
+        console.log(error.response); // check if its null
+        console.log(error.response.data); // use the response.data to redirect to the existed chat
       });
   });
 
   // function to post a new chat entry (message) in an existing chat
   const postChatEntry = useCallback((parentChatId, subject, messageBody, attachments) => {
     AuthenticationService.getStoredAxiosInterceptor();
+    console.log(typeof parseInt(parentChatId));
+    console.log(typeof subject);
+    console.log(typeof messageBody);
+    console.log(typeof attachments);
     let FormData = require("form-data");
     let formdata = new FormData();
-    formdata.append("parentChatId", parentChatId); // Integer
-    formdata.append("subject", subject); // String
-    formdata.append("messageBody", messageBody); // String
-    formdata.append("attachments", attachments); // JsonNode with JsonArray of attachment strings, key should be "attachments"
+    formdata.append("subject", JSON.stringify(subject)); // String
+    formdata.append("messageBody", JSON.stringify(messageBody)); // String
+    formdata.append("attachments", JSON.stringify({})); // JsonNode with JsonArray of attachment strings, key should be "attachments"
     return axios
       .post(
-        `${API_URL}/chat/postChatEntry`,
-        // `${API_URL}/chat/postChatEntry?auditor_id=${auditor_id}&tenant_id=${tenant_id}`, {
-        //   params: {
-        //     parentChatId: parentChatId,
-        //     subject: subject,
-        //     messageBody: messageBody,
-        //     attachments: attachments,
-        //   }
-        // }
+        //`${API_URL}/chat/postChatEntry?parentChatId=${parseInt(parentChatId)}&subject=${subject}&messageBody=${messageBody}&attachments=${attachments}`,
+        `${API_URL}/chat/postChatEntry?parentChatId=${parseInt(parentChatId)}`,
         formdata,
         {
           headers: {
@@ -123,7 +121,7 @@ export const ContextProvider = (props) => {
         console.log(response);
       })
       .catch(() => {
-        console.log("Failed new chat creation");
+        console.log("Failed new chat entry post");
       });
   });
 
@@ -287,6 +285,8 @@ export const ContextProvider = (props) => {
   const [allChatsOfUserState, setAllChatsOfUserState] = useState([]);
   //state for chat entries of a chat
   const [chatEntriesOfUserState, setChatEntriesOfUserState] = useState([]);
+  //state for current opened chat
+  const [currentChatState, setCurrentChatState] = useState();
   //state of comments in modal
   const [comment, setComment] = useState("");
 
@@ -413,6 +413,9 @@ export const ContextProvider = (props) => {
         setChatEntriesOfUserState,
         getChatEntriesOfUser,
         postChatEntry,
+
+        currentChatState,
+        setCurrentChatState,
 
         fbReportState,
         setFbReportState,

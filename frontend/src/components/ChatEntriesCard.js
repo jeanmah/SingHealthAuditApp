@@ -1,82 +1,59 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from '../Context';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import AccordionActions from '@material-ui/core/AccordionActions';
-import Chip from '@material-ui/core/Chip';
-import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
+import { Typography, Button, Grid, ButtonBase } from '@material-ui/core';
+
 import Chat from "../pages/AllChats";
+import useStyle from "../styles";
 
 const ChatEntriesCards = () => {
   const { chatEntriesOfUserState, setChatEntriesOfUserState } = useContext(Context);
+  const styles = useStyle();
   console.log("chatEntries: " + chatEntriesOfUserState);
   console.log("dict: " + chatEntriesOfUserState[2]);
   return (
-    <div>
+    <Grid container>
       {chatEntriesOfUserState && (chatEntriesOfUserState.map((entry, index) => {
-            return (
-              <React.Fragment key={index}>
-                <AccordionDetails>
-                  <Typography>
-                    <div>Chat Entry ID: {entry.chat_entry_id}</div>
-                    <div>Subject:{entry.subject}</div>
-                    <div>Sender ID: {entry.sender_id}</div>
-                    <div>Time: {entry.time}</div>
-                    <div>Date: {entry.date}</div>
-                    <div>Message Body: {entry.messageBody}</div>
-                    <div>Attachments: {entry.attachments}</div>
-                    <br />
-                  </Typography>
-                </AccordionDetails>
-                <AccordionActions>
-                  <Button size="small" color="primary">
-                    Reply
-                  </Button>
-                </AccordionActions>
-                <Divider />
-              </React.Fragment>
-            );}
-          )
-          
-        // for (var key in Object.keys(chatEntriesOfUserState)) {
-        //   if (chatEntriesOfUserState[key].length === 0) {
-        //     return (
-        //       <React.Fragment>
-        //         <AccordionDetails>
-        //           <Typography>
-        //             No message.
-        //           </Typography>
-        //         </AccordionDetails>
-        //       </React.Fragment>
-        //     )
-        //   } else {
-        //     chatEntriesOfUserState.map((entry, index) => {
-        //     //console.log("chatEntry1: " + chatEntriesOfUserState[0]);
-        //       return (
-        //         <React.Fragment key={index}>
-        //           <AccordionDetails>
-        //             <Typography>
-        //               <div>Chat Entry ID: {entry.chat_entry_id}</div>
-        //               <div>Date: {entry.date}</div>
-        //               <div>Message Body: {entry.messageBody}</div>
-        //               <div>Sender ID: {entry.sender_id}</div>
-        //               <div>Subject:{entry.subject}</div>
-        //               <div>Time: {entry.time}</div>
-        //               <div>Attachments: {entry.attachments}</div>
-        //               <br />
-        //             </Typography>
-        //           </AccordionDetails>
-        //         </React.Fragment>
-        //       );}
-        //     )
-        //   }
-        // }
-      )}
-    </div>
+          return (
+            <React.Fragment key={index}>
+              <Grid item>
+                <Typography>Chat Entry ID: {entry.chat_entry_id}</Typography>
+                <Typography>Subject:{entry.subject}</Typography>
+                <Typography>Sender ID: {entry.sender_id}</Typography>
+                <Typography>Time: {entry.time}</Typography>
+                <Typography>Date: {entry.date}</Typography>
+                <Typography>Message Body: {entry.messageBody}</Typography>
+                <Typography>Attachments: {entry.attachments}</Typography>
+              </Grid>
+              {/* <Grid item>
+                <Grid item xs={12} sm container>
+                  <Grid item xs container direction="column" spacing={2}>
+                    <Grid item xs>
+                      <Typography gutterBottom variant="subtitle1">
+                        Standard license
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        Full resolution 1920x1080 • JPEG
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        ID: 1030114
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="body2" style={{ cursor: 'pointer' }}>
+                        Remove
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="subtitle1">$19.00</Typography>
+                  </Grid>
+                </Grid>
+              </Grid> */}
+            </React.Fragment>
+          );}
+        )
+    )}
+    </Grid>
   )
 }
 

@@ -25,7 +25,11 @@ function EditPassword() {
       postPasswordChange(newPassword);
       console.log("Password change updated.")
     }
-    //return <Redirect to="/"/>
+  }
+
+  function clickRedirect() {
+    console.log("Redirecting...");
+    return <Redirect to="/" />;
   }
 
   function postPasswordChange(newPassword) {
@@ -69,6 +73,16 @@ function EditPassword() {
         onClick={() => submitNewPassword(passwordState, confirmPasswordState)}
       >
         Submit
+      </Button>
+      <Button 
+        align="center"
+        variant="outlined"
+        color="primary"
+        className={styles.buttons}
+        fullWidth
+        onClick={() => clickRedirect()}
+      >
+        Redirect
       </Button>
     </main>
   )

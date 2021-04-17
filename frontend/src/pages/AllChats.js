@@ -1,12 +1,11 @@
 import React, { useEffect, useContext, useState } from "react";
 import { Link } from 'react-router-dom';
-import { Typography, Button } from "@material-ui/core";
+import { Typography, Button, FormGroup, Grid } from "@material-ui/core";
 import axios from "axios";
 
 import { Context } from "../Context";
 import Navbar from "../Navbar";
 import useStyles from "../styles";
-import { FormGroup } from "@material-ui/core";
 import ChatCards from "../components/ChatCards";
 import ChatEntriesCards from "../components/ChatEntriesCard";
 
@@ -49,49 +48,32 @@ function Chat() {
               newChat.messages = ["No message"];
             };
             chatsArray.push(newChat);
-            console.log(newChat);
+            //console.log(newChat);
           });
-          console.log(chatsArray);
+          //console.log(chatsArray);
           setAllChatsOfUserState(chatsArray);
         });
       } catch {
         console.log("Failed to retrive allChatsOfUser");
       }
-
-      try {
-        await getChatEntriesOfUser(parentChatId).then((response) => {
-          console.log("chatEntriesOfUser: " + response.data);
-          console.log(response.data[0]);
-          console.log(response.data[1]);
-          response.data.map((entry) => {
-            console.log("entry: " + entry);
-            chatEntriesArray.push(entry);
-          })
-          console.log("chatEntriedArray: " + chatEntriesArray);
-          setChatEntriesOfUserState(chatEntriesArray);
-          console.log("chatEntriesState: " + chatEntriesOfUserState);
-        })
-      } catch {
-        console.log("Failed to retrive chatEntriesOfUser")
-      }
     }
     getResponse();
   }, []);
 
-  console.log(allChatsOfUserState);
+  //console.log(allChatsOfUserState);
 
   function handleClick() {
     let tenant_id = "1005";
     let auditor_id = "1003";
     console.log("Chat calling postNewChat");
-    //postCreateNewChat(auditor_id, tenant_id);
+    postCreateNewChat(auditor_id, tenant_id);
   }
 
   return (
     <main className={styles.main}>
       <Navbar />
       <br />
-      <Typography variant="h3" align="center">Chat</Typography>
+      <Typography variant="h3" align="center">Chats</Typography>
       <Button 
         align="center"
         variant="outlined"
@@ -105,15 +87,16 @@ function Chat() {
       <br />
       <br />
       <Typography align="center">All Chats of the User</Typography>
-      {allChatsOfUserState.map((chat, index) => {
-        return (
-          <React.Fragment key={index}>
-            <FormGroup column="true">
-              <ChatCards chat_id={chat.chat_id} tenant_id={chat.tenant_id}/>
-            </FormGroup>
-          </React.Fragment>
-        );
-      })}
+      <Grid container spacing={2}>
+        {allChatsOfUserState.map((chat, index) => {
+          return (
+            <React.Fragment key={index}>
+              <ChatCards chat={chat}/>
+            </React.Fragment>
+          );
+        })}
+      </Grid>
+      
       <br />
       <br />
     </main>
