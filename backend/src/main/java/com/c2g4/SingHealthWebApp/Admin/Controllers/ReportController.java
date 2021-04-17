@@ -412,8 +412,8 @@ public class ReportController {
 		return entryOutput;
 	}
 
-	@GetMapping("/report/geQuestionInfo")
-	public ResponseEntity<?> geQuestionInfo(
+	@GetMapping("/report/getQuestionInfo")
+	public ResponseEntity<?> getQuestionInfo(
 			@RequestParam(required=true) int report_id,
 			@RequestParam(required=true) int qn_id){
 		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
