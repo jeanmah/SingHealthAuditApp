@@ -451,6 +451,7 @@ public class ReportController {
 		}
 		if(foundReportEntry==null) return ResponseEntity.badRequest().body(null);
 
+
 		try {
 			jNode.put("date", objectMapper.valueToTree(foundReportEntry.getDate()));
 			jNode.put("time", foundReportEntry.getTime().toString());
@@ -462,6 +463,7 @@ public class ReportController {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().body(null);
 		}
+
 
 		jNode.put("qn_id", qn_id);
 		JsonNode questionInfo = jNode;
@@ -511,6 +513,46 @@ public class ReportController {
 		}
 		
 		return ResponseEntity.ok(report_ids);
+	}
+	@GetMapping("/report/getOriginalAuditEntries")
+	public ResponseEntity<?> getOriginalAuditEntries(@RequestParam int report_id){
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		ArrayNode originalEntriesArrayNode = objectMapper.createArrayNode();
+
+		//Get original entries
+		sortEntries(builder.getEntries());
+		ArrayList<ReportEntry> originalEntries = new ArrayList<>();
+		ArrayList<Integer> questionsAdded = new ArrayList<>();
+
+		for(ReportEntry entry:builder.getEntries()) {
+			if(!questionsAdded.contains(entry.getQn_id())) {
+				originalEntries.add(entry);
+				questionsAdded.add(entry.getQn_id());
+			} else{
+				break;
+			}
+		}
+		if(originalEntries.size()==0){
+			return ResponseEntity.badRequest().body("no entries found");
+		} else {
+			sortEntriesByQuestion(originalEntries);
+			String reportType = builder.getReportType();
+			for(ReportEntry re: originalEntries){
+				ObjectNode entryOutput = addAdditionalEntryFields(re,reportType);
+				originalEntriesArrayNode.add(entryOutput);
+			}
+		}
+		return ResponseEntity.ok(originalEntriesArrayNode);
+	}
+
+	private static void sortEntriesByQuestion(List<ReportEntry> entries){
+		Comparator<ReportEntry> compareByQuestion = Comparator.comparing(ReportEntry::getQn_id);
+		entries.sort(compareByQuestion);
 	}
 	
 	private JsonNode getTenantReportIds(int tenant_id, String type) {
@@ -604,6 +646,8 @@ public class ReportController {
 		}
 		return overdueAudits;
 	}
+
+
 	
 
 
