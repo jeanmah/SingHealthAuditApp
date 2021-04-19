@@ -12,10 +12,19 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
-import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
+import Box from "@material-ui/core/Box";
+import Loading from "../pages/Loading";
 
 const useStyles = makeStyles((theme) => ({
+  mainContainer: {
+    display: "flex",
+    justifyContent: "center",
+  },
+  accordion: {
+    width: "90%",
+    maxWidth: 900,
+  },
   title: {
     display: "flex",
     flexDirection: "row",
@@ -28,11 +37,12 @@ const useStyles = makeStyles((theme) => ({
   dropdownMain: {
     display: "flex",
     flexDirection: "column",
+    padding: theme.spacing(0, 6, 0, 6),
   },
   dropdownContainer: {
     display: "flex",
     flexDirection: "column",
-    margin: theme.spacing(0, 0, 0, 2),
+    // margin: theme.spacing(0, 0, 0, 2),
   },
   textInfo: {
     padding: theme.spacing(2, 0, 2, 0),
@@ -45,29 +55,42 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1, 0, 2, 2),
     fontWeight: "medium",
   },
-  tenantResponse: {
+  tenantResponses: {
     display: "flex",
-    padding: theme.spacing(2, 0, 2, 2),
-    backgroundColor: theme.palette.background.default,
-  },
-  tenantTextResponse: {
-    // margin: theme.spacing(0, 2, 5, 2),
-    padding: theme.spacing(0, 0, 0, 2),
-    backgroundColor: theme.palette.background.default,
+    flexDirection: "column",
+    alignItems: "center",
   },
   tenantResponseContainer: {
-    margin: theme.spacing(3, 7, 3, 2),
-    padding: theme.spacing(2, 2, 2, 2),
+    margin: theme.spacing(4, 0, 6, 0),
+    padding: theme.spacing(5, 5, 5, 5),
     backgroundColor: theme.palette.background.default,
     display: "flex",
     flexDirection: "column",
+    alignItems: "center",
     maxWidth: 700,
   },
+  // tenantResponse: {
+  //   display: "flex",
+  //   padding: theme.spacing(2, 0, 2, 2),
+  //   backgroundColor: theme.palette.background.default,
+  // },
+  tenantResponseTitle: {
+    display: "flex",
+  },
+  tenantResponseContent: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  tenantTextResponse: {
+    padding: theme.spacing(2, 0, 4, 0),
+  },
+
   avatar: {},
   image: {
-    width: "100%",
+    width: "90%",
     maxWidth: 400,
-    padding: theme.spacing(3, 2, 2, 2),
+    // padding: theme.spacing(3, 2, 2, 2),
   },
   button: {
     width: 240,
@@ -76,9 +99,9 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#F15A22",
   },
   buttonContainer: {
-    padding: theme.spacing(3, 2, 3, 2),
+    padding: theme.spacing(2, 0, 8, 0),
     display: "flex",
-
+    justifyContent: "center",
     // justifyContent: "center",
   },
   // media: {
@@ -143,9 +166,9 @@ function AuditReportCard({
   };
 
   return (
-    <>
-      {tenantResponse && (
-        <Accordion>
+    <div className={classes.mainContainer}>
+      {tenantResponse ? (
+        <Accordion className={classes.accordion}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-label="Expand"
@@ -179,64 +202,69 @@ function AuditReportCard({
                 RECTIFICATION PERIOD: {timeframe}
               </Typography>
             </div>
-            {tenantResponse.map((response) => {
-              const { remarks, images } = response;
+            <div className={classes.tenantResponses}>
+              {tenantResponse.map((response) => {
+                const { remarks, images } = response;
 
-              return (
-                <>
-                  <Box
-                    className={classes.tenantResponseContainer}
-                    boxShadow={2}
-                  >
-                    <div className={classes.tenantResponse}>
-                      <Avatar
-                        src="/broken-image.jpg"
-                        className={classes.avatar}
-                      />
-                      <Typography
-                        color="textPrimary"
-                        className={classes.textTenant}
-                      >
-                        Tenant Response:
-                      </Typography>
-                    </div>
-
-                    <Typography
-                      color="textPrimary"
-                      // variant="h8"
-                      className={classes.tenantTextResponse}
-                      variant="caption"
+                return (
+                  <>
+                    <Box
+                      className={classes.tenantResponseContainer}
+                      boxShadow={2}
                     >
-                      {remarks}
-                    </Typography>
+                      <div className={classes.tenantResponseTitle}>
+                        <Avatar
+                          src="/broken-image.jpg"
+                          className={classes.avatar}
+                        />
+                        <Typography
+                          color="textPrimary"
+                          className={classes.textTenant}
+                        >
+                          Tenant Response:
+                        </Typography>
+                      </div>
+                      <div className={classes.tenantResponseContent}>
+                        <Typography
+                          color="textPrimary"
+                          // variant="h8"
+                          className={classes.tenantTextResponse}
+                          variant="caption"
+                        >
+                          {remarks}
+                        </Typography>
 
-                    {images.length !== 0 && (
-                      <img src={images[0]} className={classes.image}></img>
-                    )}
-                  </Box>
-                  {current_qn_status === "FAIL" && (
-                    <div className={classes.buttonContainer}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        className={classes.button}
-                        size="large"
-                        onClick={() => {
-                          resolveNonCompliance();
-                        }}
-                        // color="secondary"
-                      >
-                        resolve
-                      </Button>
-                    </div>
-                  )}
-                </>
-              );
-            })}
+                        {images.length !== 0 && (
+                          <img src={images[0]} className={classes.image}></img>
+                        )}
+                      </div>
+                    </Box>
+                  </>
+                );
+              })}
+            </div>
+            {current_qn_status === "FAIL" && (
+              <div className={classes.buttonContainer}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  size="large"
+                  onClick={() => {
+                    resolveNonCompliance();
+                  }}
+                  // color="secondary"
+                >
+                  resolve
+                </Button>
+              </div>
+            )}
           </AccordionDetails>
         </Accordion>
-      )}{" "}
-    </>
+      ) : (
+        <Loading />
+      )}
+    </div>
   );
 }
 

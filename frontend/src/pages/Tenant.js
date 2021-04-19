@@ -21,6 +21,9 @@ import StoreIcon from "@material-ui/icons/Store";
 import LocalHospitalIcon from "@material-ui/icons/LocalHospital";
 import Grid from "@material-ui/core/Grid";
 import ReceiptIcon from "@material-ui/icons/Receipt";
+import EmailIcon from "@material-ui/icons/Email";
+import Button from "@material-ui/core/Button";
+import ReportProblemIcon from "@material-ui/icons/ReportProblem";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
     // margin: theme.spacing(4, 0, 10, 0),
   },
   nested: {
+    // display: "flex",
     paddingLeft: theme.spacing(4),
   },
   header: {
@@ -44,6 +48,15 @@ const useStyles = makeStyles((theme) => ({
   },
   listItem: {
     padding: theme.spacing(2, 2, 2, 2),
+  },
+  previousAuditsButtons: {
+    display: "flex",
+    padding: theme.spacing(0, 2, 3, 2),
+    justifyContent: "center",
+    // justifyContent: "space-evenly",
+  },
+  button: {
+    margin: theme.spacing(1, 2, 1, 2),
   },
 }));
 
@@ -162,27 +175,52 @@ function Tenant() {
                     overall_status,
                   } = audit;
                   return (
-                    <Link to={`/tenant/report/${report_id}`}>
+                    <>
                       <List component="div" disablePadding>
-                        <ListItem button className={classes.nested}>
-                          <ListItemIcon>
-                            <ReceiptIcon color="secondary" />
-                          </ListItemIcon>
-                          {report_type === "FB" && (
-                            <ListItemText
-                              primary={`F&B Checklist conducted on ${new Date(
-                                open_date
-                              ).toString()}`}
-                              secondary={
-                                overall_status === 0
-                                  ? `Score: ${overall_score} (UNRESOLVED)`
-                                  : `Score: ${overall_score}`
-                              }
-                            />
-                          )}
-                        </ListItem>
+                        <Box boxShadow={1}>
+                          <ListItem className={classes.nested}>
+                            <ListItemIcon>
+                              <ReceiptIcon color="secondary" />
+                            </ListItemIcon>
+                            {report_type === "FB" && (
+                              <ListItemText
+                                primary={`F&B Checklist conducted on ${new Date(
+                                  open_date
+                                ).toString()}`}
+                                secondary={`Score: ${overall_score} `}
+                              />
+                            )}
+                          </ListItem>
+
+                          <div className={classes.previousAuditsButtons}>
+                            {overall_status !== 1 && (
+                              <Link to={`/tenant/report/${report_id}`}>
+                                <Button
+                                  variant="contained"
+                                  color="secondary"
+                                  size="small"
+                                  className={classes.button}
+                                  startIcon={<ReportProblemIcon />}
+                                >
+                                  view non-compliance
+                                </Button>
+                              </Link>
+                            )}
+                            <Link to={`/tenant/email/${report_id}`}>
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                                className={classes.button}
+                                startIcon={<EmailIcon />}
+                              >
+                                send Email
+                              </Button>
+                            </Link>
+                          </div>
+                        </Box>
                       </List>
-                    </Link>
+                    </>
                   );
                 })}
               </Collapse>

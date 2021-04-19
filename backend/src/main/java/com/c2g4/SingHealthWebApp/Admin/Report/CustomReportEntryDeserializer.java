@@ -44,6 +44,7 @@ public class CustomReportEntryDeserializer extends StdDeserializer<ReportEntry> 
 
         //from json
         JsonNode qn_id_node = node.get("qn_id");
+        System.out.println(node.fieldNames());
         entry.setQn_id(qn_id_node.asInt());
         //check pass or fail
         JsonNode passFailNode = node.get("status");

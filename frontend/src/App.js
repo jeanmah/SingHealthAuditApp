@@ -22,6 +22,7 @@ import EditAccount from "./pages/EditAccount";
 import EditPassword from "./pages/EditPassword";
 import Chat from "./pages/Chat";
 import TenantReport from "./pages/TenantReport";
+import AuditEmail from "./pages/AuditEmail";
 
 function App() {
   return (
@@ -72,6 +73,11 @@ function App() {
             exact
             path="/tenant/report/:reportId"
             component={AuditReport}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/tenant/email/:reportId"
+            component={AuditEmail}
           />
           <AuthenticatedRoute
             exact

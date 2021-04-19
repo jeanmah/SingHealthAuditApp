@@ -291,6 +291,13 @@ export const ContextProvider = (props) => {
     });
   };
 
+  const getOriginalReport = (reportId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios.get(`${API_URL}/report/getOriginalAuditEntries`, {
+      params: { report_id: parseInt(reportId) },
+    });
+  };
+
   const getReportStats = (reportId) => {
     AuthenticationService.getStoredAxiosInterceptor();
     return axios.get(`${API_URL}/report/getReportStatistics`, {
@@ -504,6 +511,7 @@ export const ContextProvider = (props) => {
         getTenantRectification,
         getChatEntriesOfUser,
         postCreateNewChat,
+        getOriginalReport,
       }}
     >
       {props.children}
