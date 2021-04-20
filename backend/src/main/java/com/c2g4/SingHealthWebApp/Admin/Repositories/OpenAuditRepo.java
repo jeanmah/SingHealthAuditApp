@@ -1,5 +1,7 @@
 package com.c2g4.SingHealthWebApp.Admin.Repositories;
 
+import java.util.List;
+
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -7,8 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.OpenAuditModel;
-
-import java.util.List;
 
 /**
  * Repository of SQL queries to interact with the OpenAudits Table
@@ -30,4 +30,7 @@ public interface OpenAuditRepo extends CrudRepository<OpenAuditModel, Integer> {
     @Modifying
     @Query("DELETE FROM Open_Audits WHERE report_id = :report_id ")
     void deleteAuditById(@Param("report_id") int report_id);
+    
+    @Query("SELECT tenant_id FROM Completed_Audits WHERE start_date BETWEEN CURDATE() - INTERVAL :days DAY AND CURDATE();")
+    List<Integer> getTenantIds(@Param("days") int days);
 }
