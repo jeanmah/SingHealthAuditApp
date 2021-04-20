@@ -6,15 +6,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service("EmailService")
 public class EmailServiceImpl {
@@ -25,6 +30,15 @@ public class EmailServiceImpl {
     private JavaMailSender emailSender;
     @Autowired
     private SimpleMailMessage template;
+
+    @Autowired
+    private SpringTemplateEngine thymeleafTemplateEngine;
+
+    @Value("classpath:/SingHealth_Logo.png")
+    private Resource SinghealthLogoImage;
+
+    @Value("classpath:/SingHealth_Logo.png")
+    private String SinghealthLogoPath;
 
     private static final Logger logger = LoggerFactory.getLogger(ReportBuilder.class);
 
@@ -72,5 +86,33 @@ public class EmailServiceImpl {
             e.printStackTrace();
         }
     }
+
+    public void sendMessageUsingThymeleafTemplate(
+            String to, String subject, Map<String, Object> templateModel)
+            throws MessagingException {
+
+        HashMap<String,Object> templateModelWithImage = new HashMap<>(templateModel);
+        templateModelWithImage.put("logoPath",SinghealthLogoPath);
+
+        Context thymeleafContext = new Context();
+        thymeleafContext.setVariables(templateModelWithImage);
+
+        String htmlBody = thymeleafTemplateEngine.process("OverDueEmailTemplate.html", thymeleafContext);
+
+        sendHtmlMessage(to, subject, htmlBody);
+    }
+
+    private void sendHtmlMessage(String to, String subject, String htmlBody) throws MessagingException {
+
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setFrom(mailServerUsername);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlBody, true);
+        helper.addInline("attachment.png", SinghealthLogoImage);
+        emailSender.send(message);
+    }
+
 
 }

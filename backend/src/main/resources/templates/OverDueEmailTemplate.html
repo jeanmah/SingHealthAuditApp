@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Overdue Rectification Email</title>
@@ -15,7 +16,7 @@
             <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; border: 1px solid #cccccc;">
                 <tr>
                     <td align="center" bgcolor="#70bbd9" style="padding: 40px 0 30px 0;">
-                        <img src="SingHealth_Logo.png" alt="Singhealth Logo" width="300" height="230" style="display: block;" />
+                        <h1 style="display: block; color:white;">SINGHEALTH AUDITS</h1>
                     </td>
                 </tr>
                 <tr>
@@ -23,7 +24,7 @@
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
                             <tr>
                                 <td style="color: #153643; font-family: Arial, sans-serif;">
-                                    <h1 style="font-size: 24px; margin: 0;">Lorem ipsum dolor sit amet!</h1>
+                                    <h1 style="font-size: 24px; margin: 0;">Overdue Rectifications</h1>
                                 </td>
                             </tr>
                             <tr>
@@ -35,37 +36,22 @@
                                 <td>
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
                                         <tr>
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                                            <table th:each="overdue: ${overdueEntries}" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
                                                 <tr>
-                                                    <td>
-                                                        <img src="SingHealth_Logo.png" alt="" width="100%" height="140" style="display: block;" />
-                                                    </td>
+                                                    <th th:text="${overdue.getReportStats}" style="text-align:left"></th>
+                                                    <th th:text="${overdue.auditDate}" style="text-align:left"></th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="color: #153643; font-family: Arial, sans-serif; font-size: 16px;
-                                                    line-height: 24px; padding: 25px 0 0 0;">
-                                                        <p style="margin: 0;">Name here stuff is happening.</p>
+                                                    <td>
+                                                        <p th:text="${overdue.getTenantInfo}"></p>
+                                                        <p th:text="${overdue.getAuditorInfo}"></p>
+                                                    </td>
+                                                    <td>
+                                                        <p th:text="${overdue.earliestOverDue}"></p>
+                                                        <p th:text="${overdue.numOverDue}"></p>
                                                     </td>
                                                 </tr>
                                             </table>
-                                        </tr>
-                                        <tr>
-                                            <td style="font-size: 0; line-height: 0;" width="20">&nbsp;</td>
-                                            <td width="260" valign="top">
-                                                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
-                                                    <tr>
-                                                        <td>
-                                                            <img src="SingHealth_Logo.png" alt="" width="100%" height="140" style="display: block;" />
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="color: #153643; font-family: Arial, sans-serif; font-size: 16px;
-                                                         line-height: 24px; padding: 25px 0 0 0;">
-                                                            <p style="margin: 0;">Name here stuff is happening.</p>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
                                         </tr>
                                     </table>
                                 </td>
@@ -80,15 +66,6 @@
                                 <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;">
                                     <p style="margin: 0;">This is an autogenerated message<br/>
                                         <a href="#" style="color: #ffffff;">Home</a></p>
-                                </td>
-                                <td align="right">
-                                    <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                                        <tr>
-                                            <td>
-                                                <img src="SingHealth_Logo.png" alt="Twitter." width="38" height="38" style="display: block;" border="0" />
-                                            </td>
-                                        </tr>
-                                    </table>
                                 </td>
                             </tr>
                         </table>
