@@ -1,16 +1,20 @@
 package com.c2g4.SingHealthWebApp.repositoriesTest;
 
-import com.c2g4.SingHealthWebApp.Admin.Controllers.MangerController_OLD;
-import com.c2g4.SingHealthWebApp.Admin.Models.*;
-import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
-import com.c2g4.SingHealthWebApp.Others.ResourceString;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.Transient;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.CompletedAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
+import com.c2g4.SingHealthWebApp.Others.ResourceString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CommonRepoTestFunctions {
 
