@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
+import { Typography } from "@material-ui/core";
 
 import { auditorNavLinks, tenantNavLinks, managerNavLinks } from "./data";
 import auditor from "./auditor.png";
-import { Context } from './Context';
+import { Context } from "./Context";
+import useStyles from "./styles";
 
 function Navbar() {
   const { accountState, getAccountInfo } = useContext(Context);
@@ -12,6 +14,7 @@ function Navbar() {
   const [toggleClicked, settoggleClicked] = useState(false);
   const linksContainerRef = useRef(null);
   const linksRef = useRef(null);
+  const styles = useStyles();
   const showLinks = () => {
     settoggleClicked(!toggleClicked);
   };
@@ -59,7 +62,7 @@ function Navbar() {
       <div className="nav-pc">
         <div className="nav-mobile">
           <img src={auditor} className="logo" alt="auditor"></img>
-          <div className="auditor-name">Welcome {username}</div>
+          <div className="auditor-name"><Typography variant="h6">Welcome {username}</Typography></div>
           <button
             className="nav-toggle"
             onClick={() => {

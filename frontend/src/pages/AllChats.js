@@ -1,13 +1,10 @@
 import React, { useEffect, useContext, useState } from "react";
-import { Link } from 'react-router-dom';
-import { Typography, Button, FormGroup, Grid } from "@material-ui/core";
-import axios from "axios";
+import { Typography, TextField, Button, FormGroup, Grid } from "@material-ui/core";
 
 import { Context } from "../Context";
 import Navbar from "../Navbar";
 import useStyles from "../styles";
 import ChatCards from "../components/ChatCards";
-import ChatEntriesCards from "../components/ChatEntriesCard";
 
 function Chat() {
 
@@ -15,20 +12,32 @@ function Chat() {
     setAllChatsOfUserState,
     allChatsOfUserState,
     getAllChatsOfUser,
-    setChatEntriesOfUserState,
-    chatEntriesOfUserState,
-    getChatEntriesOfUser,
     postCreateNewChat,
+    accountState,
+    chatSubmitState,
   } = useContext(Context);
 
   const [allChatsState, setAllChatsState] = useState([]);
+  const [auditorIdState, setAuditorIdState] = useState("");
+  const [tenantIdState, setTenantIdState] = useState("");
+  const { role_id, acc_id } = accountState;
   const styles = useStyles();
   const chatsArray = [];
-  const chatEntriesArray = [];
-  const chatsEntriesDict = {};
 
-  const parentChatId = "2";
-  const numLastestChatEntries = "1";
+  function targetUserChangeHandler(target_id) {
+    if (target_id === null) {
+      return; // If no target_id is entered: show alert
+    }
+    if (role_id === "Auditor") {
+      setAuditorIdState(acc_id);
+      setTenantIdState(target_id);
+    } else if (role_id == "Tenant") {
+      setTenantIdState(acc_id);
+      setAuditorIdState(target_id);
+    } else {
+      console.log("Invalid auditor/tenant ID");
+    }
+  }
 
   useEffect(() => {
     //getAllChatsOfUser();
@@ -36,58 +45,48 @@ function Chat() {
       try{
         await getAllChatsOfUser().then((response) => {
           console.log("allChatsOfUser: " + response.data);
-          response.data.map((chat) => {
-            //console.log(chat);
-            let newChat = {};
-            newChat.chat_id = chat.chat_id;
-            newChat.tenant_id = chat.tenant_id;
-            newChat.auditor_id = chat.auditor_id;
-            if (chat.messages.messages) {
-              newChat.messages = [...chat.messages.messages];
-            } else {
-              newChat.messages = ["No message"];
-            };
-            chatsArray.push(newChat);
-            //console.log(newChat);
-          });
-          //console.log(chatsArray);
-          setAllChatsOfUserState(chatsArray);
+          setAllChatsOfUserState(response.data);
         });
       } catch {
         console.log("Failed to retrive allChatsOfUser");
       }
     }
     getResponse();
-  }, []);
-
-  //console.log(allChatsOfUserState);
+  }, [chatSubmitState]);
 
   function handleClick() {
-    let tenant_id = "1005";
-    let auditor_id = "1003";
     console.log("Chat calling postNewChat");
-    postCreateNewChat(auditor_id, tenant_id);
+    console.log("auditor id: " + auditorIdState);
+    console.log("tenant id: " + tenantIdState);
+    postCreateNewChat(auditorIdState, tenantIdState);
   }
 
   return (
     <main className={styles.main}>
       <Navbar />
+      <div className={styles.chat_edit}>
+        <FormGroup column="true">
+          <TextField 
+            className={styles.message_input} 
+            label="Receiver ID" 
+            variant="outlined" 
+            align="center"
+            onChange={(e) => targetUserChangeHandler(e.target.value)}
+          />
+        </FormGroup>
+        
+        <Button 
+          align="center"
+          variant="outlined"
+          color="secondary"
+          className={styles.big_buttons}
+          onClick={() => handleClick()}
+        >
+          Create Chat
+        </Button>
+      </div>
       <br />
-      <Typography variant="h3" align="center">Chats</Typography>
-      <Button 
-        align="center"
-        variant="outlined"
-        color="primary"
-        className={styles.buttons}
-        fullWidth
-        onClick={() => handleClick()}
-      >
-        New Chat
-      </Button>
-      <br />
-      <br />
-      <Typography align="center">All Chats of the User</Typography>
-      <Grid container spacing={2}>
+      <div className={styles.chat_list}>
         {allChatsOfUserState.map((chat, index) => {
           return (
             <React.Fragment key={index}>
@@ -95,7 +94,7 @@ function Chat() {
             </React.Fragment>
           );
         })}
-      </Grid>
+      </div>
       
       <br />
       <br />

@@ -111,10 +111,6 @@ function Login() {
               onChange={(e) => setPasswordState(e.target.value)}
             />
             <DisplayMessage />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               fullWidth
               variant="contained"
@@ -124,7 +120,7 @@ function Login() {
             >
               Sign In
             </Button>
-            <Grid container>
+            {/* <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
@@ -135,7 +131,7 @@ function Login() {
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
-            </Grid>
+            </Grid> */}
             {/* <Box mt={5}>
               <Copyright />
             </Box> */}

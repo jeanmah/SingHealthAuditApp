@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Typography, Button, TextField, FormGroup } from "@material-ui/core";
+import { useHistory } from "react-router-dom";
+import { Typography, Button, TextField, FormGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 import axios from "axios";
 
 import { Context } from "../Context";
@@ -34,6 +35,34 @@ function EditAccount() {
   const [lastnameState, setLastnameState] = useState(last_name);
   const [emailState, setEmailState] = useState(email);
   const [hpState, setHpState] = useState(hp);
+  const [alertState, setAlertState] = useState(false);
+  const history = useHistory();
+
+  // Prevent over re-render by using function to modify states, instead of changing states directly
+  function openAlert() {
+    setAlertState(true);
+  }
+
+  function closeAlert() {
+    setAlertState(false);
+  }
+
+  function submitAccountUpdate(newPassword, confirmedNewPassword) {
+    postAccountChange(
+      usernameState,
+      firstnameState,
+      lastnameState,
+      emailState,
+      hpState,
+    );
+    openAlert();
+  }
+
+  function continueRedirect() {
+    console.log("Redirecting...");
+    closeAlert();
+    history.push("/");
+  }
 
   useEffect(() => {
     getAccountInfo();
@@ -55,7 +84,8 @@ function EditAccount() {
     if (props.info == null) {
       return null
     } else if (disabledInfo.includes(props.category)) {
-      return <TextField 
+      return <TextField
+        className={styles.big_textfield}
         label={props.category} 
         defaultValue={props.info} 
         disabled={true}
@@ -102,11 +132,11 @@ function EditAccount() {
       <br />
       <Typography variant="h3" align="center">Edit Account</Typography>
       <FormGroup column="true">
-        <TextField label="Username" onChange={(e) => setUsernameState(e.target.value)} />
-        <TextField label="First Name" onChange={(e) => setFirstnameState(e.target.value)} />
-        <TextField label="Last Name" onChange={(e) => setLastnameState(e.target.value)} />
-        <TextField label="Email" onChange={(e) => setEmailState(e.target.value)} />
-        <TextField label="Contact Number" onChange={(e) => setHpState(e.target.value)} />
+        <TextField className={styles.big_textfield} label="Username" onChange={(e) => setUsernameState(e.target.value)} />
+        <TextField className={styles.big_textfield} label="First Name" onChange={(e) => setFirstnameState(e.target.value)} />
+        <TextField className={styles.big_textfield} label="Last Name" onChange={(e) => setLastnameState(e.target.value)} />
+        <TextField className={styles.big_textfield} label="Email" onChange={(e) => setEmailState(e.target.value)} />
+        <TextField className={styles.big_textfield} label="Contact Number" onChange={(e) => setHpState(e.target.value)} />
         <br />
         <EditAccountInfo category="Role" info={role_id}/>
         <EditAccountInfo category="Account ID" info={acc_id}/>
@@ -118,23 +148,37 @@ function EditAccount() {
         <br />
       </FormGroup>
       <Button
-        className={styles.buttons}
+        className={styles.big_buttons}
         align="center"
         variant="outlined"
         color="primary"
         fullWidth
-        onClick={() => 
-          postAccountChange(
-            usernameState,
-            firstnameState,
-            lastnameState,
-            emailState,
-            hpState,
-          )
-        }
+        onClick={submitAccountUpdate}
       >
         Submit
       </Button>
+      <Dialog
+        open={alertState}
+        onClose={closeAlert}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Message:"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Account Information successfully updated.
+          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            Redirecting to login page...
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={continueRedirect} color="primary">
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </main>
   )
 }

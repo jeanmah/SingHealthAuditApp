@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
-import { Redirect } from "react-router-dom";
-import { Typography, Button, TextField, FormGroup } from "@material-ui/core";
+import { useHistory } from "react-router-dom";
+import { Typography, Button, TextField, FormGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 import axios from "axios";
 
 import { Context } from "../Context";
@@ -8,15 +8,22 @@ import useStyles from "../styles";
 import Navbar from "../Navbar";
 
 function EditPassword() {
-  const {
-    accountState,
-    getAccountInfo
-  } = useContext(Context);
-
+  const { accountState, getAccountInfo } = useContext(Context);
   const API_URL = "http://localhost:8080";
   const [passwordState, setPasswordState] = useState("");
   const [confirmPasswordState, setConfirmPasswordState] = useState("");
+  const [alertState, setAlertState] = useState(false);
   const styles = useStyles();
+  const history = useHistory();
+
+  // Prevent over re-render by using function to modify states, instead of changing states directly
+  function openAlert() {
+    setAlertState(true);
+  }
+
+  function closeAlert() {
+    setAlertState(false);
+  }
 
   function submitNewPassword(newPassword, confirmedNewPassword) {
     if (newPassword != confirmedNewPassword) {
@@ -25,11 +32,13 @@ function EditPassword() {
       postPasswordChange(newPassword);
       console.log("Password change updated.")
     }
+    openAlert();
   }
 
-  function clickRedirect() {
+  function continueRedirect() {
     console.log("Redirecting...");
-    return <Redirect to="/" />;
+    closeAlert();
+    history.push("/");
   }
 
   function postPasswordChange(newPassword) {
@@ -61,29 +70,40 @@ function EditPassword() {
       <br />
       <Typography variant="h3" align="center">Edit Password</Typography>
       <FormGroup column="true">
-        <TextField label="New Password" onChange={(e) => setPasswordState(e.target.value)}/>
-        <TextField label="Confirm New Password" onChange={(e) => setConfirmPasswordState(e.target.value)}/>
+        <TextField className={styles.big_textfield} label="New Password" onChange={(e) => setPasswordState(e.target.value)}/>
+        <TextField className={styles.big_textfield} label="Confirm New Password" onChange={(e) => setConfirmPasswordState(e.target.value)}/>
       </FormGroup>
       <Button 
         align="center"
         variant="outlined"
         color="primary"
-        className={styles.buttons}
+        className={styles.big_buttons}
         fullWidth
         onClick={() => submitNewPassword(passwordState, confirmPasswordState)}
       >
         Submit
       </Button>
-      <Button 
-        align="center"
-        variant="outlined"
-        color="primary"
-        className={styles.buttons}
-        fullWidth
-        onClick={() => clickRedirect()}
+      <Dialog
+        open={alertState}
+        onClose={closeAlert}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
       >
-        Redirect
-      </Button>
+        <DialogTitle id="alert-dialog-title">{"Message:"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Password successfully updated.
+          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            Redirecting to login page...
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={continueRedirect} color="primary">
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
     </main>
   )
 }

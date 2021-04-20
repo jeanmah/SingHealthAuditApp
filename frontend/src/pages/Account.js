@@ -70,10 +70,9 @@ function Account() {
       <FormGroup column="true">
         <Link to="/edit_account">
           <Button
-            className={styles.buttons}
+            className={styles.big_buttons}
             align="center"
             variant="outlined"
-            fullWidth
             color="primary"
           >
             Edit Account
@@ -81,10 +80,9 @@ function Account() {
         </Link>
         <Link to="/edit_password">
           <Button
-            className={styles.buttons}
+            className={styles.big_buttons}
             align="center"
             variant="outlined"
-            fullWidth
             color="secondary"
           >
             Edit Password
