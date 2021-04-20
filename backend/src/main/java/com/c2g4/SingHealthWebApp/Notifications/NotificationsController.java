@@ -3,6 +3,10 @@ package com.c2g4.SingHealthWebApp.Notifications;
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -26,7 +32,7 @@ public class NotificationsController {
     private NotificationsRepo notificationsRepo;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private final ObjectMapper objectMapper = new ObjectMapper();
     /**
      * gets all the current and past notifications for a particular role (Tenant, Auditor, Manager),
      * does not include notifications that are created but not yet released,
@@ -192,49 +198,66 @@ public class NotificationsController {
     /**
      * only authorised for managers to create a notification
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
-     * @param title String the title of the notification
-     * @param message String the message body of the notification
-     * @param receipt_date Date "YYYY-MM-DD" of when the recipients should start to get the notification
-     * @param end_date Date "YYYY-MM-DD" of when the recipients should stop getting the notification
-     * @param to_role_ids an int to specify which roles should get the notification,
-     *                    it is thought of in binary where MSB is tenant, LSB is manager,
-     *                    TAM 1 means for, 0 means not for eg 101 means for tenant, not for auditor, for manager
+     * @param newNotification Json of new notification with keys {title, message, receipt_date, end_date, to_role_ids}
+     * message String the message body of the notification
+     * receipt_date Date "YYYY-MM-DD" of when the recipients should start to get the notification
+     * end_date Date "YYYY-MM-DD" of when the recipients should stop getting the notification
+     * to_role_ids an int to specify which roles should get the notification,
+     *  it is thought of in binary where MSB is tenant, LSB is manager,
+     *  TAM 1 means for, 0 means not for eg 101 means for tenant, not for auditor, for manager
      * @return HTTP ok with body "notification created with ID: {NEW NOTIFICATION ID}"
      * returns HTTP UNAUTHORIZED if the user is not a manager
      */
     //    only authorised for managers to create a notification
     @PostMapping("/notifications/postNewNotification")
     public ResponseEntity<?> postNewNotification(@AuthenticationPrincipal UserDetails callerUser,
-                                                 @RequestPart(value = "title") String title,
-                                                 @RequestPart(value = "message") String message,
-                                                 @RequestPart(value = "receipt_date") Date receipt_date,
-                                                 @RequestPart(value = "end_date") Date end_date,
-                                                 @RequestPart(value = "to_role_ids") int to_role_ids){
+                                                 @RequestPart(value = "new_notification") String newNotification){
 
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
         if(!callerAccount.getRole_id().equals(ResourceString.MANAGER_ROLE_KEY)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
+        try {
+            ObjectNode notificationContentJson = (ObjectNode) objectMapper.readTree(newNotification);
+            String title = notificationContentJson.get("title").asText();
+            String message = notificationContentJson.get("message").asText();
+            String receipt_date = notificationContentJson.get("receipt_date").asText();
+            Date receiptDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date));
 
-        if(to_role_ids<=0 || to_role_ids>7) return ResponseEntity.badRequest().body("role_id invalid");
+            String end_date = notificationContentJson.get("end_date").asText();
+            Date endDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(end_date));
+            if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
-        Date create_date = new Date(Calendar.getInstance().getTime().getTime());
-        NotificationsModel newNotification =
-                new NotificationsModel(0,callerAccount.getAccount_id(),title,message,create_date,receipt_date,end_date,to_role_ids);
-        newNotification = notificationsRepo.save(newNotification);
-        return ResponseEntity.ok("notification created with ID: " + newNotification.getNotification_id());
+            int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
+
+            if(to_role_ids<=0 || to_role_ids>7) return ResponseEntity.badRequest().body("role_id invalid");
+
+            Date create_date = new Date(Calendar.getInstance().getTime().getTime());
+            NotificationsModel newNotificationModel =
+                    new NotificationsModel(0,callerAccount.getAccount_id(),title,message,create_date,receiptDate,endDate,to_role_ids);
+            newNotificationModel = notificationsRepo.save(newNotificationModel);
+
+            return ResponseEntity.ok("notification created with ID: " + newNotificationModel.getNotification_id());
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("cannot get contents from new_notification");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Dates are not formatted correctly please use dd/mm/yy");
+        }
     }
 
     /**
      * only authorised for the creator of the notification, requires notification id
      * @param callerUser the UserDetails of the caller taken from the Authentication Principal.
-     * @param notification_id an int the id of the notification to modify
-     * @param title String the title of the notification
-     * @param message String the message body of the notification
-     * @param receipt_date Date "YYYY-MM-DD" of when the recipients should start to get the notification
-     * @param end_date Date "YYYY-MM-DD" of when the recipients should stop getting the notification
-     * @param to_role_ids an int to specify which roles should get the notification,
+     * @param modifiedNotification Json of new notification with keys {notification_id, title, message, receipt_date, end_date, to_role_ids}
+     *  title String the title of the notification
+     *  message String the message body of the notification
+     *  receipt_date Date "YYYY-MM-DD" of when the recipients should start to get the notification
+     *  end_date Date "YYYY-MM-DD" of when the recipients should stop getting the notification
+     *  to_role_ids an int to specify which roles should get the notification,
      *                    it is thought of in binary where MSB is tenant, LSB is manager,
      *                    TAM 1 means for, 0 means not for eg 101 means for tenant, not for auditor, for manager
      * @return HTTP ok with body "notification updated"
@@ -243,30 +266,54 @@ public class NotificationsController {
     //    only authorised for the creator of the notification, requires notification id
     @PostMapping("/notifications/postModifyNotification")
     public ResponseEntity<?> postModifyNotification(@AuthenticationPrincipal UserDetails callerUser,
-                                                 @RequestPart(value = "notification_id") int notification_id,
-                                                 @RequestPart(value = "title") String title,
-                                                 @RequestPart(value = "message") String message,
-                                                 @RequestPart(value = "receipt_date") Date receipt_date,
-                                                 @RequestPart(value = "end_date") Date end_date,
-                                                 @RequestPart(value = "to_role_ids") int to_role_ids){
+                                                    @RequestPart(value = "new_notification") String modifiedNotification){
 
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
 
-        if(to_role_ids<=0 || to_role_ids>7) return ResponseEntity.badRequest().body("role_id invalid");
-        NotificationsModel notificationToModify = notificationsRepo.getNotificationByNotificationId(notification_id);
-        if(notificationToModify==null) return ResponseEntity.badRequest().body("notification to modify not found");
-        if(!(notificationToModify.getCreator_id()==callerAccount.getAccount_id())){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-        notificationToModify.setTitle(title);
-        notificationToModify.setMessage(message);
-        notificationToModify.setReceipt_date(receipt_date);
-        notificationToModify.setEnd_date(end_date);
-        notificationToModify.setTo_role_ids(to_role_ids);
+        try {
+            ObjectNode notificationContentJson = (ObjectNode) objectMapper.readTree(modifiedNotification);
 
-        notificationsRepo.modifyNotificationById(notification_id,title,message,receipt_date,end_date,to_role_ids);
-        return ResponseEntity.ok("notification updated");
+            int notification_id = notificationContentJson.get("notification_id").asInt();
+
+            NotificationsModel notificationToModify = notificationsRepo.getNotificationByNotificationId(notification_id);
+            if(notificationToModify==null) return ResponseEntity.badRequest().body("notification to modify not found");
+            if(!(notificationToModify.getCreator_id()==callerAccount.getAccount_id())){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+
+            String title = notificationContentJson.get("title").asText();
+            String message = notificationContentJson.get("message").asText();
+            String receipt_date = notificationContentJson.get("receipt_date").asText();
+            Date receiptDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date));
+
+            String end_date = notificationContentJson.get("end_date").asText();
+            Date endDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(end_date));
+            if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
+
+            int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
+
+            if(to_role_ids<=0 || to_role_ids>7) return ResponseEntity.badRequest().body("role_id invalid");
+
+            notificationToModify.setTitle(title);
+            notificationToModify.setMessage(message);
+            notificationToModify.setReceipt_date(receiptDate);
+            notificationToModify.setEnd_date(endDate);
+            notificationToModify.setTo_role_ids(to_role_ids);
+
+            notificationsRepo.modifyNotificationById(notification_id,title,message,receiptDate,endDate,to_role_ids);
+            return ResponseEntity.ok("notification updated");
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("cannot get contents from new_notification");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Dates are not formatted correctly please use dd/mm/yy");
+        }
+
+
+
     }
 
     /**

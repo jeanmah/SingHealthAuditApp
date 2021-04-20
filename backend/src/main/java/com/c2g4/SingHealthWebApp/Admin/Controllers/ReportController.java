@@ -452,8 +452,8 @@ public class ReportController {
 		if(foundReportEntry==null) return ResponseEntity.badRequest().body(null);
 
 		jNode.put("date", objectMapper.valueToTree(foundReportEntry.getDate()));
-		jNode.put("time", objectMapper.valueToTree(foundReportEntry.getTime()));
-		jNode.put("original_remarks", objectMapper.valueToTree(foundReportEntry.getRemarks()));
+		jNode.put("time", foundReportEntry.getTime().toString());
+		jNode.put("original_remarks", foundReportEntry.getRemarks());
 		jNode.put("severity", objectMapper.valueToTree(foundReportEntry.getSeverity()));
 		jNode.put("current_qn_status",String.valueOf(lastReportEntry.getStatus()));
 
