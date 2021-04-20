@@ -266,7 +266,7 @@ public class NotificationsController {
     //    only authorised for the creator of the notification, requires notification id
     @PostMapping("/notifications/postModifyNotification")
     public ResponseEntity<?> postModifyNotification(@AuthenticationPrincipal UserDetails callerUser,
-                                                    @RequestPart(value = "new_notification") String modifiedNotification){
+                                                    @RequestPart(value = "modifiedNotification") String modifiedNotification){
 
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
