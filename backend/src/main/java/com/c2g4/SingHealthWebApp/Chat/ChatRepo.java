@@ -18,6 +18,9 @@ public interface ChatRepo extends CrudRepository<ChatModel, Integer> {
     @Query("SELECT * FROM Chat WHERE auditor_id = :auditor_id")
     List<ChatModel> findChatsByTAuditorId(@Param("auditor_id") int auditor_id);
 
+    @Query("SELECT * FROM Chat WHERE auditor_id = :auditor_id AND tenant_id =:tenant_id LIMIT 1")
+    ChatModel findChatByUsers(@Param("auditor_id") int auditor_id, @Param("tenant_id") int tenant_id);
+
     @Modifying
     @Query("UPDATE Chat c SET c.messages = :messages WHERE c.chat_id = :chat_id")
     void updateMessagesByChatId(@Param("chat_id") int acc_id, @Param("messages") String messages);
