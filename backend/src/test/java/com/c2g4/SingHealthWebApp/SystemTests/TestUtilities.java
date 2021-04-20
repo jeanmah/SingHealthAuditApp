@@ -1,6 +1,10 @@
 package com.c2g4.SingHealthWebApp.SystemTests;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -15,6 +19,7 @@ public class TestUtilities {
 	public int timeOut = 2000;
 	public int timeSleep = 100;
 	public String siteRootURL = "http://localhost:3000";
+	public Random random = new Random();
 	
 	public static final int TESTMODE = 0;
 	public static final int DEBUGMODE = 1;
@@ -27,6 +32,23 @@ public class TestUtilities {
 	}
 	
 	//UTILITIES
+	public <T> T getRandomElement(List<T> list) {
+		return list.get(random.nextInt(list.size()));
+	}
+	
+	public void auditUserLogin() {
+		WebElement loginBox = driver.findElement(By.id("username"));
+		WebElement passBox = driver.findElement(By.id("password"));
+		Map.Entry<String, String> credentials = TestResources.getCredentials(TestResources.AUDITOR);
+		loginBox.sendKeys(credentials.getKey());
+		passBox.sendKeys(credentials.getValue());
+		this.comfortSleep();
+		WebElement loginButton = driver.findElement(By.className("MuiButton-label"));
+		loginButton.click();
+		assertTrue(this.checkElementExists(By.className("MuiTab-wrapper")));
+		this.comfortSleep();
+	}
+	
 	public WebElement tryFindLinkElementByLink(String link, int duration) {
 		for(int i = 0; i < duration; i = i + 500) {
 			List<WebElement> webElements = driver.findElements(By.tagName("a"));
