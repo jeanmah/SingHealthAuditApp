@@ -67,7 +67,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    maxWidth: 700,
+    width: "90%",
+    maxWidth: 500,
   },
   // tenantResponse: {
   //   display: "flex",

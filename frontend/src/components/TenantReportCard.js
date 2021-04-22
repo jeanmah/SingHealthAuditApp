@@ -49,6 +49,11 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     // margin: theme.spacing(0, 0, 0, 2),
   },
+  imageFromAuditor: {
+    width: "70%",
+    maxWidth: 400,
+    padding: theme.spacing(0, 0, 3, 0),
+  },
   textInfo: {
     padding: theme.spacing(2, 0, 2, 0),
     color: "#F15A22",
@@ -122,7 +127,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    maxWidth: 700,
+    width: "90%",
+    maxWidth: 500,
   },
   prevResponseTitle: {
     display: "flex",
@@ -153,6 +159,7 @@ function TenantReportCard({
   tenant_id,
   current_qn_status,
   severity,
+  image,
 }) {
   const classes = useStyles();
   const [comment, setComment] = useState("");
@@ -315,6 +322,7 @@ function TenantReportCard({
               >
                 RECTIFICATION PERIOD: {timeframe}
               </Typography>
+              <img src={image} className={classes.imageFromAuditor}></img>
             </div>
 
             {current_qn_status === "FAIL" && (
@@ -331,7 +339,7 @@ function TenantReportCard({
                 <div className={classes.tenantResponse}>
                   <TextField
                     id="standard-multiline-static"
-                    label="Comment on rectification to non-compliance"
+                    placeholder="Comment on rectification to non-compliance"
                     multiline
                     value={comment}
                     className={classes.comment}

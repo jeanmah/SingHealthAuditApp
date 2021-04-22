@@ -197,16 +197,17 @@ function Question({ fb_qn_id, requirement, labelId }) {
         today.setDate(today.getDate());
         break;
     }
+
     let severityDate =
       (today.getDate() < 10
         ? "0" + today.getDate().toString()
         : today.getDate().toString()) +
-      (today.getMonth() < 10
-        ? "0" + today.getMonth().toString()
-        : today.getMonth().toString()) +
+      (today.getMonth() + 1 < 10
+        ? "0" + (today.getMonth() + 1).toString()
+        : (today.getMonth() + 1).toString()) +
       today.getFullYear().toString().slice(2, 4);
+
     console.log(severityDate);
-    console.log(imageState);
 
     setFbReportState((prevState) => {
       return prevState.map((question) =>

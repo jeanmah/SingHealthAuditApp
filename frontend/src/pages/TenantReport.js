@@ -146,6 +146,7 @@ function TenantReport() {
                   tenant_id={tenantid}
                   current_qn_status={data.current_qn_status}
                   severity={data.severity}
+                  image={data.images[0]}
                 />
               );
             })}

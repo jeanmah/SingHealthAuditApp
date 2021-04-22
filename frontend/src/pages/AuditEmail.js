@@ -46,6 +46,7 @@ function AuditEmail() {
   const [checklistType, setChecklistType] = useState();
   const [dateOfAudit, setDateOfAudit] = useState("");
   const [score, setScore] = useState("");
+  const [images, setImages] = useState();
 
   const { getReport, getQuestionInfo, getOriginalReport } = useContext(Context);
 
@@ -73,7 +74,9 @@ function AuditEmail() {
         });
 
         let checklistString = "";
+        let imagesString = "";
         let completedChecklist;
+        let completedImages;
         let count = 0;
         for (let i = 0; i < reportQuestions.length; i++) {
           // for (let i = 0; i < 50; i++) {
@@ -126,16 +129,27 @@ function AuditEmail() {
           <br />
           
           Status: Failed
-          </span><br /> `;
+          </span>
+          
+          
+          
+          <br /> `;
+
+          imagesString +=
+            reportQuestions[i].status === "PASS"
+              ? ``
+              : `<br /><img style="width: 400px; height:auto" src="${reportQuestions[i].images[0]}" alt="Photo of non-compliance" /> <br />`;
           count++;
         }
         console.log(checklistString);
         if (count === reportQuestions.length) {
           completedChecklist = `<div>${checklistString}</div>`;
+          completedImages = `<div>${imagesString}</div>`;
         }
 
         if (count === reportQuestions.length && completedChecklist) {
           setChecklistReport(completedChecklist);
+          setImages(completedImages);
         }
         // setChecklistReport(``);
         setStoreName(reportInfo.store_name);
@@ -175,6 +189,30 @@ function AuditEmail() {
           console.log(error.text);
         }
       );
+
+    emailjs
+      .send(
+        "service_1xo642c",
+        "image_template",
+        {
+          to_email: toEmail,
+          to_name: toName,
+          store_name: storeName,
+          checklist_type: checklistType,
+          date: dateOfAudit,
+          score: score,
+          images: images,
+        },
+        "user_Y6aBIfzMOeWunufHbkvwx"
+      )
+      .then(
+        (result) => {
+          console.log(result.text);
+        },
+        (error) => {
+          console.log(error.text);
+        }
+      );
   }
   const handleToEmail = (e) => {
     setToEmail(e.target.value);
@@ -186,7 +224,7 @@ function AuditEmail() {
 
   return (
     <div>
-      {checklistReport ? (
+      {checklistReport && images ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
