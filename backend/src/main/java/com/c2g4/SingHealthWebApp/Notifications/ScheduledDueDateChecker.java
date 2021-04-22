@@ -32,7 +32,7 @@ public class ScheduledDueDateChecker {
     EmailServiceImpl emailService;
 
     //runs at 6am everyday
-    @Scheduled(cron = "10 55 02 * * ?")
+    @Scheduled(cron = "20 39 03 * * ?")
     public void checkDueDates(){
         logger.info("AUTOMATED CHECK DUE DATE START");
         List<Integer> openAuditModelIds = openAuditRepo.getAllOpenAuditsIds();
@@ -42,6 +42,10 @@ public class ScheduledDueDateChecker {
             logger.info("Openaudit id {}",openAuditId);
             ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo,
                     completedAuditRepo, openAuditId);
+            if(builder==null){
+                logger.warn("Report not found in the database");
+                continue;
+            }
             List<ReportEntry> overDueEntries = builder.getOverDueEntries();
             if(overDueEntries.size()==0){
                 logger.info("nothing is overdue");
@@ -95,25 +99,9 @@ public class ScheduledDueDateChecker {
             }
             String email = accountModel.getEmail();
             ArrayList<OverDueAuditEntries> overDueAuditEntriesList = usersToNotify.get(userId);
-            //OverDueRectificationEmailTemplate emailTemplate = new OverDueRectificationEmailTemplate(usersToNotify.get(userId), accountModel.getRole_id());
-            //String emailBody = emailTemplate.getBody();
+
             Map<String, Object> templateModel = new HashMap<>();
             templateModel.put("overdueEntries", overDueAuditEntriesList);
-
-//            for(OverDueAuditEntires overDueAuditEntires: overDueAuditEntriesList) {
-//                AccountModel tenant = overDueAuditEntires.getTenant();
-//                AccountModel auditor = overDueAuditEntires.getAuditor();
-
-//                templateModel.put("tenantName", String.format("%s %s",tenant.getFirst_name(), tenant.getLast_name()));
-//                templateModel.put("tenantBranch",tenant.getBranch_id());
-//                templateModel.put("tenantId",tenant.getAccount_id());
-//
-//                templateModel.put("auditorName", String.format("%s %s", auditor.getFirst_name(), auditor.getLast_name()));
-//                templateModel.put("auditorId",auditor.getAccount_id());
-//
-//                templateModel.put("auditDate",overDueAuditEntires.getAuditDate());
-//                templateModel.put("EarliestRectificationDueDate",overDueAuditEntires.getEarliestOverDue());
-//                templateModel.put("NumberOverdue",overDueAuditEntires.overDueEntries.size());
 
             try {
                 emailService.sendMessageUsingThymeleafTemplate(email, EMAIL_SUBJECT, templateModel);

@@ -127,59 +127,10 @@ public class AuditModelBuilder {
 		}
 		return audit;
 	}
-	
-	//Set builder to init for an OpenAuditModel for testing
-	/**
-	 * Sets the parameters in the builder to testing values
-	 * @return AuditModelBuilder
-	 */
-	public AuditModelBuilder initTestOpenAudit() {
-		setReportId(0);
-		setTenantId(1);
-		setAuditorId(2);
-		setManagerId(3);
-		setOverallRemarks("Test OpenAuditModel");
-		setOverallScore(4);
-		ObjectMapper objectmapper = new ObjectMapper();
-		try {
-			this.report_data = objectmapper.readTree("{name: \"John\", age: 31, city: \"New York\"}");
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		this.need_auditor = 1;
-		this.overall_status = 0;
-		return this;
-	}
-	
-	//Set builder to init for a CompletedAuditModel for  testing
-	/**
-	 * Sets the parameters in the builder to testing values
-	 * @return AuditModelBuilder
-	 */
-	public AuditModelBuilder initTestCompletedAudit() {
-		setReportId(0);
-		setTenantId(1);
-		setAuditorId(2);
-		setManagerId(3);
-		setOverallRemarks("Test CompletedAuditModel");
-		setReport_type(ResourceString.FB_KEY);
-		setOverallScore(4);
-		ObjectMapper objectmapper = new ObjectMapper();
-		try {
-			this.report_data = objectmapper.readTree("{name: \"John\", age: 31, city: \"New York\"}");
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		this.overall_status = 1;
-		return this;
-	}
+
 	
 	//Getters and Setters for the builder class specifically
-	public String getReportType() {
+	public String getReportStatus() {
 		switch(this.overall_status) {
 		case 0:
 			return "Open Audit";
@@ -274,12 +225,6 @@ public class AuditModelBuilder {
 	}
 
 	public AuditModelBuilder setReport_type(String report_type) {
-
-		switch (report_type) {
-			case "FB" -> this.overall_status = 0;
-			case "NFB" -> this.overall_status = 1;
-			default -> throw new IllegalArgumentException();
-		}
 		this.report_type = report_type;
 		return this;
 	}

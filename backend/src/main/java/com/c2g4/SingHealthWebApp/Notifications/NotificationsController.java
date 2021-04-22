@@ -19,6 +19,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -112,7 +113,8 @@ public class NotificationsController {
      */
     private List<NotificationsModel> addRelevantNotifications(List<NotificationsModel> unCheckedNotifications, String role_id){
         List<NotificationsModel> notificationsModels = new ArrayList<>();
-
+        System.out.println("UNCHECKED");
+        System.out.println(Arrays.toString(unCheckedNotifications.toArray()));
         for(NotificationsModel notificationsModel: unCheckedNotifications) {
             switch (role_id) {
                 case ResourceString.TENANT_ROLE_KEY:
@@ -222,10 +224,11 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= new Date (new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
+            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 00:00:00",receipt_date)).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 23:59:00",end_date)).getTime());
+
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
@@ -287,10 +290,11 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
+            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 00:00:00",receipt_date)).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 23:59:00",end_date)).getTime());
+
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
