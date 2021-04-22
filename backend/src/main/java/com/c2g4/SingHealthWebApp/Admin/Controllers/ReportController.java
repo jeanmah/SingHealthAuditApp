@@ -1,13 +1,12 @@
 package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.c2g4.SingHealthWebApp.Admin.Models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListSMAModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 import com.c2g4.SingHealthWebApp.Admin.Report.ClosedReport;
 import com.c2g4.SingHealthWebApp.Admin.Report.Component_Status;
 import com.c2g4.SingHealthWebApp.Admin.Report.CustomReportEntryDeserializer;
@@ -46,8 +52,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
@@ -342,6 +346,54 @@ public class ReportController {
 		JsonNode statistics = jNode;
 		
 		return ResponseEntity.ok(statistics);
+	}
+	
+	@GetMapping("/report/getNumOfOpenAuditsAtInstituion")
+	public ResponseEntity<?> getNumOfOpenAuditsAtInstitution(@RequestParam(required = true) int days) {
+		List<Integer> listOfTenantIds = openAuditRepo.getTenantIds(days);
+		
+		HashMap<Integer, String> idToBranchId = new HashMap<>();
+		HashMap<String, Integer> branchIdFreqList = new HashMap<>();
+		for(Integer id:listOfTenantIds) {
+			String branch_id;
+			if(idToBranchId.containsKey(id)) {
+				branch_id = idToBranchId.get(id);
+			}else {
+				branch_id = accountRepo.getBranchIdFromAccountId(id);
+				idToBranchId.put(id, branch_id);
+			}
+			
+			if(branchIdFreqList.containsKey(branch_id)) {
+				branchIdFreqList.put(branch_id, branchIdFreqList.get(branch_id) + 1);
+			}else {
+				branchIdFreqList.put(branch_id, 1);
+			}
+		}
+		return ResponseEntity.ok(branchIdFreqList);	
+	}
+	
+	@GetMapping("/report/getNumOfClosedAuditsAtInstituion")
+	public ResponseEntity<?> getNumOfClosedAuditsAtInstitution(@RequestParam(required = true) int days) {
+		List<Integer> listOfTenantIds = completedAuditRepo.getTenantIds(days);
+		
+		HashMap<Integer, String> idToBranchId = new HashMap<>();
+		HashMap<String, Integer> branchIdFreqList = new HashMap<>();
+		for(Integer id:listOfTenantIds) {
+			String branch_id;
+			if(idToBranchId.containsKey(id)) {
+				branch_id = idToBranchId.get(id);
+			}else {
+				branch_id = accountRepo.getBranchIdFromAccountId(id);
+				idToBranchId.put(id, branch_id);
+			}
+			
+			if(branchIdFreqList.containsKey(branch_id)) {
+				branchIdFreqList.put(branch_id, branchIdFreqList.get(branch_id) + 1);
+			}else {
+				branchIdFreqList.put(branch_id, 1);
+			}
+		}
+		return ResponseEntity.ok(branchIdFreqList);	
 	}
 
 	private void getFailedQuestions(List<ReportEntry> entries,List<Integer>
