@@ -4,7 +4,6 @@ import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
@@ -46,7 +45,7 @@ public class NotificationsController {
      */
     @GetMapping("/notifications/getAllAvailableNotifications")
     public ResponseEntity<?> getAllAvailableNotifications(@AuthenticationPrincipal UserDetails callerUser,
-                                         @RequestParam(required = false, defaultValue = "-1") String role_id){
+                                                          @RequestParam(required = false, defaultValue = "-1") String role_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");
@@ -143,7 +142,7 @@ public class NotificationsController {
      */
     @GetMapping("/notifications/getNotificationByNotificationId")
     public ResponseEntity<?> getNotificationByNotificationId(@AuthenticationPrincipal UserDetails callerUser,
-                                                     @RequestParam int notification_id){
+                                                             @RequestParam int notification_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");
@@ -171,7 +170,7 @@ public class NotificationsController {
      */
     @GetMapping("/notifications/getNotificationsByCreatorId")
     public ResponseEntity<?> getNotificationsByCreatorId(@AuthenticationPrincipal UserDetails callerUser,
-                                                     @RequestParam(required = false, defaultValue = "-1") int creator_id){
+                                                         @RequestParam(required = false, defaultValue = "-1") int creator_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");
@@ -223,10 +222,10 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date));
+            Date receiptDate= new Date (new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(end_date));
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
@@ -285,10 +284,10 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date));
+            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(end_date));
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();

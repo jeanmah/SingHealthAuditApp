@@ -21,6 +21,7 @@ import EditAccount from "./pages/EditAccount";
 import EditPassword from "./pages/EditPassword";
 import AllChats from "./pages/AllChats";
 import Chat from "./pages/Chat";
+import Announcement from "./pages/Announcements";
 
 function App() {
   return (
@@ -42,7 +43,8 @@ function App() {
           <AuthenticatedRoute exact path="/store" component={Store} />
 
           <AuthenticatedRoute exact path="/allChats" component={AllChats} />
-          <AuthenticatedRoute exact path="/chat/:chatId" component={Chat}/>
+          <AuthenticatedRoute exact path="/chat/:chatId" component={Chat} />
+          <AuthenticatedRoute exact path="/announcements" component={Announcement} />
 
           <AuthenticatedRoute exact path="/error" component={Error} />
         </Switch>

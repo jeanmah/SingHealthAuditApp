@@ -38,6 +38,26 @@ export const ContextProvider = (props) => {
       });
   };
 
+  const getAllAuditors = () => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/account/getAllUsersofType`, {
+        params: {
+          roleType: "Auditor",
+        },
+      });
+  };
+
+  const getAllTenants = () => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/account/getAllUsersofType`, {
+        params: {
+          roleType: "Tenant",
+        },
+      });
+  };
+
   const getAllChatsOfUser = () => {
     AuthenticationService.getStoredAxiosInterceptor();
     console.log("This is calling getAllChatsOfUser");
@@ -183,25 +203,24 @@ export const ContextProvider = (props) => {
       });
   }
 
-  // let payload = {
-    //   title: title,
-    //   message: message,
-    //   receipt_date: receipt_date,
-    //   end_date: end_date,
-    //   to_role_ids: to_role_ids,
-    // };
-  // formdata.append("announcementContent", JSON.stringify(payload));
-
-  // function to post a new notification (only available to managers)
+  // Function to post a new notification (only available to managers)
   const postNewNotification = useCallback((title, message, receipt_date, end_date, to_role_ids) => {
     AuthenticationService.getStoredAxiosInterceptor();
+    console.log(typeof title);
+    console.log(typeof message);
+    console.log(typeof receipt_date);
+    console.log(typeof end_date);
+    console.log(typeof to_role_ids);
     let FormData = require("form-data");
     let formdata = new FormData();
-    formdata.append("title", title); // String
-    formdata.append("message", message); // String
-    formdata.append("receipt_date", receipt_date); // Date
-    formdata.append("end_date", end_date); // Date
-    formdata.append("to_role_ids", to_role_ids); // Integer
+    let payload = {
+      title: title,
+      message: message,
+      receipt_date: receipt_date,
+      end_date: end_date,
+      to_role_ids: to_role_ids,
+    };
+    formdata.append("new_notification", JSON.stringify(payload));
     return axios
       .post(
         `${API_URL}/notifications/postNewNotification`,
@@ -220,6 +239,68 @@ export const ContextProvider = (props) => {
         console.log("Failed new notification post");
       });
   });
+
+  // Function to modify existing notifiation (only available to managers)
+  const postModifyNotification = useCallback((notification_id, title, message, receipt_date, end_date, to_role_ids) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log(typeof notification_id); // Integer
+    console.log(typeof title); // String
+    console.log(typeof message); // String
+    console.log(typeof receipt_date); // String
+    console.log(typeof end_date); // String
+    console.log(typeof to_role_ids); // Integer
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    let payload = {
+      notification_id: notification_id,
+      title: title,
+      message: message,
+      receipt_date: receipt_date,
+      end_date: end_date,
+      to_role_ids: to_role_ids,
+    };
+    formdata.append("modifiedNotification", JSON.stringify(payload));
+    return axios
+      .post(
+        `${API_URL}/notifications/postModifyNotification`,
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        setChatSubmitState(response);
+      })
+      .catch(() => {
+        console.log("Failed modify notification post");
+      });
+  });
+
+  // Function to delete existing notifiation (only available to managers)
+  const deleteNotification = (notification_id) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log("Deleting the announcement..." + notification_id);
+    console.log(typeof notification_id); // Integer
+    return axios
+      .delete(`${API_URL}/notifications/deleteNotification`, {
+        params: {
+          notification_id: notification_id,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        setChatSubmitState(response);
+      })
+      .catch(() => {
+        console.log("Failed to delete notification");
+      });
+  };
+
+
+
 
   //function to get Fb Checklist questions
   const getFbChecklistQuestions = () => {
@@ -293,7 +374,6 @@ export const ContextProvider = (props) => {
   //function to get user info given user id
   const getUserInfo = (userId) => {
     AuthenticationService.getStoredAxiosInterceptor();
-
     return axios.get(`${API_URL}/account/getUserProfile`, {
       params: { user_id: parseInt(userId) },
     });
@@ -387,9 +467,9 @@ export const ContextProvider = (props) => {
   const [currentChatState, setCurrentChatState] = useState();
   //state for notifications to display
   const [allAvailableNotificationsState, setAllAvailableNotificationsState] = useState([]);
-  //
+  //state for current notifications
   const [currentNotificationsState, setCurrentNotificationsState] = useState([]);
-  //
+  //state for notification searched by id
   const [notificationsByNotificationIdState, setNotificationsByNotificationIdState] = useState([]);
   //state of comments in modal
   const [comment, setComment] = useState("");
@@ -507,6 +587,8 @@ export const ContextProvider = (props) => {
         accountState,
         setAccountState,
         getAccountInfo,
+        getAllAuditors,
+        getAllTenants,
 
         allChatsOfUserState,
         setAllChatsOfUserState,
@@ -532,6 +614,8 @@ export const ContextProvider = (props) => {
         getNotificationByNotificationId,
         getNotificationsByCreatorId,
         postNewNotification,
+        postModifyNotification,
+        deleteNotification,
 
         fbReportState,
         setFbReportState,

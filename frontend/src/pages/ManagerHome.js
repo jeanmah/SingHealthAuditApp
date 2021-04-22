@@ -4,18 +4,10 @@ import { Button, IconButton, TextField, FormControl, InputLabel, Select, Typogra
 import { InputAdornment, DialogActions, DialogContent, DialogTitle, Dialog, DialogContentText } from "@material-ui/core";
 import SearchIcon from '@material-ui/icons/Search';
 
-import 'date-fns';
-import DateFnsUtils from '@date-io/date-fns';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
-
 import Navbar from "../Navbar";
 import useStyles from "../styles";
 import { Context } from "../Context"
-import { getDate, getDateAfterOneMonth } from "../components/utils";
+import NotificationRow from "../components/NotificationRow";
 
 
 function ManagerHome() {
@@ -31,32 +23,41 @@ function ManagerHome() {
     getNotificationByNotificationId,
     chatSubmitState,
     postNewNotification,
+    postModifyNotification,
+    deleteNotification,
   } = useContext(Context);
 
   const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
   const [notificationRangeState, setNotificationRangeState] = useState("current");
   const [searchBarInputState, setSearchBarInputState] = useState("");
+
+  // States for inputs
   const [titleState, setTitleState] = useState("");
   const [messageState, setMessageState] = useState("");
-  const [receiptDateState, setReceiptDateState] = useState(getDate()); // Default today
-  const [endDateState, setEndDateState] = useState(getDateAfterOneMonth()); // Default one month later
+  const [receiptDateDisplayed, setReceiptDateDisplayed] = useState(new Date());
+  const [receiptDateState, setReceiptDateState] = useState(""); // Default today
+  const [endDateDisplayed, setEndDateDisplayed] = useState(new Date());
+  const [endDateState, setEndDateState] = useState(""); // Default one month later
   const [receiversState, setReceiversState] = useState(7); // Default all users
 
+  // States for dialogs
   const [postNewDialogState, setPostNewDialogState] = useState(false);
   const [modifyDialogState, setModifyDialogState] = useState(false);
   const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [tipDialogState, setTipDialogState] = useState(false);
+  const [successDialogState, setSuccessDialogState] = useState(false);
+
   const { role_id } = accountState;
 
   function handleTitleChange(input_title) {setTitleState(input_title);}
   function handleMessageChange(input_message) {setMessageState(input_message);}
-  function handleReceiptDateChange(input_date) {setReceiptDateState(input_date);}
+  function handleReceiptDateChange(input_date) {
+    setReceiptDateState(input_date); // String passed to backend
+    setReceiptDateDisplayed(input_date); // Date object to display
+  }
   function handleEndDateChange(input_date) {
-    setEndDateState(input_date);
-    console.log("end_date: " + endDateState);
-    console.log(typeof endDateState);
-    console.log("test date: " + new Date());
-    console.log(typeof new Date());
+    setEndDateState(input_date); // String passed to backend
+    setEndDateDisplayed(input_date); // Date object to display
   }
   function handleReceiverChange(input_receiver) {setReceiversState(parseInt(input_receiver));}
 
@@ -68,10 +69,25 @@ function ManagerHome() {
   function closeDeleteDialog() {setDeleteDialogState(false);}
   function openTipDialog() {setTipDialogState(true);}
   function closeTipDialog() {setTipDialogState(false);}
+  function openSuccessDialog() {setSuccessDialogState(true);}
+  function closeSuccessDialog() {setSuccessDialogState(false);}
 
   function submitNewAccouncement() {
     console.log("Submitting new announcement...");
     postNewNotification(titleState, messageState, receiptDateState, endDateState, receiversState);
+    openSuccessDialog();
+  }
+
+  function modifyPastAnnouncement() {
+    console.log("Modifying announcement...");
+    postModifyNotification(1, "Modified Test1", "Hello there!!!", "20/04/2021", "30/04/2021", 7);
+    openSuccessDialog();
+  }
+
+  function deleteAnnouncement() {
+    console.log("Deleting announcement...");
+    deleteNotification(4);
+    openSuccessDialog();
   }
 
   function handleSearchButtonClick() {
@@ -110,6 +126,13 @@ function ManagerHome() {
   function handleTipClick() {
     console.log("Openning accouncement tips...");
     openTipDialog();
+  }
+  function handleSuccessClick() {
+    console.log("Success dialog click...");
+    closeSuccessDialog();
+    closePostNewDialog();
+    closeModifyDialog();
+    closeDeleteDialog();
   }
 
   useEffect(() => {
@@ -156,24 +179,7 @@ function ManagerHome() {
         <div className={styles.announcement_list}>
           {displayedNotificationsState.map((notification, index) => {
             return (
-              <React.Fragment key={index}>
-                <div className={styles.announcement_bubble}>
-                  <Grid item xs={12} sm container>
-                    <Grid item xs container direction="column" spacing={2}>
-                      <Grid item xs>
-                        <Typography variant="subtitle2" color="textSecondary">{notification.title}</Typography>
-                        <Typography variant="body1">{notification.message}</Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid item>
-                      <Typography variant="body2" color="textSecondary">Posted by {notification.creator_id} on {notification.receipt_date}</Typography>
-                      <Typography variant="body2" color="textSecondary">Valid period: {notification.receipt_date} to {notification.end_date}</Typography>
-                      <Button className={styles.buttons} variant="outlined" color="primary" onClick={handleModifyAnnouncementClick}>Modify</Button>
-                      <Button className={styles.buttons} variant="outlined" color="secondary" onClick={handleDeleteAnnouncementClick}>Delete</Button>
-                    </Grid>
-                  </Grid>
-                </div>
-              </React.Fragment>
+              <NotificationRow notification={notification} key={index}/>
             )
           })}
         </div>
@@ -193,14 +199,16 @@ function ManagerHome() {
           <DialogContent>
             <TextField className={styles.new_announcement_input} value={titleState} label="Title" variant="outlined" onChange={(e) => handleTitleChange(e.target.value)}/>
             <TextField className={styles.new_announcement_input} value={messageState} label="Message" variant="outlined" onChange={(e) => handleMessageChange(e.target.value)}/>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <TextField className={styles.new_announcement_input} value={receiptDateState} label="Receipt Date (DD/MM/YYYY)" variant="outlined" onChange={(e) => handleReceiptDateChange(e.target.value)}/>
+            <TextField className={styles.new_announcement_input} value={endDateState} label="End Date (DD/MM/YYYY)" variant="outlined" onChange={(e) => handleEndDateChange(e.target.value)}/>
+            {/* <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Grid container justify="space-around">
                 <KeyboardDatePicker
                   className={styles.dialog_date_picker}
                   margin="normal"
                   label="Receipt Date"
                   format="yyyy-MM-dd"
-                  value={receiptDateState}
+                  value={receiptDateDisplayed}
                   onChange={handleReceiptDateChange}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
@@ -210,14 +218,14 @@ function ManagerHome() {
                   className={styles.dialog_date_picker}
                   label="End Date"
                   format="yyyy-MM-dd"
-                  value={endDateState}
+                  value={endDateDisplayed}
                   onChange={handleEndDateChange}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
                 />
               </Grid>
-            </MuiPickersUtilsProvider>
+            </MuiPickersUtilsProvider> */}
             <FormControl variant="outlined" className={styles.dialog_selector}>
               <InputLabel>Receivers</InputLabel>
               <Select native label="Receivers" value={receiversState} onChange={(e) => handleReceiverChange(e.target.value)}>
@@ -235,84 +243,6 @@ function ManagerHome() {
           <DialogActions>
             <Button onClick={closePostNewDialog} color="secondary">Cancel</Button>
             <Button onClick={submitNewAccouncement} color="primary">Continue</Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Dialog used for modifying existing annoucement */}
-        <Dialog
-          className={styles.post_new_announcement_dialog}
-          open={modifyDialogState}
-          onClose={closeModifyDialog}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">{"Modify Announcement"}</DialogTitle>
-          <DialogContent>
-            <TextField className={styles.new_announcement_input} label="Title" variant="outlined"/>
-            <TextField className={styles.new_announcement_input} label="Message" variant="outlined"/>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Grid container justify="space-around">
-                <KeyboardDatePicker
-                  className={styles.dialog_date_picker}
-                  margin="normal"
-                  id="date-picker-dialog"
-                  label="Receipt Date"
-                  format="yyyy-MM-dd"
-                  value={receiptDateState}
-                  onChange={handleReceiptDateChange}
-                  KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                  }}
-                />
-                <KeyboardDatePicker
-                  className={styles.dialog_date_picker}
-                  id="date-picker-dialog"
-                  label="End Date"
-                  format="yyyy-MM-dd"
-                  value={endDateState}
-                  onChange={handleEndDateChange}
-                  KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                  }}
-                />
-              </Grid>
-            </MuiPickersUtilsProvider>
-            <FormControl variant="outlined" className={styles.dialog_selector}>
-              <InputLabel htmlFor="outlined-age-native-simple">Receivers</InputLabel>
-              <Select native label="Receivers" inputProps={{ name: 'age', id: 'outlined-age-native-simple' }}>
-                <option aria-label="None" value=""/>
-                <option value={2}>Only Auditor</option>
-                <option value={4}>Only Tenant</option>
-                <option value={5}>Manager and Tenant</option>
-                <option value={6}>Auditor and Tenant</option>
-                <option value={7}>All users</option>
-              </Select>
-            </FormControl>
-          </DialogContent>
-          <DialogContent>
-            <Link className={styles.dialog_link} onClick={handleTipClick}>Tips</Link>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeModifyDialog} color="secondary">Cancel</Button>
-            <Button onClick={submitNewAccouncement} color="primary">Continue</Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Dialog used for alerting delete annoucement */}
-        <Dialog
-          className={styles.post_new_announcement_dialog}
-          open={deleteDialogState}
-          onClose={closeDeleteDialog}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">{"Alert"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">Confirm to delete this announcement?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeDeleteDialog} color="primary">Cancel</Button>
-            <Button onClick={submitNewAccouncement} color="secondary">Confirm</Button>
           </DialogActions>
         </Dialog>
 
@@ -334,6 +264,23 @@ function ManagerHome() {
           </DialogContent>
           <DialogActions>
             <Button onClick={closeTipDialog} color="primary">Ok</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Dialog used for handling dialog states upon successful submission */}
+        <Dialog
+          className={styles.post_new_announcement_dialog}
+          open={successDialogState}
+          onClose={closeSuccessDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Changes updated!"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">Your changes have been updated</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleSuccessClick} color="primary">Ok</Button>
           </DialogActions>
         </Dialog>
         

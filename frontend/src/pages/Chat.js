@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { Context } from '../Context';
 import Navbar from "../Navbar";
 import useStyles from "../styles";
-import { getDate, getTime } from "../components/utils";
+import { getDateString, getTimeString } from "../components/utils";
 
 function Chat() {
   const { chatId } = useParams(); // typeof chatId: String
@@ -77,8 +77,8 @@ function Chat() {
     let subject = subjectState;
     let messageBody = bodyState;
     let attachments = null; // What is JSON node?
-    let date = getDate();
-    let time = getTime();
+    let date = getDateString(new Date());
+    let time = getTimeString();
     console.log("This is calling postNewChatEntry");
     console.log("Date: " + date);
     console.log("Time: " + time);
@@ -94,7 +94,7 @@ function Chat() {
 
   function bodyChangeHandler(body_input) {
     setBodyState(body_input);
-  }
+  };
 
   return (
     <main className={styles.main}>

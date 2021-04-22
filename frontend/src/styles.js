@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundPosition: "center",
   },
   paper: {
-    marginTop: "40%",
+    marginTop: "30%",
     margin: theme.spacing(8, 4),
     display: "flex",
     flexDirection: "column",
@@ -149,6 +149,9 @@ const useStyles = makeStyles((theme) => ({
   annoucement_title: {
     marginLeft: "4%",
   },
+  contactlist_title: {
+    marginLeft: "3%",
+  },
   announcement_list: {
     backgroundColor: "lightblue",
     position: "absolute",
@@ -195,7 +198,12 @@ const useStyles = makeStyles((theme) => ({
   dialog_selector: {
     width: "96%",
     marginLeft: "2%",
-    marginTop: "5%",
+    marginTop: "2%",
+  },
+  chats_dialog_selector: {
+    width: "96%",
+    marginLeft: "2%",
+    marginTop: 0,
   },
   dialog_date_picker: {
     width: "94%",

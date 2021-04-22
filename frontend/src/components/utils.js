@@ -1,14 +1,13 @@
 import React from "react";
 
-export function getDate() {
-  var today = new Date();
-  var year = today.getFullYear();
-  var month = addZero(today.getMonth()+1);
-  var day = addZero(today.getDate());
-  return year + "-" + month + "-" + day;
+export function getDateString(date) {
+  var year = date.getFullYear();
+  var month = addZero(date.getMonth()+1);
+  var day = addZero(date.getDate());
+  return day + "/" + month + "/" + year;
 };
 
-export function getDateAfterOneMonth() {
+export function getDateStringAfterOneMonth() {
   var today = new Date();
   var year = today.getFullYear();
   var month = parseInt(addZero(today.getMonth()+2));
@@ -17,18 +16,18 @@ export function getDateAfterOneMonth() {
     month -= 12;
     year += 1;
   }
-  return year + "-" + month + "-" + day;
-}
+  return day + "/" + month + "/" + year;
+};
 
 export function addZero(number) {
   if (number < 10) return "0" + number;
   else return number;
 };
 
-export function getTime() {
+export function getTimeString() {
   var today = new Date();
   var hours = addZero(today.getHours());
   var minutes = addZero(today.getMinutes());
   var seconds = addZero(today.getSeconds());
   return hours + ":" + minutes + ":" + seconds;
-}
+};
