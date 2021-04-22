@@ -222,10 +222,11 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= new Date (new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
+            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 00:00:00",receipt_date)).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 23:59:00",end_date)).getTime());
+
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
@@ -287,10 +288,11 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
+            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 00:00:00",receipt_date)).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(String.format("%s 23:59:00",end_date)).getTime());
+
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();

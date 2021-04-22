@@ -145,30 +145,19 @@ public class AuditModelBuilderTest {
     }
 
     @Test
-    public void setReport_typeOpen() {
-        auditModelBuilder.setReport_type("Open Audit");
+    public void setReport_typeFB() {
+        auditModelBuilder.setReport_type(ResourceString.FB_KEY);
         HashMap<String,String> editedVals = new HashMap<>();
-        editedVals.put(REPORTTYPE,"Open Audit");
+        editedVals.put(REPORTTYPE,ResourceString.FB_KEY);
         assertAuditModelBuilder(editedVals);
     }
 
     @Test
     public void setReport_typeCompleted() {
-        auditModelBuilder.setReport_type("Completed Audit");
+        auditModelBuilder.setReport_type(ResourceString.NFB_KEY);
         HashMap<String,String> editedVals = new HashMap<>();
-        editedVals.put(REPORTTYPE,"Completed Audit");
+        editedVals.put(REPORTTYPE,ResourceString.NFB_KEY);
         assertAuditModelBuilder(editedVals);
-    }
-
-    @Test
-    public void setReport_typeBAD() {
-        try {
-            auditModelBuilder.setReport_type("BAD");
-        }catch (IllegalArgumentException e) {
-            System.out.println("OK");
-            return;
-        }
-        fail();
     }
 
     @Test
@@ -220,21 +209,72 @@ public class AuditModelBuilderTest {
         assertAuditModelBuilder(editedVals);
     }
 
-/*
-    public String getOverallRemarks() {
-        return overall_remarks;
+    @Test
+    public void setStartDate() {
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        auditModelBuilder.setStartDate(date);
+        HashMap<String,String> editedVals = new HashMap<>();
+        editedVals.put(STARTDATE,date.toString());
+        assertAuditModelBuilder(editedVals);
     }
 
-    public String getReport_type() {
-        return report_type;
+    @Test
+    public void setEnd_date() {
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        auditModelBuilder.setEnd_date(date);
+        HashMap<String,String> editedVals = new HashMap<>();
+        editedVals.put(ENDDATE,date.toString());
+        assertAuditModelBuilder(editedVals);
     }
 
-
-
-    public int getOverallScore() {
-        return overall_score;
+    @Test
+    public void setLastUpdateDate() {
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        auditModelBuilder.setLastUpdateDate(date);
+        HashMap<String,String> editedVals = new HashMap<>();
+        editedVals.put(LASTUPDATEDATE,date.toString());
+        assertAuditModelBuilder(editedVals);
     }
-*/
+
+    @Test
+    public void getStart_date() {
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        auditModelBuilder.setStartDate(date);
+        assert (auditModelBuilder.getStart_date().equals(date));
+    }
+
+    @Test
+    public void getLastUpdateDate() {
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        auditModelBuilder.setLastUpdateDate(date);
+        assert (auditModelBuilder.getLastUpdateDate().equals(date));
+    }
+
+    @Test
+    public void getEnd_date() {
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        auditModelBuilder.setEnd_date(date);
+        assert (auditModelBuilder.getEnd_date().equals(date));
+    }
+
+    @Test
+    public void getOverallRemarks() {
+        String remarks = "REMARKS";
+        auditModelBuilder.setOverallRemarks(remarks);
+        assert (auditModelBuilder.getOverallRemarks().equals(remarks));
+    }
+    @Test
+    public void getReport_type() {
+        auditModelBuilder.setReport_type(ResourceString.FB_KEY);
+        assert (auditModelBuilder.getReport_type().equals(ResourceString.FB_KEY));
+    }
+
+    @Test
+    public void getOverallScore() {
+        int score = 12;
+        auditModelBuilder.setOverallScore(score);
+        assert (auditModelBuilder.getOverallScore()==score);
+    }
 
     @Test
     public void getTenantId() {
@@ -257,7 +297,7 @@ public class AuditModelBuilderTest {
     }
 
     @Test
-    public void getReportData(JsonNode report_data) {
+    public void getReportData() {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode node = objectMapper.createObjectNode();
         node.put("key","value");
@@ -296,6 +336,116 @@ public class AuditModelBuilderTest {
         assert (auditModelBuilder.getNeedTenant()==need);
     }
 
+    @Test
+    public void getReportStatusOpen() {
+        auditModelBuilder.setTypeIsOpenAudit();
+        assert (auditModelBuilder.getReportStatus().equals("Open Audit"));
+    }
+
+    @Test
+    public void getReportStatusClosed() {
+        auditModelBuilder.setTypeIsCompletedAudit();
+        assert (auditModelBuilder.getReportStatus().equals("Completed Audit"));
+    }
+
+    @Test
+    public void buildNoReportId(){
+        try {
+            setAuditReportBuilder();
+            auditModelBuilder.setReportId(-1);
+            auditModelBuilder.build();
+
+        }catch (IllegalArgumentException e){
+            System.out.println("PASS");
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void buildNoTenantId(){
+        try {
+            setAuditReportBuilder();
+            auditModelBuilder.setTenantId(-1);
+            auditModelBuilder.build();
+
+        }catch (IllegalArgumentException e){
+            System.out.println("PASS");
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void buildNoAuditorId(){
+        try {
+            setAuditReportBuilder();
+            auditModelBuilder.setAuditorId(-1);
+            auditModelBuilder.build();
+
+        }catch (IllegalArgumentException e){
+            System.out.println("PASS");
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void buildNoScore(){
+        try {
+            setAuditReportBuilder();
+            auditModelBuilder.setOverallScore(-1);
+            auditModelBuilder.build();
+
+        }catch (IllegalArgumentException e){
+            System.out.println("PASS");
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void buildNoReportType(){
+        try {
+            setAuditReportBuilder();
+            auditModelBuilder.setReport_type("-1");
+            auditModelBuilder.build();
+
+        }catch (IllegalArgumentException e){
+            System.out.println("PASS");
+            return;
+        }
+        fail();
+    }
+
+    @Test
+    public void buildNoOverallstatus0NoNeed(){
+        try {
+            setAuditReportBuilder();
+            auditModelBuilder.setTypeIsOpenAudit();
+            auditModelBuilder.setNeed(0,0,0);
+            auditModelBuilder.build();
+        }catch (IllegalArgumentException e){
+            System.out.println("PASS");
+            return;
+        }
+        fail();
+    }
+    @Test
+    public void buildOpenOK(){
+        setAuditReportBuilder();
+        auditModelBuilder.setTypeIsOpenAudit();
+        auditModelBuilder.setNeed(1,1,0);
+        assert(auditModelBuilder.build().getClass()==OpenAuditModel.class);
+    }
+
+
+    @Test
+    public void buildCompletedOK(){
+        setAuditReportBuilder();
+        auditModelBuilder.setTypeIsCompletedAudit();
+        assert(auditModelBuilder.build().getClass()==CompletedAuditModel.class);
+    }
 
     private void assertAuditModelBuilder(HashMap<String,String> editedValues) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -312,9 +462,9 @@ public class AuditModelBuilderTest {
             put(STARTDATE,null);
             put(LASTUPDATEDATE,null);
             put(ENDDATE,null);
-            put(NEEDTANTNT,"-1");
-            put(NEEDAUDITOR,"-1");
-            put(NEEDMANAGER,"-1");
+            put(NEEDTANTNT,"0");
+            put(NEEDAUDITOR,"0");
+            put(NEEDMANAGER,"0");
         }};
 
         for(String editedKey: editedValues.keySet()){
@@ -327,7 +477,6 @@ public class AuditModelBuilderTest {
         assert(auditModelBuilder.getManagerId()==Integer.parseInt(defaultValues.get(MANAGERID)));
         assert(auditModelBuilder.getOverallRemarks().equals(defaultValues.get(OVERALLREMARKS)));
         assert(auditModelBuilder.getReport_type().equals(defaultValues.get(REPORTTYPE)));
-        //assert(auditModelBuilder.getOverallScore()==Integer.parseInt(defaultValues.get(OVERALLSTATUS)));
         assert(auditModelBuilder.getOverallScore()==Integer.parseInt(defaultValues.get(OVERALLSCORE)));
         if(defaultValues.get(REPORTDATA)==null) {
             assert (auditModelBuilder.getReportData() == null);
@@ -351,138 +500,33 @@ public class AuditModelBuilderTest {
         if(editedValues.containsKey(LASTUPDATEDATE)){
             assert (auditModelBuilder.getLastUpdateDate().toString().equals(defaultValues.get(LASTUPDATEDATE)));
         }
+        if(editedValues.containsKey(OVERALLSTATUS)){
+            switch(Integer.parseInt(editedValues.get(OVERALLSTATUS))) {
+                case 0:
+                    assert(auditModelBuilder.getReportStatus().equals("Open Audit"));
+                    break;
+                case 1:
+                    assert(auditModelBuilder.getReportStatus().equals("Completed Audit"));
+                    break;
+            }
+
+        }
+    }
+
+    public void setAuditReportBuilder(){
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode dataNode = objectMapper.createObjectNode();
+        dataNode.put("key","value");
+
+        auditModelBuilder.setReportId(0);
+        auditModelBuilder.setNeed(0,0,0);
+        auditModelBuilder.setTenantId(0);
+        auditModelBuilder.setAuditorId(0);
+        auditModelBuilder.setManagerId(0);
+        auditModelBuilder.setOverallScore(0);
+        auditModelBuilder.setReport_type(ResourceString.FB_KEY);
+
+        auditModelBuilder.setReportData(dataNode);
     }
 
 }
-/*
-    public AuditModel build() {
-        //Check for errors
-        if (this.report_id == -1) {
-            logger.error("Report_id not set!");
-            throw new IllegalArgumentException();
-        }
-        if (this.tenant_id == -1) {
-            logger.error("Tenant_id not set!");
-            throw new IllegalArgumentException();
-        }
-        if (this.auditor_id == -1) {
-            logger.error("Auditor_id not set!");
-            throw new IllegalArgumentException();
-        }
-        if (this.overall_score == -1) {
-            logger.error("overall_score not set!");
-            throw new IllegalArgumentException();
-        }
-        if (this.report_type.matches("-1")) {
-            logger.error("report_type not set!");
-            throw new IllegalArgumentException();
-        }
-        if (this.report_data == null) {
-            logger.error("There is no report data!");
-            throw new IllegalArgumentException();
-        }
-        if (this.overall_status == 0 && (this.need_auditor + this.need_tenant + this.need_manager < 1)) {
-            logger.error("This report is open but no 'need_user' bit has been set!");
-            throw new IllegalArgumentException();
-        }
-
-        AuditModel audit = null;
-        switch(this.overall_status) {
-            case 0:
-                audit = new OpenAuditModel(this.report_id, this.tenant_id, this.auditor_id,
-                        this.manager_id, this.start_date, this.last_update_date, this.overall_remarks,
-                        this.report_type, this.overall_score, this.report_data,
-                        this.need_tenant, this.need_auditor,this.need_manager);
-                break;
-            case 1:
-                audit = new CompletedAuditModel(this.report_id, this.tenant_id, this.auditor_id,
-                        this.manager_id, this.start_date, this.end_date, this.overall_remarks,
-                        this.report_type, this.overall_score, this.report_data);
-                break;
-        }
-        return audit;
-    }
-
-    public AuditModelBuilder initTestOpenAudit() {
-        setReportId(0);
-        setTenantId(1);
-        setAuditorId(2);
-        setManagerId(3);
-        setOverallRemarks("Test OpenAuditModel");
-        setOverallScore(4);
-        ObjectMapper objectmapper = new ObjectMapper();
-        try {
-            this.report_data = objectmapper.readTree("{name: \"John\", age: 31, city: \"New York\"}");
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        this.need_auditor = 1;
-        this.overall_status = 0;
-        return this;
-    }
-
-
-    public  void initTestCompletedAudit() {
-        setReportId(0);
-        setTenantId1
-        setAuditorId(2);
-        setManagerId3;
-        setOverallRemarks("Test CompletedAuditModel");
-        serreportytp(fbkey)_
-                setOverallScore(4);
-
-        try {
-            this.repordatt = obj.readTree("{name: \"John\", age: 31, city: \"New York\"}");
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        this.overall_status = 1;
-        return this;
-    }
-
-    //Getters and Setters for the builder class specifically
-    public String getReportType() {
-        switch(this.overall_status) {
-            case 0:
-                return "Open Audit";
-            case 1:
-                return "Completed Audit";
-        }
-        return null;
-    }
-
-
-    public Date getStart_date() {
-        return start_date;
-    }
-
-    public AuditModelBuilder setStartDate(Date start_date) {
-        this.start_date = start_date;
-        return this;
-    }
-
-    public Date getLastUpdateDate() {
-        return last_update_date;
-    }
-
-    public Date getEnd_date() {
-        return end_date;
-    }
-
-    public AuditModelBuilder setEnd_date(Date end_date) {
-        this.end_date = end_date;
-        return this;
-    }
-
-    public AuditModelBuilder setLastUpdateDate(Date last_update_date) {
-        this.last_update_date = last_update_date;
-        return this;
-    }
-*/
-
-
-

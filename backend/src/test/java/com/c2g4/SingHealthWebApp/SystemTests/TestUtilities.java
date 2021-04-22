@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -32,6 +33,25 @@ public class TestUtilities {
 	}
 	
 	//UTILITIES
+	//Because selenium's clear doesn't always work
+	public void clear(WebElement element) {
+		element.sendKeys(Keys.CONTROL + "a");
+		element.sendKeys(Keys.BACK_SPACE);
+	}
+	
+	public void waitForId(String username) {
+		waitForId(username, timeOut);
+	}
+	
+	public void waitForId(String username, int timeout) {
+        try {
+        	WebDriverWait wait = new WebDriverWait(driver, timeout);
+        	wait.until(ExpectedConditions.elementToBeClickable(By.id(username)));
+        }catch(Exception noSuchELementException) {
+        	System.out.println("Something went wrong.");
+        }
+	}
+	
 	public <T> T getRandomElement(List<T> list) {
 		return list.get(random.nextInt(list.size()));
 	}
