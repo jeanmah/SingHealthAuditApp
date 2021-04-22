@@ -9,6 +9,7 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { Context } from "../Context";
 import Loading from "./Loading";
+import ReactHtmlParser from "react-html-parser";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -59,32 +60,24 @@ function AuditEmail() {
   useEffect(() => {
     async function emailAsync() {
       try {
+        const reportQuestions = await getOriginalReport(reportId).then(
+          (response) => {
+            console.log(response);
+            return response.data;
+          }
+        );
+
         const reportInfo = await getReport(reportId).then((response) => {
-          console.log(response);
+          console.log(response.data);
           return response.data;
         });
 
-        console.log(
-          await getQuestionInfo(reportId, reportInfo.entries[0].qn_id).then(
-            (response) => {
-              return response;
-            }
-          )
-        );
-        console.log(
-          await getOriginalReport(reportId).then((response) => {
-            return response;
-          })
-        );
-
         let checklistString = "";
-        let count = 1;
-        for (let i = 0; i < 96; i++) {
-          let severity = await getQuestionInfo(reportId, i + 1).then(
-            (response) => {
-              return response.data.severity;
-            }
-          );
+        let completedChecklist;
+        let count = 0;
+        for (let i = 0; i < reportQuestions.length; i++) {
+          // for (let i = 0; i < 50; i++) {
+          let severity = reportQuestions[i].severity;
           severity /= 1000000;
           severity = Math.floor(severity);
           let timeframe = "";
@@ -105,23 +98,46 @@ function AuditEmail() {
               timeframe = "1 day";
               break;
           }
-          checklistString += `Question ${i + 1}: ${await getQuestionInfo(
-            reportId,
-            i + 1
-          ).then((response) => {
-            return response.data.requirement;
-          })} \nRemarks: ${await getQuestionInfo(reportId, i + 1).then(
-            (response) => {
-              return response.data.original_remarks;
-            }
-          )} \nRectification Period: ${timeframe}\n`;
+          checklistString +=
+            reportQuestions[i].status === "PASS"
+              ? `<br/>
+          <span>
+          ${reportQuestions[i].qn_id}. ${reportQuestions[i].Requirement}
+          
+          <br/>
+
+          
+          
+          Status: Passed
+          
+          <br/>`
+              : `<br/>
+          <span style="color: #F15A22; font-weight: bold">
+          ${reportQuestions[i].qn_id}. ${reportQuestions[i].Requirement}
+          
+          <br/>
+          
+          Remarks: ${reportQuestions[i].remarks}
+          
+          <br/>
+          
+          Retification Period: ${timeframe}
+          
+          <br />
+          
+          Status: Failed
+          </span><br /> `;
           count++;
         }
         console.log(checklistString);
-        console.log(count);
-        if (count === 97) {
-          setChecklistReport(checklistString);
+        if (count === reportQuestions.length) {
+          completedChecklist = `<div>${checklistString}</div>`;
         }
+
+        if (count === reportQuestions.length && completedChecklist) {
+          setChecklistReport(completedChecklist);
+        }
+        // setChecklistReport(``);
         setStoreName(reportInfo.store_name);
         setChecklistType(reportInfo.report_type);
         setDateOfAudit(new Date(reportInfo.open_date).toString());
@@ -135,14 +151,20 @@ function AuditEmail() {
   }, []);
 
   //emailjs function
-  function sendEmail(e) {
-    e.preventDefault();
-
+  function sendEmail() {
     emailjs
-      .sendForm(
+      .send(
         "service_1xo642c",
         "checklist_template",
-        e.target,
+        {
+          to_email: toEmail,
+          to_name: toName,
+          store_name: storeName,
+          checklist_type: checklistType,
+          date: dateOfAudit,
+          score: score,
+          checklist: checklistReport,
+        },
         "user_Y6aBIfzMOeWunufHbkvwx"
       )
       .then(
@@ -170,7 +192,8 @@ function AuditEmail() {
           <Box className={classes.header} textAlign="center" boxShadow={1}>
             <Typography variant="h5">Set Email Fields</Typography>
           </Box>
-          <form className={classes.emailFields} onSubmit={sendEmail}>
+          {/* <form className={classes.emailFields} onSubmit={sendEmail}> */}
+          <form className={classes.emailFields}>
             <TextField
               className={classes.field}
               id="standard-basic"
@@ -193,6 +216,7 @@ function AuditEmail() {
                 handleToName(e);
               }}
               value={toName}
+              readOnly
             />
             <TextField
               className={classes.field}
@@ -200,6 +224,7 @@ function AuditEmail() {
               label="Store Name"
               name="store_name"
               value={storeName}
+              readOnly
             />
             <TextField
               className={classes.field}
@@ -207,6 +232,7 @@ function AuditEmail() {
               label="Checklist Type"
               name="checklist_type"
               value={checklistType}
+              readOnly
             />
             <TextField
               className={classes.field}
@@ -214,6 +240,7 @@ function AuditEmail() {
               label="Date of Conducted Audit"
               name="date"
               value={dateOfAudit}
+              readOnly
             />
             <TextField
               className={classes.field}
@@ -221,24 +248,30 @@ function AuditEmail() {
               label="Audit Score"
               name="score"
               value={score}
+              readOnly
             />
-            <TextField
+            {/* <TextField
               className={classes.field}
               id="standard-basic"
               label="Checklist"
               name="checklist"
-              value={checklistReport}
-            />
+              value={ReactHtmlParser(checklistReport)}
+              readOnly
+            >
+              <>{ReactHtmlParser(checklistReport)}</>
+            </TextField> */}
+            {/* <div>{ReactHtmlParser(checklistReport)}</div> */}
+
             {/* <input type="submit" value="Send"> */}
             <Button
-              type="submit"
+              // type="submit"
               className={classes.buttonSubmit}
               variant="contained"
               color="primary"
               size="large"
-              // onClick={() => {
-              //   sendEmail();
-              // }}
+              onClick={() => {
+                sendEmail();
+              }}
               color="secondary"
             >
               send email

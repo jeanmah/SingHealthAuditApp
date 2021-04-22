@@ -127,6 +127,8 @@ function AuditReportCard({
   // const [tenantRectificationImage, setTenantRectificationImage] = useState();
   // const [failedEntries, setFailedEntries] = useState();
   const [tenantResponse, setTenantResponse] = useState();
+  //resolve state for rerendering
+  const [resolveState, setResolveState] = useState();
 
   const { getTenantRectification, submitReportUpdate } = useContext(Context);
 
@@ -149,9 +151,10 @@ function AuditReportCard({
       }
     }
     getResponse();
-  }, []);
+  }, [resolveState]);
 
   const resolveNonCompliance = () => {
+    alert("Non-compliance successfully resolved");
     async function resolveAsync() {
       // const entry = await getReportEntry(report_id, qn_id).then((response) => {
       //   console.log(response.data);
@@ -161,6 +164,7 @@ function AuditReportCard({
         qn_id: qn_id,
         status: true,
       });
+      setResolveState(qn_id);
     }
     resolveAsync();
   };

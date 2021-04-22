@@ -70,7 +70,9 @@ function Tenant() {
   const [openChecklist, setOpenChecklist] = useState(false);
   const [openPrevAudits, setOpenPrevAudits] = useState(false);
   //Context: getUserInfo method
-  const { getUserInfo, getTenantAudits, getReport } = useContext(Context);
+  const { getUserInfo, getTenantAudits, getReport, getAudits } = useContext(
+    Context
+  );
 
   const classes = useStyles();
 
@@ -85,7 +87,7 @@ function Tenant() {
       });
 
     // console.log(tenantId);
-
+    const username = sessionStorage.getItem("authenticatedUser");
     async function getResponse() {
       try {
         const reportIdArray = await getTenantAudits(tenantId).then(
@@ -101,8 +103,17 @@ function Tenant() {
             // return [response.data.LATEST, ...response.data.CLOSED];
           }
         );
-        console.log(reportIdArray);
         // console.log(reportIdArray);
+        // console.log(reportIdArray);
+
+        // const reportIdArray = await getAudits(username).then((response) => {
+        //   console.log(response);
+        //   return [
+        //     ...response.data.CLOSED.completed_audits,
+        //     ...response.data.OPEN.outstanding_audits,
+        //   ];
+        // });
+
         //initialize array to store all objects of report info
         let reportInfoArray = [];
 
