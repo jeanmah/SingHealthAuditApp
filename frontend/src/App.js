@@ -1,6 +1,11 @@
 //import logo from "./logo.svg";
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from "react-router-dom";
 
 import Account from "./pages/Account";
 import Tenant from "./pages/Tenant";
@@ -87,6 +92,7 @@ function App() {
           <AuthenticatedRoute exact path="/t/store" component={Store} />
           <AuthenticatedRoute exact path="/chat" component={Chat} />
           <AuthenticatedRoute exact path="/error" component={Error} />
+          <Redirect to="/" component={LoginComponent} />
         </Switch>
       </ContextProvider>
     </Router>

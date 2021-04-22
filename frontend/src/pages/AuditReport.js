@@ -26,6 +26,7 @@ function AuditReport() {
     getUserInfoNoParams,
     getReport,
     getQuestionInfo,
+    resolvedState,
   } = useContext(Context);
   const classes = useStyles();
 
@@ -103,7 +104,7 @@ function AuditReport() {
       }
     }
     getResponse();
-  }, []);
+  }, [resolvedState]);
 
   return (
     <div>
@@ -147,6 +148,7 @@ function AuditReport() {
                   tenant_id={tenantid}
                   qn_id={data.qn_id}
                   current_qn_status={data.current_qn_status}
+                  image={data.images[0]}
                 />
               );
             })}

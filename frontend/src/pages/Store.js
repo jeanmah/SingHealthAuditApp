@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: theme.spacing(4, 0, 10, 0),
+    margin: theme.spacing(4, 2, 10, 2),
   },
   list: {
     width: "100%",
@@ -35,7 +35,12 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     // margin: theme.spacing(4, 0, 10, 0),
   },
+  titleResolved: {
+    // padding: theme.spacing(0, 2, 0, 2),
+    color: "#F15A22",
+  },
   nested: {
+    // display: "flex",
     paddingLeft: theme.spacing(4),
   },
   header: {
@@ -44,6 +49,9 @@ const useStyles = makeStyles((theme) => ({
   },
   listItem: {
     padding: theme.spacing(2, 2, 2, 2),
+  },
+  resolvedLabel: {
+    color: "#F15A22",
   },
 }));
 
@@ -117,7 +125,7 @@ function Store() {
           <Box className={classes.header} textAlign="center" boxShadow={1}>
             <Typography variant="h5">{tenantInfo.store_name}</Typography>
           </Box>
-          <Grid container className={classes.root}>
+          <div className={classes.root}>
             <List
               component="nav"
               aria-labelledby="nested-list-subheader"
@@ -162,12 +170,18 @@ function Store() {
                               primary={`F&B Checklist conducted on ${new Date(
                                 open_date
                               ).toString()}`}
-                              secondary={
-                                overall_status === 0
-                                  ? `Score: ${overall_score} (UNRESOLVED)`
-                                  : `Score: ${overall_score}`
-                              }
+                              secondary={`Score: ${overall_score} `}
                             />
+                          )}
+                          {overall_status === 1 && (
+                            // <ListItemText className={classes.titleResolved}>
+                            <Typography
+                              variant="button"
+                              className={classes.resolvedLabel}
+                            >
+                              Resolved
+                            </Typography>
+                            // </ListItemText>
                           )}
                         </ListItem>
                       </List>
@@ -212,7 +226,7 @@ function Store() {
                 </List>
               </Collapse> */}
             </List>
-          </Grid>
+          </div>
         </>
       ) : (
         <Loading />

@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: theme.spacing(4, 0, 10, 0),
+    padding: theme.spacing(4, 2, 10, 2),
   },
   list: {
     width: "100%",
@@ -57,6 +57,10 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     margin: theme.spacing(1, 2, 1, 2),
+  },
+  resolvedLabel: {
+    color: "#F15A22",
+    padding: theme.spacing(0, 2, 0, 2),
   },
 }));
 
@@ -200,6 +204,16 @@ function Tenant() {
                                 ).toString()}`}
                                 secondary={`Score: ${overall_score} `}
                               />
+                            )}
+                            {overall_status === 1 && (
+                              // <ListItemText className={classes.titleResolved}>
+                              <Typography
+                                variant="button"
+                                className={classes.resolvedLabel}
+                              >
+                                Resolved
+                              </Typography>
+                              // </ListItemText>
                             )}
                           </ListItem>
 

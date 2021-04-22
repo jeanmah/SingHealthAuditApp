@@ -31,6 +31,7 @@ class AuthenticationService {
   logout() {
     sessionStorage.removeItem(SESSION_TOKEN);
     sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+    this.setupAxiosInterceptors("hello");
     window.location.reload();
   }
 

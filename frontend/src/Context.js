@@ -205,6 +205,7 @@ export const ContextProvider = (props) => {
       })
       .then((response) => {
         console.log(response);
+        setResolvedState(report_id);
       })
       .catch(() => {
         console.log("Failed report update");
@@ -349,7 +350,8 @@ export const ContextProvider = (props) => {
   const [allChatsOfUserState, setAllChatsOfUserState] = useState([]);
   //state of comments in modal
   const [comment, setComment] = useState("");
-
+  //resolved state
+  const [resolvedState, setResolvedState] = useState();
   //function to prepare report state
   const createFbReportState = useCallback((checklist, response) => {
     console.log(checklist);
@@ -512,6 +514,8 @@ export const ContextProvider = (props) => {
         getChatEntriesOfUser,
         postCreateNewChat,
         getOriginalReport,
+        resolvedState,
+        setResolvedState,
       }}
     >
       {props.children}

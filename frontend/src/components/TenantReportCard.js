@@ -322,7 +322,9 @@ function TenantReportCard({
               >
                 RECTIFICATION PERIOD: {timeframe}
               </Typography>
-              <img src={image} className={classes.imageFromAuditor}></img>
+              {image && (
+                <img src={image} className={classes.imageFromAuditor} />
+              )}
             </div>
 
             {current_qn_status === "FAIL" && (

@@ -44,6 +44,11 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     // margin: theme.spacing(0, 0, 0, 2),
   },
+  imageFromAuditor: {
+    width: "70%",
+    maxWidth: 400,
+    padding: theme.spacing(0, 0, 3, 0),
+  },
   textInfo: {
     padding: theme.spacing(2, 0, 2, 0),
     color: "#F15A22",
@@ -120,6 +125,7 @@ function AuditReportCard({
   report_id,
   tenant_id,
   qn_id,
+  image,
 }) {
   const classes = useStyles();
 
@@ -128,10 +134,13 @@ function AuditReportCard({
   // const [tenantRectificationImage, setTenantRectificationImage] = useState();
   // const [failedEntries, setFailedEntries] = useState();
   const [tenantResponse, setTenantResponse] = useState();
-  //resolve state for rerendering
-  const [resolveState, setResolveState] = useState();
 
-  const { getTenantRectification, submitReportUpdate } = useContext(Context);
+  const {
+    getTenantRectification,
+    submitReportUpdate,
+    resolvedState,
+    setResolvedState,
+  } = useContext(Context);
 
   useEffect(() => {
     async function getResponse() {
@@ -152,7 +161,7 @@ function AuditReportCard({
       }
     }
     getResponse();
-  }, [resolveState]);
+  }, [resolvedState]);
 
   const resolveNonCompliance = () => {
     alert("Non-compliance successfully resolved");
@@ -165,7 +174,6 @@ function AuditReportCard({
         qn_id: qn_id,
         status: true,
       });
-      setResolveState(qn_id);
     }
     resolveAsync();
   };
@@ -206,6 +214,9 @@ function AuditReportCard({
               >
                 RECTIFICATION PERIOD: {timeframe}
               </Typography>
+              {image && (
+                <img src={image} className={classes.imageFromAuditor}></img>
+              )}
             </div>
             <div className={classes.tenantResponses}>
               {tenantResponse.map((response) => {
