@@ -15,6 +15,9 @@ const useStyles = makeStyles((theme) => ({
     top: "40%",
     left: "40%",
   },
+  loading: {
+    color: "#F15A22",
+  },
 }));
 
 export default function CircularIndeterminate() {
@@ -26,7 +29,7 @@ export default function CircularIndeterminate() {
         <Typography variant="h5" className={classes.text}>
           Loading
         </Typography>
-        <CircularProgress />
+        <CircularProgress className={classes.loading} />
       </Box>
     </div>
   );

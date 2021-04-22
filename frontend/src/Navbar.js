@@ -60,7 +60,9 @@ function Navbar() {
       <div className="nav-pc">
         <div className="nav-mobile">
           <img src={auditor} className="logo" alt="auditor"></img>
-          <div className="auditor-name"><Typography variant="h6">Welcome {username}</Typography></div>
+          <div className="auditor-name">
+            <Typography variant="h6">Welcome {username}</Typography>
+          </div>
           <button
             className="nav-toggle"
             onClick={() => {
@@ -79,7 +81,7 @@ function Navbar() {
                 AuthenticationService.logout();
               }}
             >
-              Log Out
+              Logout
             </Link>
           </ul>
         </div>

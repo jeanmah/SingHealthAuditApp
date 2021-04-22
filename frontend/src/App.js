@@ -91,11 +91,15 @@ function App() {
             path="/t/report/:reportId"
             component={TenantReport}
           />
-          <AuthenticatedRoute exact path="/t/store" component={Store} />
+          <AuthenticatedRoute exact path="/store" component={Store} />
 
           <AuthenticatedRoute exact path="/allChats" component={AllChats} />
           <AuthenticatedRoute exact path="/chat/:chatId" component={Chat} />
-          <AuthenticatedRoute exact path="/announcements" component={Announcement} />
+          <AuthenticatedRoute
+            exact
+            path="/announcements"
+            component={Announcement}
+          />
 
           <AuthenticatedRoute exact path="/error" component={Error} />
           <Redirect to="/" component={LoginComponent} />

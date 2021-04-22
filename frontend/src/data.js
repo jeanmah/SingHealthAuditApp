@@ -726,6 +726,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/cgh.png",
+    address: "2 Simei Street 3, Singapore 529889",
   },
   {
     id: "2",
@@ -733,6 +734,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/kkh.png",
+    address: "100 Bukit Timah Rd, Singapore 229899",
   },
   {
     id: "3",
@@ -740,6 +742,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/sgh.png",
+    address: "Outram Rd, Singapore 169608",
   },
   {
     id: "4",
@@ -747,6 +750,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/skh.png",
+    address: "110 Sengkang E Way, Singapore 544886",
   },
   {
     id: "5",
@@ -754,6 +758,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/nccs.png",
+    address: "11 Hospital Crescent, Singapore 169610",
   },
   {
     id: "6",
@@ -761,6 +766,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/ndcs.jpeg",
+    address: "5 Second Hospital Ave, Singapore 168938",
   },
 ];
 
