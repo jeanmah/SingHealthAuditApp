@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { Button, IconButton, TextField, FormControl, InputLabel, Select, Typography, Grid } from "@material-ui/core";
 import { InputAdornment, DialogActions, DialogContent, DialogTitle, Dialog, DialogContentText } from "@material-ui/core";
 import SearchIcon from '@material-ui/icons/Search';
-import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
 
 import Navbar from "../Navbar";
 import useStyles from "../styles";
@@ -26,11 +24,9 @@ function ManagerHome() {
   } = useContext(Context);
 
   const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
-  const [notificationRangeState, setNotificationRangeState] = useState("all");
+  const [rangeState, setRangeState] = useState("all");
 
   const [searchBarInputState, setSearchBarInputState] = useState("");
-  const [searchIdState, setSearchIdState] = useState("");
-  const [searchManagerState, setSearchManagerState] = useState("");
 
   // States for inputs
   const [titleState, setTitleState] = useState("");
@@ -81,15 +77,18 @@ function ManagerHome() {
     console.log("Submitting search bar input: " + searchBarInputState);
     console.log(typeof searchBarInputState);
     if (searchBarInputState < 1000 && searchBarInputState > 0) {
-      setNotificationRangeState("by_notification_id");
+      setRangeState("by_notification_id");
       console.log("Setting range to By Institution ID");
     } else if (searchBarInputState >= 1000) {
-      setNotificationRangeState("by_manager_id");
+      setRangeState("by_manager_id");
       console.log("Setting range to By Manager ID");
     } else {
-      setNotificationRangeState("all");
+      setRangeState("all");
       console.log("Setting range to All");
     }
+
+    console.log("Searchbar input: " + searchBarInputState);
+    console.log("Current range: " + rangeState);
   }
 
   function handleNewAnnouncementClick() {
@@ -107,34 +106,19 @@ function ManagerHome() {
   }
 
   useEffect(() => {
-
-    if (notificationRangeState === "by_notification_id") {
-      console.log("Search ID State: " + searchBarInputState);
-      getNotificationByNotificationId(searchBarInputState)
-      .then((response) => {
-        console.log("response from getNotiByNotiID: " + response.data);
-        setDisplayedNotificationsState(response.data);
-      })
-      .catch(() => {
-        console.log("Failed to get notification by notification ID");
-      });
-    }
     
     async function getResponse() {
         try{
           await getAllAvailableNotifications().then((response) => {
             console.log("All available notifications: " + response.data);
-            if (notificationRangeState === "all") {
               setDisplayedNotificationsState(response.data);
-            }
           })
         } catch {
           console.log("Failed to retrive allAvailableNotifications");
         }
     };
     getResponse();
-    //getCurrentNotifications();
-    //getNotificationByNotificationId();
+
   }, [chatSubmitState]);
 
   return (
@@ -153,9 +137,18 @@ function ManagerHome() {
         </div>
         <div className={styles.announcement_list}>
           {displayedNotificationsState.map((notification, index) => {
-            return (
-              <NotificationRow notification={notification} key={index}/>
-            )
+            // return (
+            //   <NotificationRow notification={notification} key={index}/>
+            // )
+            if (rangeState === "all") {
+              return <NotificationRow notification={notification} key={index}/>
+            } else if (rangeState === "by_notification_id" && notification.notification_id === searchBarInputState) {
+              return <NotificationRow notification={notification} key={index}/>
+            } else if (rangeState === "by_manager_id" && notification.creator_id === searchBarInputState) {
+              return <NotificationRow notification={notification} key={index}/>
+            } else {
+              return null;
+            }
           })}
         </div>
         <div className={styles.post_new_accouncement_div}>

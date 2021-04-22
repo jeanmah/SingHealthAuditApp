@@ -41,10 +41,11 @@ const ChatCards = (props) => {
   }, []);
 
   return (
-    <NavLink to={{pathname: `/chat/${props.chat.chat_id}`, test: test}}>
+    <NavLink to={{pathname: `/chat/${props.chat.chat_id}/${targetUserState.store_name}/${targetUserState.acc_id}`, test: test}}>
       <Button className={styles.chat_bubble}>
-        <Typography variant="subtitle1">{targetUserState.username}</Typography>
+        <Typography variant="subtitle1">{targetUserState.store_name}</Typography>
         <Typography variant="body2" color="textSecondary">{target_role} ID: {target_id}</Typography>
+        <Typography variant="body2" color="textSecondary">Username: {targetUserState.username}</Typography>
         <Typography variant="body2" color="textSecondary">Chat ID: {props.chat.chat_id}</Typography>        
       </Button>
     </NavLink>

@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'inline-block',
     marginLeft: '2%',
     width: '96%',
-    height: '20%',
+    height: '25%',
     backgroundColor: 'white',
   },
   bubbleContainer: {
@@ -115,7 +115,7 @@ const useStyles = makeStyles((theme) => ({
   },
   chat_entry_edit: {
     position: "absolute",
-    bottom: "2%",
+    bottom: 0,
     width: "100%",
     height: "25%",
   },
@@ -132,7 +132,7 @@ const useStyles = makeStyles((theme) => ({
   },
   chat_entries_list: {
     position: "absolute",
-    height: "50%",
+    height: "49%",
     overflow: "scroll",
     width: "100%"
   },

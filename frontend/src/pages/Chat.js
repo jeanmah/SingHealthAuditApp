@@ -16,7 +16,7 @@ import useStyles from "../styles";
 import { getDateString, getTimeString } from "../components/utils";
 
 function Chat() {
-  const { chatId } = useParams(); // typeof chatId: String
+  const { chatId, storeName, accId } = useParams(); // typeof chatId: String
   const [chatEntriesState, setChatEntriesState] = useState([]);
   const [subjectState, setSubjectState] = useState("");
   const [bodyState, setBodyState] = useState("");
@@ -117,7 +117,10 @@ function Chat() {
       <Navbar />
       <br />
       <Typography variant="h5" align="center">
-        Chat ID: {chatId}
+        {storeName}
+      </Typography>
+      <Typography variant="body2" align="center">
+        ID: {accId}
       </Typography>
       <br />
       <ul className={styles.chat_entries_list}>

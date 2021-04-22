@@ -24,7 +24,6 @@ function Chat() {
   const [auditorIdState, setAuditorIdState] = useState("");
   const [tenantIdState, setTenantIdState] = useState("");
   const [dialogState, setDialogState] = useState(false);
-  const [allAuditorsState, setAllAuditorsState] = useState([]);
   const [allTenantsState, setAllTenantsState] = useState([]);
 
   const [newTargetState, setNewTargetState] = useState("Select a tenant");
@@ -42,9 +41,11 @@ function Chat() {
 
   function handleNewTargetChange(target_user_string) {
     setNewTargetState(target_user_string);
-    var target_id = target_user_string.split(" ")[1];
+    var target_id = target_user_string.split("-")[1];
     console.log(target_user_string);
     console.log(target_id);
+    console.log(typeof acc_id); // Number
+    console.log(typeof target_id); // String
     if (target_id === null) {
       return; // If no target_id is entered: show alert
     }
@@ -52,8 +53,8 @@ function Chat() {
       setAuditorIdState(acc_id);
       setTenantIdState(target_id);
     } else if (role_id == "Tenant") {
-      setTenantIdState(acc_id);
-      setAuditorIdState(target_id);
+      setTenantIdState(acc_id.toString()); // Number => String
+      setAuditorIdState(target_id); // String
     } else {
       console.log("Invalid auditor/tenant ID");
     }
@@ -88,7 +89,7 @@ function Chat() {
     console.log("auditor id: " + auditorIdState);
     console.log("tenant id: " + tenantIdState);
     // If no tenant is selected
-    if (auditorIdState.length === 0 || tenantIdState.length===0) {
+    if (auditorIdState.length===0 || tenantIdState.length===0) {
       openDialog();
     } else {
       postCreateNewChat(auditorIdState, tenantIdState);
@@ -105,8 +106,8 @@ function Chat() {
         <FormControl variant="outlined" className={styles.chats_dialog_selector}>
           <Select native value={newTargetState} onChange={(e) => handleNewTargetChange(e.target.value)}>
             {allTenantsState.map((tenant, index) => (
-                <option key={index} value={`${tenant.username} ${tenant.acc_id}`}>
-                  {tenant.username} {tenant.acc_id}
+                <option key={index} value={`${tenant.store_name}-${tenant.acc_id}`} id={tenant.acc_id}>
+                  {tenant.store_name} {tenant.acc_id}
                 </option>
               ))
             }
