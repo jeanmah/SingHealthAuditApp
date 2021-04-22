@@ -21,13 +21,16 @@ import StoreIcon from "@material-ui/icons/Store";
 import LocalHospitalIcon from "@material-ui/icons/LocalHospital";
 import Grid from "@material-ui/core/Grid";
 import ReceiptIcon from "@material-ui/icons/Receipt";
+import EmailIcon from "@material-ui/icons/Email";
+import Button from "@material-ui/core/Button";
+import ReportProblemIcon from "@material-ui/icons/ReportProblem";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: theme.spacing(4, 0, 10, 0),
+    padding: theme.spacing(4, 2, 10, 2),
   },
   list: {
     width: "100%",
@@ -36,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
     // margin: theme.spacing(4, 0, 10, 0),
   },
   nested: {
+    // display: "flex",
     paddingLeft: theme.spacing(4),
   },
   header: {
@@ -44,6 +48,19 @@ const useStyles = makeStyles((theme) => ({
   },
   listItem: {
     padding: theme.spacing(2, 2, 2, 2),
+  },
+  previousAuditsButtons: {
+    display: "flex",
+    padding: theme.spacing(0, 2, 3, 2),
+    justifyContent: "center",
+    // justifyContent: "space-evenly",
+  },
+  button: {
+    margin: theme.spacing(1, 2, 1, 2),
+  },
+  resolvedLabel: {
+    color: "#F15A22",
+    padding: theme.spacing(0, 2, 0, 2),
   },
 }));
 
@@ -57,7 +74,9 @@ function Tenant() {
   const [openChecklist, setOpenChecklist] = useState(false);
   const [openPrevAudits, setOpenPrevAudits] = useState(false);
   //Context: getUserInfo method
-  const { getUserInfo, getTenantAudits, getReport } = useContext(Context);
+  const { getUserInfo, getTenantAudits, getReport, getAudits } = useContext(
+    Context
+  );
 
   const classes = useStyles();
 
@@ -72,38 +91,33 @@ function Tenant() {
       });
 
     // console.log(tenantId);
-
+    const username = sessionStorage.getItem("authenticatedUser");
     async function getResponse() {
       try {
         const reportIdArray = await getTenantAudits(tenantId).then(
           (response) => {
             console.log(response);
-            if (response.data.LATEST === -1 && response.data.OVERDUE === -1) {
+
+            if (response.data.LATEST === -1) {
               return [...response.data.CLOSED.past_audits];
             }
-            if (response.data.LATEST === -1) {
-              return [
-                ...response.data.CLOSED.past_audits,
-                response.data.OVERDUE,
-              ];
-            }
-            if (response.data.OVERDUE === -1) {
-              return [
-                ...response.data.CLOSED.past_audits,
-                response.data.LATEST,
-              ];
-            }
-            return [
-              ...response.data.CLOSED.past_audits,
-              response.data.LATEST,
-              response.data.OVERDUE,
-            ];
+
+            return [...response.data.CLOSED.past_audits, response.data.LATEST];
 
             // return [response.data.LATEST, ...response.data.CLOSED];
           }
         );
-        console.log(reportIdArray);
         // console.log(reportIdArray);
+        // console.log(reportIdArray);
+
+        // const reportIdArray = await getAudits(username).then((response) => {
+        //   console.log(response);
+        //   return [
+        //     ...response.data.CLOSED.completed_audits,
+        //     ...response.data.OPEN.outstanding_audits,
+        //   ];
+        // });
+
         //initialize array to store all objects of report info
         let reportInfoArray = [];
 
@@ -176,27 +190,62 @@ function Tenant() {
                     overall_status,
                   } = audit;
                   return (
-                    <Link to={`/tenant/report/${report_id}`}>
+                    <>
                       <List component="div" disablePadding>
-                        <ListItem button className={classes.nested}>
-                          <ListItemIcon>
-                            <ReceiptIcon color="secondary" />
-                          </ListItemIcon>
-                          {report_type === "FB" && (
-                            <ListItemText
-                              primary={`F&B Checklist conducted on ${new Date(
-                                open_date
-                              ).toString()}`}
-                              secondary={
-                                overall_status === 0
-                                  ? `Score: ${overall_score} (UNRESOLVED)`
-                                  : `Score: ${overall_score}`
-                              }
-                            />
-                          )}
-                        </ListItem>
+                        <Box boxShadow={1}>
+                          <ListItem className={classes.nested}>
+                            <ListItemIcon>
+                              <ReceiptIcon color="secondary" />
+                            </ListItemIcon>
+                            {report_type === "FB" && (
+                              <ListItemText
+                                primary={`F&B Checklist conducted on ${new Date(
+                                  open_date
+                                ).toString()}`}
+                                secondary={`Score: ${overall_score} `}
+                              />
+                            )}
+                            {overall_status === 1 && (
+                              // <ListItemText className={classes.titleResolved}>
+                              <Typography
+                                variant="button"
+                                className={classes.resolvedLabel}
+                              >
+                                Resolved
+                              </Typography>
+                              // </ListItemText>
+                            )}
+                          </ListItem>
+
+                          <div className={classes.previousAuditsButtons}>
+                            {overall_status !== 1 && (
+                              <Link to={`/tenant/report/${report_id}`}>
+                                <Button
+                                  variant="contained"
+                                  color="secondary"
+                                  size="small"
+                                  className={classes.button}
+                                  startIcon={<ReportProblemIcon />}
+                                >
+                                  view non-compliance
+                                </Button>
+                              </Link>
+                            )}
+                            <Link to={`/tenant/email/${report_id}`}>
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                                className={classes.button}
+                                startIcon={<EmailIcon />}
+                              >
+                                send Email
+                              </Button>
+                            </Link>
+                          </div>
+                        </Box>
                       </List>
-                    </Link>
+                    </>
                   );
                 })}
               </Collapse>
@@ -223,12 +272,14 @@ function Tenant() {
                       <ListItemText primary="Conduct F&B Audit" />
                     </ListItem>
                   </Link>
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <StoreIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct Non-F&B Audit" />
-                  </ListItem>
+                  <Link to={`/tenant/nfbChecklist/${tenantId}`}>
+                    <ListItem button className={classes.nested}>
+                      <ListItemIcon>
+                        <StoreIcon color="secondary" />
+                      </ListItemIcon>
+                      <ListItemText primary="Conduct Non-F&B Audit" />
+                    </ListItem>
+                  </Link>
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
                       <LocalHospitalIcon color="secondary" />

@@ -41,7 +41,6 @@ export default function CenteredTabs() {
     getTenantAudits,
     getUserInfoNoParams,
     getReport,
-    getClosedTenantAudits,
     tenantState,
     setTenantState,
   } = useContext(Context);
@@ -63,8 +62,11 @@ export default function CenteredTabs() {
         if (category === "OVERDUE") {
           const reportIdArray = await getTenantAudits(tenantId).then(
             (response) => {
-              console.log(response);
-              return response.data.OVERDUE;
+              // console.log(response);
+              if (response.data.OVERDUE === -1) {
+                return [];
+              }
+              return [response.data.OVERDUE];
             }
           );
           //initialize array to store all objects of report info
@@ -85,7 +87,10 @@ export default function CenteredTabs() {
         if (category === "UNRESOLVED") {
           const reportIdArray = await getTenantAudits(tenantId).then(
             (response) => {
-              console.log(response);
+              // console.log(response);
+              if (response.data.LATEST === -1) {
+                return [];
+              }
               return [response.data.LATEST];
             }
           );
@@ -107,7 +112,13 @@ export default function CenteredTabs() {
         if (category === "COMPLETED") {
           const reportIdArray = await getTenantAudits(tenantId).then(
             (response) => {
-              return [response.data.LATEST, ...response.data.CLOSED];
+              if (response.data.LATEST === -1) {
+                return [...response.data.CLOSED.past_audits];
+              }
+              return [
+                response.data.LATEST,
+                ...response.data.CLOSED.past_audits,
+              ];
             }
           );
           //initialize array to store all objects of report info

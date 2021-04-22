@@ -92,6 +92,7 @@ export default function CenteredTabs() {
         }
         if (category === "OVERDUE") {
           const reportIdArray = await getAudits(username).then((response) => {
+            console.log(response);
             return response.data.OVERDUE;
           });
           //initialize array to store all objects of report info

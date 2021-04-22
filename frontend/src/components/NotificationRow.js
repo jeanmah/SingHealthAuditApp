@@ -5,6 +5,7 @@ import { DialogActions, DialogContent, DialogTitle, Dialog, DialogContentText } 
 
 import useStyles from "../styles";
 import { Context } from "../Context"
+import { toValidFormat } from "../components/utils";
 
 // props.notification
 const NotificationRow = (props) => {
@@ -19,8 +20,8 @@ const NotificationRow = (props) => {
   // States for modifying announcement
   const [titleState, setTitleState] = useState(notification.title);
   const [messageState, setMessageState] = useState(notification.message);
-  const [receiptDateState, setReceiptDateState] = useState(notification.receipt_date); // Default today
-  const [endDateState, setEndDateState] = useState(notification.end_date); // Default one month later
+  const [receiptDateState, setReceiptDateState] = useState(toValidFormat(notification.receipt_date)); // Default today
+  const [endDateState, setEndDateState] = useState(toValidFormat(notification.end_date)); // Default one month later
   const [receiversState, setReceiversState] = useState(notification.to_role_ids); // Default all users
 
   // States for dialogs
@@ -127,7 +128,7 @@ const NotificationRow = (props) => {
             </FormControl>
           </DialogContent>
           <DialogContent>
-            <Link className={styles.dialog_link} onClick={handleTipClick}>Tips</Link>
+            <Button className={styles.dialog_link} onClick={handleTipClick}>Tips</Button>
           </DialogContent>
           <DialogActions>
             <Button onClick={closeModifyDialog} color="secondary">Cancel</Button>

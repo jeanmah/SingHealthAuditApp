@@ -20,6 +20,8 @@ import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
 import Rating from "@material-ui/lab/Rating";
 import { withStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import PhotoCamera from "@material-ui/icons/PhotoCamera";
 
 const useStyles = makeStyles((theme) => ({
   dropdownContainer: {
@@ -38,8 +40,27 @@ const useStyles = makeStyles((theme) => ({
     width: "70%",
   },
   button: {
-    color: "#F15A22",
     fontWeight: "medium",
+    backgroundColor: "#F15A22",
+  },
+  input: {
+    display: "none",
+  },
+  camera: {
+    display: "flex",
+    flexDirection: "column",
+    //   alignItems: "center",
+  },
+  uploadText: {
+    padding: theme.spacing(0, 1, 0, 2),
+  },
+  image: {
+    width: "90%",
+    maxWidth: 400,
+    // padding: theme.spacing(4, 0, 2, 0),
+  },
+  buttonContainer: {
+    padding: theme.spacing(2, 0, 2, 0),
   },
 }));
 const StyledRating = withStyles({
@@ -94,6 +115,8 @@ function Question({ fb_qn_id, requirement, labelId }) {
   const [comment, setComment] = useState("");
   //state to update severity
   const [severity, setSeverity] = useState(0);
+  //state to update image
+  const [imageState, setImageState] = useState([]);
 
   //handle the checkbox changes
   const handleToggle = (question_id) => () => {
@@ -128,6 +151,28 @@ function Question({ fb_qn_id, requirement, labelId }) {
     setSeverity(e.target.value);
     // console.log(e.target.value);
   };
+
+  //function to handle input file change
+  const handleChange = (e) => {
+    const getBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    };
+
+    getBase64(e.target.files[0]).then((image) => {
+      console.log(image);
+      setImageState(image);
+    });
+  };
+
   //function to update fb report state upon clicking save
   const handleSave = () => {
     alert(`Input saved for question ${parseInt(fb_qn_id)}`);
@@ -152,14 +197,16 @@ function Question({ fb_qn_id, requirement, labelId }) {
         today.setDate(today.getDate());
         break;
     }
+
     let severityDate =
       (today.getDate() < 10
         ? "0" + today.getDate().toString()
         : today.getDate().toString()) +
-      (today.getMonth() < 10
-        ? "0" + today.getMonth().toString()
-        : today.getMonth().toString()) +
+      (today.getMonth() + 1 < 10
+        ? "0" + (today.getMonth() + 1).toString()
+        : (today.getMonth() + 1).toString()) +
       today.getFullYear().toString().slice(2, 4);
+
     console.log(severityDate);
 
     setFbReportState((prevState) => {
@@ -169,6 +216,7 @@ function Question({ fb_qn_id, requirement, labelId }) {
               ...question,
               severity: parseInt(severity + severityDate),
               remarks: comment,
+              images: [imageState],
             }
           : question
       );
@@ -185,7 +233,7 @@ function Question({ fb_qn_id, requirement, labelId }) {
           aria-controls="additional-actions1-content"
           id="additional-actions1-header"
         >
-          <ListItem button>
+          <ListItem>
             <ListItemText id={fb_qn_id} primary={`${requirement}`} />
             <Checkbox
               // edge="end"
@@ -220,11 +268,46 @@ function Question({ fb_qn_id, requirement, labelId }) {
                 }}
               />
             </Box>
+            <input
+              // accept="image/*"
+              className={classes.input}
+              id={`icon-button-file${fb_qn_id}`}
+              // id="icon-button-file"
+              name={`file${fb_qn_id}`}
+              type="file"
+              // value={null}
+              // name="picture"
+              onClick={(e) => {
+                e.target.value = "";
+              }}
+              onChange={(e) => {
+                handleChange(e);
+              }}
+            />
+            <label
+              htmlFor={`icon-button-file${fb_qn_id}`}
+              // htmlFor="icon-button-file"
+              className={classes.camera}
+            >
+              <IconButton
+                color="primary"
+                aria-label="upload picture"
+                component="span"
+              >
+                {/* <Typography variant="button" className={classes.uploadText}>
+                  Upload photo
+                </Typography> */}
+                <PhotoCamera />
+              </IconButton>
+            </label>
           </div>
-          <div>
+
+          <div className={classes.buttonContainer}>
             <Button
               className={classes.button}
-              size="small"
+              size="large"
+              color="primary"
+              variant="contained"
               onClick={() => {
                 handleSave();
               }}

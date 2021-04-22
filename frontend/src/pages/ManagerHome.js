@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Button, IconButton, TextField, FormControl, InputLabel, Select, Typography, Grid } from "@material-ui/core";
 import { InputAdornment, DialogActions, DialogContent, DialogTitle, Dialog, DialogContentText } from "@material-ui/core";
 import SearchIcon from '@material-ui/icons/Search';
+import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
 
 import Navbar from "../Navbar";
 import useStyles from "../styles";
@@ -15,11 +17,7 @@ function ManagerHome() {
   const styles = useStyles();
   const { 
     accountState, 
-    allAvailableNotificationsState,
     getAllAvailableNotifications,
-    currentNotificationsState,
-    getCurrentNotifications,
-    notificationsByNotificationIdState,
     getNotificationByNotificationId,
     chatSubmitState,
     postNewNotification,
@@ -28,8 +26,11 @@ function ManagerHome() {
   } = useContext(Context);
 
   const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
-  const [notificationRangeState, setNotificationRangeState] = useState("current");
+  const [notificationRangeState, setNotificationRangeState] = useState("all");
+
   const [searchBarInputState, setSearchBarInputState] = useState("");
+  const [searchIdState, setSearchIdState] = useState("");
+  const [searchManagerState, setSearchManagerState] = useState("");
 
   // States for inputs
   const [titleState, setTitleState] = useState("");
@@ -42,8 +43,6 @@ function ManagerHome() {
 
   // States for dialogs
   const [postNewDialogState, setPostNewDialogState] = useState(false);
-  const [modifyDialogState, setModifyDialogState] = useState(false);
-  const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [tipDialogState, setTipDialogState] = useState(false);
   const [successDialogState, setSuccessDialogState] = useState(false);
 
@@ -63,10 +62,6 @@ function ManagerHome() {
 
   function openPostNewDialog() {setPostNewDialogState(true);}
   function closePostNewDialog() {setPostNewDialogState(false);}
-  function openModifyDialog() {setModifyDialogState(true);}
-  function closeModifyDialog() {setModifyDialogState(false);}
-  function openDeleteDialog() {setDeleteDialogState(true);}
-  function closeDeleteDialog() {setDeleteDialogState(false);}
   function openTipDialog() {setTipDialogState(true);}
   function closeTipDialog() {setTipDialogState(false);}
   function openSuccessDialog() {setSuccessDialogState(true);}
@@ -78,50 +73,28 @@ function ManagerHome() {
     openSuccessDialog();
   }
 
-  function modifyPastAnnouncement() {
-    console.log("Modifying announcement...");
-    postModifyNotification(1, "Modified Test1", "Hello there!!!", "20/04/2021", "30/04/2021", 7);
-    openSuccessDialog();
-  }
-
-  function deleteAnnouncement() {
-    console.log("Deleting announcement...");
-    deleteNotification(4);
-    openSuccessDialog();
+  function handleSearchBarChange(search_input) {
+    setSearchBarInputState(parseInt(search_input)); // String => Integer
   }
 
   function handleSearchButtonClick() {
     console.log("Submitting search bar input: " + searchBarInputState);
     console.log(typeof searchBarInputState);
-    // if (searchBarInputState.length === 4) {
-    //   setNotificationRangeState("by_creator_id");
-    // } else {
-    //   setNotificationRangeState("by_notification_id");
-    // }
-    // setNotificationRangeState("all_available");
+    if (searchBarInputState < 1000 && searchBarInputState > 0) {
+      setNotificationRangeState("by_notification_id");
+      console.log("Setting range to By Institution ID");
+    } else if (searchBarInputState >= 1000) {
+      setNotificationRangeState("by_manager_id");
+      console.log("Setting range to By Manager ID");
+    } else {
+      setNotificationRangeState("all");
+      console.log("Setting range to All");
+    }
   }
 
-  function handleSearchBarChange(search_input) {
-    setSearchBarInputState(search_input);
-  }
-
-  function handleClick() {
-    //setDisplayedNotificationsState(allAvailableNotificationsState);
-    console.log("Search Button Clicked!");
-    console.log(searchBarInputState);
-    console.log("REAL notificationsState: " + allAvailableNotificationsState);
-  }
   function handleNewAnnouncementClick() {
     console.log("Posting new announcement...");
     openPostNewDialog();
-  }
-  function handleModifyAnnouncementClick() {
-    console.log("Modifying existing announcement...");
-    openModifyDialog();
-  }
-  function handleDeleteAnnouncementClick() {
-    console.log("Deleting existing announcement...");
-    openDeleteDialog();
   }
   function handleTipClick() {
     console.log("Openning accouncement tips...");
@@ -131,31 +104,33 @@ function ManagerHome() {
     console.log("Success dialog click...");
     closeSuccessDialog();
     closePostNewDialog();
-    closeModifyDialog();
-    closeDeleteDialog();
   }
 
   useEffect(() => {
-    async function getResponse(role_id) {
+
+    if (notificationRangeState === "by_notification_id") {
+      console.log("Search ID State: " + searchBarInputState);
+      getNotificationByNotificationId(searchBarInputState)
+      .then((response) => {
+        console.log("response from getNotiByNotiID: " + response.data);
+        setDisplayedNotificationsState(response.data);
+      })
+      .catch(() => {
+        console.log("Failed to get notification by notification ID");
+      });
+    }
+    
+    async function getResponse() {
         try{
           await getAllAvailableNotifications().then((response) => {
             console.log("All available notifications: " + response.data);
-            setDisplayedNotificationsState(response.data);
-            console.log("Notifications state: " + displayedNotificationsState);
+            if (notificationRangeState === "all") {
+              setDisplayedNotificationsState(response.data);
+            }
           })
         } catch {
           console.log("Failed to retrive allAvailableNotifications");
         }
-
-        // try{
-        //   await getCurrentNotifications().then((response) => {
-        //     console.log("Current notifications: " + response.data);
-        //     setNotificationsState(response.data);
-        //     console.log("Notifications state: " + notificationsState);
-        //   })
-        // } catch {
-        //   console.log("Failed to retrive currentNotifications");
-        // }
     };
     getResponse();
     //getCurrentNotifications();
@@ -170,7 +145,7 @@ function ManagerHome() {
           className={styles.search_bar} 
           label="Search Notification ID/Creator ID" 
           variant="outlined" 
-          InputProps={{endAdornment: (<InputAdornment><IconButton onClick={handleClick}><SearchIcon/></IconButton></InputAdornment>)}}
+          InputProps={{endAdornment: (<InputAdornment><IconButton onClick={handleSearchButtonClick}><SearchIcon/></IconButton></InputAdornment>)}}
           onChange={(e) => handleSearchBarChange(e.target.value)}
         />
         <div className={styles.annoucement_title_div}>
@@ -207,9 +182,9 @@ function ManagerHome() {
                   className={styles.dialog_date_picker}
                   margin="normal"
                   label="Receipt Date"
-                  format="yyyy-MM-dd"
-                  value={receiptDateDisplayed}
-                  onChange={handleReceiptDateChange}
+                  format="dd/MM/yyyy"
+                  value={receiptDateState}
+                  onChange={(e) => handleReceiptDateChange(e.target.value)}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
@@ -217,9 +192,9 @@ function ManagerHome() {
                 <KeyboardDatePicker
                   className={styles.dialog_date_picker}
                   label="End Date"
-                  format="yyyy-MM-dd"
-                  value={endDateDisplayed}
-                  onChange={handleEndDateChange}
+                  format="dd/MM/yyyy"
+                  value={endDateState}
+                  onChange={(e) => handleEndDateChange(e.target.value)}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
@@ -238,7 +213,7 @@ function ManagerHome() {
             </FormControl>
           </DialogContent>
           <DialogContent>
-            <Link className={styles.dialog_link} onClick={handleTipClick}>Tips</Link>
+            <Button className={styles.dialog_link} onClick={handleTipClick}>Tips</Button>
           </DialogContent>
           <DialogActions>
             <Button onClick={closePostNewDialog} color="secondary">Cancel</Button>

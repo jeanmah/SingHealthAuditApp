@@ -245,6 +245,9 @@ public class NotificationsController {
         } catch (ParseException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Dates are not formatted correctly please use dd/mm/yy");
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("AN ERROR HAS OCCURRED");
         }
     }
 
@@ -309,6 +312,9 @@ public class NotificationsController {
         } catch (ParseException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Dates are not formatted correctly please use dd/mm/yy");
+        } catch (NullPointerException e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("AN ERROR OCCURRED");
         }
 
 

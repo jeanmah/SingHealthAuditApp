@@ -82,6 +82,11 @@ public class JWTAuthenticationRestController {
 
     @ExceptionHandler({ AuthenticationException.class })
     public ResponseEntity<String> handleAuthenticationException(AuthenticationException e) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 

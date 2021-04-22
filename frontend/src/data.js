@@ -84,6 +84,11 @@ export const auditorNavLinks = [
     url: "/account",
     text: "Account",
   },
+  // {
+  //   id: 5,
+  //   url: "/",
+  //   text: "Log Out",
+  // },
 ];
 
 export const tenantNavLinks = [
@@ -112,6 +117,11 @@ export const tenantNavLinks = [
     url: "/account",
     text: "Account",
   },
+  // {
+  //   id: 5,
+  //   url: "/",
+  //   text: "Log Out",
+  // },
 ];
 
 export const managerNavLinks = [
@@ -125,6 +135,11 @@ export const managerNavLinks = [
     url: "/account",
     text: "My Account",
   },
+  // {
+  //   id: 3,
+  //   url: "/",
+  //   text: "Log Out",
+  // },
 ];
 
 export const audits = [

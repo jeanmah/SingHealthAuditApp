@@ -30,21 +30,19 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: "center",
   },
   button: {
-    color: "#F15A22",
+    // color: "#F15A22",
     fontWeight: "medium",
-    width: "100%",
+    // width: "100%",
     // maxWidth: 800,
-    backgroundColor: theme.palette.background.paper,
-    height: 50,
+    backgroundColor: "#F15A22",
+    // height: 50,
   },
   header: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2, 2, 2, 2),
   },
   link: {
-    width: "100%",
-    maxWidth: 800,
-    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(2, 0, 2, 0),
   },
 }));
 
@@ -92,6 +90,7 @@ function FbChecklist() {
   }, []);
 
   const handleSubmit = (tenantid, report) => {
+    console.log(report);
     submitFbReport(tenantid, report);
   };
 
@@ -124,7 +123,9 @@ function FbChecklist() {
             <Link to={`/tenant/${tenantId}`} className={classes.link}>
               <Button
                 className={classes.button}
-                size="small"
+                size="large"
+                color="primary"
+                variant="contained"
                 onClick={() => {
                   handleSubmit(tenantId, fbReportState);
                 }}

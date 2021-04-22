@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-import { Typography } from "@material-ui/core";
-
+import AuthenticationService from "./AuthenticationService";
 import { auditorNavLinks, tenantNavLinks, managerNavLinks } from "./data";
 import auditor from "./auditor.png";
 import { Context } from "./Context";
+import { Typography } from "@material-ui/core";
 import useStyles from "./styles";
 
 function Navbar() {
@@ -30,16 +30,14 @@ function Navbar() {
   }, [toggleClicked]);
 
   function mapLinks(links) {
-    return (
-      links.map((link, index) => {
-        const { url, text } = link;
-        return (
-          <li key={index}>
-            <Link to={url}>{text}</Link>
-          </li>
-        );
-      })
-    )
+    return links.map((link, index) => {
+      const { url, text } = link;
+      return (
+        <li key={index}>
+          <Link to={url}>{text}</Link>
+        </li>
+      );
+    });
   }
 
   function getNavLinks(role) {
@@ -49,8 +47,8 @@ function Navbar() {
       return mapLinks(tenantNavLinks);
     } else if (role === "Manager") {
       return mapLinks(managerNavLinks);
-    };
-  };
+    }
+  }
 
   // console.log(role_id);
   // console.log(navLinks);
@@ -75,6 +73,14 @@ function Navbar() {
         <div className="links-container" ref={linksContainerRef}>
           <ul className="links" ref={linksRef}>
             {getNavLinks(role_id)}
+            <Link
+              to={"/"}
+              onClick={() => {
+                AuthenticationService.logout();
+              }}
+            >
+              Log Out
+            </Link>
           </ul>
         </div>
       </div>

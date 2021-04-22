@@ -10,5 +10,5 @@ import com.c2g4.SingHealthWebApp.Admin.Models.BranchModel;
  *
  */
 public interface BranchRepo extends CrudRepository<BranchModel, Integer> {
-
+	
 }

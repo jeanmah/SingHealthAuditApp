@@ -59,9 +59,11 @@ public class HTTPRequestHelperTestFunctions {
 
     public static ResultActions performPostRequest(MockMvc mvc, String url, HashMap<String,String> multipartForm, HashMap<String,String> params) throws Exception {
         ArrayList<MockMultipartFile> mockMultipartFiles = new ArrayList<>();
-        for(String key: multipartForm.keySet()){
-            MockMultipartFile postFile = new MockMultipartFile(key,key,MediaType.APPLICATION_JSON_VALUE,multipartForm.get(key).getBytes());
-            mockMultipartFiles.add(postFile);
+        if(multipartForm!=null) {
+            for (String key : multipartForm.keySet()) {
+                MockMultipartFile postFile = new MockMultipartFile(key, key, MediaType.APPLICATION_JSON_VALUE, multipartForm.get(key).getBytes());
+                mockMultipartFiles.add(postFile);
+            }
         }
         MockMultipartHttpServletRequestBuilder mockMultipartBuilder = MockMvcRequestBuilders.multipart(url);
         for(MockMultipartFile mockMultipartFile: mockMultipartFiles){
