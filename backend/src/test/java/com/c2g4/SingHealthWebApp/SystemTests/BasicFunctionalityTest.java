@@ -30,7 +30,7 @@ public class BasicFunctionalityTest {
 	public static void runBeforeAllTests() {
 		System.setProperty("webdriver.chrome.driver", seleniumWebDriverPath);
 		driver = new ChromeDriver();
-		testUtil = new TestUtilities(driver, TestUtilities.DEBUGMODE);
+		testUtil = new TestUtilities(driver, TestUtilities.TESTMODE);
 		testUtil.timeOut = 5000;
 		testUtil.timeSleep = 500;
 		testUtil.siteRootURL = siteRootURL;
@@ -104,7 +104,7 @@ public class BasicFunctionalityTest {
 
 	@Test
 	public void MuiTabsTest() {
-		auditorLoginTest();
+		testUtil.auditUserLogin();
 		List<WebElement> muiTabsInner = driver.findElements(By.className("MuiTab-wrapper"));
 		List<WebElement> muiTabs = new ArrayList<>();
 		for (WebElement webElement : muiTabsInner) {
@@ -125,7 +125,7 @@ public class BasicFunctionalityTest {
 
 	@Test
 	public void navBarMyAccountTest() {
-		auditorLoginTest();
+		testUtil.auditUserLogin();
 		WebElement myAccountAnchor = testUtil.tryFindLinkElementByLink("/account");
 		myAccountAnchor.click();
 		testUtil.comfortSleep();
@@ -134,7 +134,7 @@ public class BasicFunctionalityTest {
 
 	@Test
 	public void navBarInstitutionsTest() {
-		auditorLoginTest();
+		testUtil.auditUserLogin();
 		WebElement myAccountAnchor = testUtil.tryFindLinkElementByLink("/institutions");
 		myAccountAnchor.click();
 		testUtil.comfortSleep();
@@ -144,7 +144,7 @@ public class BasicFunctionalityTest {
 
 	@Test
 	public void navBarChatTest() {
-		auditorLoginTest();
+		testUtil.auditUserLogin();
 		WebElement myAccountAnchor = testUtil.tryFindLinkElementByLink("/chat");
 		myAccountAnchor.click();
 		testUtil.comfortSleep();
@@ -154,7 +154,7 @@ public class BasicFunctionalityTest {
 
 	@Test
 	public void navBarHomeTest() {
-		auditorLoginTest();
+		testUtil.auditUserLogin();
 		WebElement myAccountAnchor = testUtil.tryFindLinkElementByLink("/home/a");
 		myAccountAnchor.click();
 		testUtil.comfortSleep();
@@ -163,7 +163,7 @@ public class BasicFunctionalityTest {
 
 	@Test
 	public void editAccountTest() {
-		auditorLoginTest();
+		testUtil.auditUserLogin();
 		WebElement myAccountAnchor = testUtil.tryFindLinkElementByLink("/account");
 		myAccountAnchor.click();
 		testUtil.comfortSleep();
@@ -175,5 +175,7 @@ public class BasicFunctionalityTest {
 		assertTrue(submitButton.getText().matches("SUBMIT"));
 		
 	}
+	
+	
 
 }

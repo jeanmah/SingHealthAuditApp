@@ -1,5 +1,7 @@
 package com.c2g4.SingHealthWebApp.Admin.Repositories;
 
+import java.util.List;
+
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -25,4 +27,7 @@ public interface CompletedAuditRepo extends CrudRepository<CompletedAuditModel, 
     @Modifying
     @Query("INSERT INTO Completed_Audits (report_id) VALUES (:report_id)")
     void createNewEntryWithId(@Param("report_id") int report_id);
+    
+    @Query("SELECT tenant_id FROM Completed_Audits WHERE start_date BETWEEN CURDATE() - INTERVAL :days DAY AND CURDATE();")
+    List<Integer> getTenantIds(@Param("days") int days);
 }
