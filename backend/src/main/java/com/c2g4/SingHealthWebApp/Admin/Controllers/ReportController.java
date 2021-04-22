@@ -457,6 +457,15 @@ public class ReportController {
 		jNode.put("severity", objectMapper.valueToTree(foundReportEntry.getSeverity()));
 		jNode.put("current_qn_status",String.valueOf(lastReportEntry.getStatus()));
 
+		ArrayNode imageArray = objectMapper.createArrayNode();
+		if (lastReportEntry.getImages() != null) {
+			for(String image : lastReportEntry.getImages()){
+				imageArray.add(image);
+			}
+		}
+
+		jNode.put("images",imageArray);
+
 		jNode.put("qn_id", qn_id);
 		JsonNode questionInfo = jNode;
 
