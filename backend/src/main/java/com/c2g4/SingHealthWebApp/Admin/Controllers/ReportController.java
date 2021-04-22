@@ -510,8 +510,8 @@ public class ReportController {
 		jNode.put("current_qn_status",String.valueOf(lastReportEntry.getStatus()));
 
 		ArrayNode imageArray = objectMapper.createArrayNode();
-		if (lastReportEntry.getImages() != null) {
-			for(String image : lastReportEntry.getImages()){
+		if (foundReportEntry.getImages() != null) {
+			for(String image : foundReportEntry.getImages()){
 				imageArray.add(image);
 			}
 		}

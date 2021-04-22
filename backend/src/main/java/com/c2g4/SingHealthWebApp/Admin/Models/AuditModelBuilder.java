@@ -274,6 +274,11 @@ public class AuditModelBuilder {
 	}
 
 	public AuditModelBuilder setReport_type(String report_type) {
+		switch (report_type) {
+			case "Open Audit" -> this.overall_status = 0;
+			case "Completed Audit" -> this.overall_status = 1;
+			default -> throw new IllegalArgumentException();
+		}
 		this.report_type = report_type;
 		return this;
 	}
