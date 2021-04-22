@@ -1,10 +1,16 @@
 package com.c2g4.SingHealthWebApp.SystemTests;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.junit.jupiter.api.AfterAll;
@@ -53,7 +59,8 @@ public class RobustnessTest {
 		testUtil.auditUserLogin();
 		List<WebElement> elements = driver.findElements(By.tagName("button"));
 		
-		int safety = 1000;
+		int safety = 10;
+		//int safety = 1000;
 		while(safety > 0) {
 			WebElement element = testUtil.getRandomElement(elements);
 			int numFailed = 0;
@@ -75,14 +82,13 @@ public class RobustnessTest {
 			}
 			safety--;
 		}
-
-		
 	}
 	
 	@Test
 	public void MonkeyURLTest() {
 		testUtil.auditUserLogin();
-		int safety = 1000;
+		int safety = 10;
+		//int safety = 1000;
 		List<URL> urls = new ArrayList<>();
 		while(safety > 0) {
 			urls = getLinks(urls);
@@ -91,13 +97,126 @@ public class RobustnessTest {
 			}else {
 				goSomewhere(urls);
 			}
-			safety++;
+			safety--;
 		}
 	}
 	
+	//<><><> URL Hacking <><><>
+	@Test
+	public void bypassLoginTest() {
+		List<String> urls = new ArrayList<String>() {{
+			add("http://localhost:3000/home/a");
+			add("http://localhost:3000/chat");
+			add("http://localhost:3000/institutions");
+			add("http://localhost:3000/account");
+			add("http://localhost:3000/edit_account");
+			add("http://localhost:3000/edit_password");
+			add("http://localhost:3000/institution/KKH");
+			add("http://localhost:3000/tenant/1005");
+			add("http://localhost:3000/tenant/report/170");
+			add("http://localhost:3000/tenant/fbChecklist/1005");
+		}};
+		
+		for(String url:urls) {
+			driver.get(url);
+			assertFalse(testUtil.checkElementExists(By.className("MuiTab-wrapper"),1));
+		}
+		
+	}
+	
+	
+	//<><><> Et tu, Brute? <><><>
+	@Test
+	public void brutePasswordTest() {
+		WebElement loginBox = driver.findElement(By.id("username"));
+		WebElement passBox = driver.findElement(By.id("password"));
+		int safety = 10;
+		while(safety > 0) {
+			testUtil.waitForId("username");
+			Map.Entry<String, String> credentials = TestResources.getCredentials(TestResources.AUDITOR);
+			testUtil.clear(loginBox);
+			loginBox.sendKeys(credentials.getKey());
+			credentials = TestResources.getCredentials(TestResources.RANDOM);
+			testUtil.clear(passBox);
+			passBox.sendKeys(credentials.getValue());
+			testUtil.comfortSleep();
+			WebElement loginButton = driver.findElement(By.className("MuiButton-label"));
+			loginButton.click();
+			assertFalse(testUtil.checkElementExists(By.className("MuiTab-wrapper"),1));
+			testUtil.comfortSleep();
+			safety--;
+		}
+	}
+	
+	@Test
+	public void bruteLoginTest() {
+		WebElement loginBox = driver.findElement(By.id("username"));
+		WebElement passBox = driver.findElement(By.id("password"));
+		int safety = 10;
+		while(safety > 0) {
+			testUtil.waitForId("username");
+			Map.Entry<String, String> credentials = TestResources.getCredentials(TestResources.RANDOM);
+			testUtil.clear(loginBox);
+			loginBox.sendKeys(credentials.getKey());
+			testUtil.clear(passBox);
+			passBox.sendKeys(credentials.getValue());
+			testUtil.comfortSleep();
+			WebElement loginButton = driver.findElement(By.className("MuiButton-label"));
+			loginButton.click();
+			assertFalse(testUtil.checkElementExists(By.className("MuiTab-wrapper"),1));
+			testUtil.comfortSleep();
+			safety--;
+		}
+	}
+	
+	@Test
+	public void SQLInjectionsTest() {
+		String fileName = "src\\test\\java\\com\\c2g4\\SingHealthWebApp\\SystemTests\\SQL_Injection_Payloads.txt";
+		File file = new File(fileName);
+		Scanner fileScanner = null;
+		try {
+			fileScanner = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int safety = 10;
+		while(fileScanner.hasNextLine() && safety > 0) {
+			WebElement loginBox = driver.findElement(By.id("username"));
+			WebElement passBox = driver.findElement(By.id("password"));
+			String line = fileScanner.nextLine();
+			testUtil.waitForId("username");
+			testUtil.clear(loginBox);
+			loginBox.sendKeys(line);
+			testUtil.clear(passBox);
+			passBox.sendKeys(line);
+			testUtil.comfortSleep();
+			WebElement loginButton = driver.findElement(By.className("MuiButton-label"));
+			loginButton.click();
+			assertFalse(testUtil.checkElementExists(By.className("MuiTab-wrapper"),1));
+			testUtil.comfortSleep();
+			safety--;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//Utilities
 	private void goSomewhere(List<URL> urls) {
 		driver.navigate().to(testUtil.getRandomElement(urls));
 	}
+	
 	private List<URL> getLinks(List<URL> urls) {
 		List<WebElement> elements = driver.findElements(By.tagName("a"));
 		urls = new ArrayList<>();
@@ -116,5 +235,7 @@ public class RobustnessTest {
 		}
 		return urls;
 	}
+	
+	
 
 }

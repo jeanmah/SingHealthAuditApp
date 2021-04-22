@@ -1,13 +1,12 @@
 package com.c2g4.SingHealthWebApp.Admin.Models;
 
-import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.Date;
-import java.util.Calendar;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Object Model/Representation of an entry of the SQL Account Table
@@ -134,7 +133,8 @@ public class AccountModel {
 		System.out.println("lock_start_datetime_cal "+lock_start_datetime_cal.getTime());
 
 		//lock for 5min
-		lock_start_datetime_cal.add(Calendar.MINUTE,2);
+		//undo after testing
+		lock_start_datetime_cal.add(Calendar.SECOND,2);
 		if(lock_start_datetime_cal.getTime().before(now.getTime())){
 			System.out.println("reset attempts 0");
 			failed_login_attempts=0;

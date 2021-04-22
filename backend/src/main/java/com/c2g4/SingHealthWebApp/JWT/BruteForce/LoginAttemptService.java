@@ -1,12 +1,13 @@
 package com.c2g4.SingHealthWebApp.JWT.BruteForce;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.stereotype.Service;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.springframework.stereotype.Service;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class LoginAttemptService {
@@ -16,9 +17,11 @@ public class LoginAttemptService {
 
     public LoginAttemptService() {
         super();
-        attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS)
+        //undo this after testing
+        attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS)
                 .build(new CacheLoader<String, Integer>() {
-            public Integer load(String key) {
+            @Override
+			public Integer load(String key) {
                 return 0;
             }
         });

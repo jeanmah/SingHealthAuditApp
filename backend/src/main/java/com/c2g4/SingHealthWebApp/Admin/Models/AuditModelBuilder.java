@@ -179,7 +179,7 @@ public class AuditModelBuilder {
 	}
 	
 	//Getters and Setters for the builder class specifically
-	public String getReportType() {
+	public String getReportStatus() {
 		switch(this.overall_status) {
 		case 0:
 			return "Open Audit";
