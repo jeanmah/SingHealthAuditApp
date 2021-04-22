@@ -1,31 +1,49 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button, IconButton, TextField, FormControl, InputLabel, Select, Typography, Grid } from "@material-ui/core";
-import { InputAdornment, DialogActions, DialogContent, DialogTitle, Dialog, DialogContentText } from "@material-ui/core";
-import SearchIcon from '@material-ui/icons/Search';
-import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import {
+  Button,
+  IconButton,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  Typography,
+  Grid,
+} from "@material-ui/core";
+import {
+  InputAdornment,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Dialog,
+  DialogContentText,
+} from "@material-ui/core";
+import SearchIcon from "@material-ui/icons/Search";
+// import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
+// import DateFnsUtils from "@date-io/date-fns";
 
 import Navbar from "../Navbar";
 import useStyles from "../styles";
-import { Context } from "../Context"
+import { Context } from "../Context";
 import NotificationRow from "../components/NotificationRow";
 
-
 function ManagerHome() {
-
   const styles = useStyles();
-  const { 
-    accountState, 
+  const {
+    accountState,
     getAllAvailableNotifications,
     getNotificationByNotificationId,
     chatSubmitState,
     postNewNotification,
     postModifyNotification,
     deleteNotification,
+    getNotificationsByCreatorId,
   } = useContext(Context);
 
-  const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
+  const [
+    displayedNotificationsState,
+    setDisplayedNotificationsState,
+  ] = useState([]);
   const [notificationRangeState, setNotificationRangeState] = useState("all");
 
   const [searchBarInputState, setSearchBarInputState] = useState("");
@@ -48,8 +66,12 @@ function ManagerHome() {
 
   const { role_id } = accountState;
 
-  function handleTitleChange(input_title) {setTitleState(input_title);}
-  function handleMessageChange(input_message) {setMessageState(input_message);}
+  function handleTitleChange(input_title) {
+    setTitleState(input_title);
+  }
+  function handleMessageChange(input_message) {
+    setMessageState(input_message);
+  }
   function handleReceiptDateChange(input_date) {
     setReceiptDateState(input_date); // String passed to backend
     setReceiptDateDisplayed(input_date); // Date object to display
@@ -58,18 +80,38 @@ function ManagerHome() {
     setEndDateState(input_date); // String passed to backend
     setEndDateDisplayed(input_date); // Date object to display
   }
-  function handleReceiverChange(input_receiver) {setReceiversState(parseInt(input_receiver));}
+  function handleReceiverChange(input_receiver) {
+    setReceiversState(parseInt(input_receiver));
+  }
 
-  function openPostNewDialog() {setPostNewDialogState(true);}
-  function closePostNewDialog() {setPostNewDialogState(false);}
-  function openTipDialog() {setTipDialogState(true);}
-  function closeTipDialog() {setTipDialogState(false);}
-  function openSuccessDialog() {setSuccessDialogState(true);}
-  function closeSuccessDialog() {setSuccessDialogState(false);}
+  function openPostNewDialog() {
+    setPostNewDialogState(true);
+  }
+  function closePostNewDialog() {
+    setPostNewDialogState(false);
+  }
+  function openTipDialog() {
+    setTipDialogState(true);
+  }
+  function closeTipDialog() {
+    setTipDialogState(false);
+  }
+  function openSuccessDialog() {
+    setSuccessDialogState(true);
+  }
+  function closeSuccessDialog() {
+    setSuccessDialogState(false);
+  }
 
   function submitNewAccouncement() {
     console.log("Submitting new announcement...");
-    postNewNotification(titleState, messageState, receiptDateState, endDateState, receiversState);
+    postNewNotification(
+      titleState,
+      messageState,
+      receiptDateState,
+      endDateState,
+      receiversState
+    );
     openSuccessDialog();
   }
 
@@ -107,31 +149,31 @@ function ManagerHome() {
   }
 
   useEffect(() => {
-
     if (notificationRangeState === "by_notification_id") {
       console.log("Search ID State: " + searchBarInputState);
       getNotificationByNotificationId(searchBarInputState)
-      .then((response) => {
-        console.log("response from getNotiByNotiID: " + response.data);
-        setDisplayedNotificationsState(response.data);
-      })
-      .catch(() => {
-        console.log("Failed to get notification by notification ID");
-      });
+        .then((response) => {
+          console.log("response from getNotiByNotiID: " + response.data);
+          setDisplayedNotificationsState(response.data);
+        })
+        .catch(() => {
+          console.log("Failed to get notification by notification ID");
+        });
     }
-    
+
     async function getResponse() {
-        try{
-          await getAllAvailableNotifications().then((response) => {
-            console.log("All available notifications: " + response.data);
-            if (notificationRangeState === "all") {
-              setDisplayedNotificationsState(response.data);
-            }
-          })
-        } catch {
-          console.log("Failed to retrive allAvailableNotifications");
-        }
-    };
+      try {
+        await getNotificationsByCreatorId().then((response) => {
+          console.log(response);
+          console.log("All available notifications: " + response.data);
+          if (notificationRangeState === "all") {
+            setDisplayedNotificationsState(response.data);
+          }
+        });
+      } catch {
+        console.log("Failed to retrive allAvailableNotifications");
+      }
+    }
     getResponse();
     //getCurrentNotifications();
     //getNotificationByNotificationId();
@@ -142,24 +184,40 @@ function ManagerHome() {
       <Navbar />
       <div className={styles.body}>
         <TextField
-          className={styles.search_bar} 
-          label="Search Notification ID/Creator ID" 
-          variant="outlined" 
-          InputProps={{endAdornment: (<InputAdornment><IconButton onClick={handleSearchButtonClick}><SearchIcon/></IconButton></InputAdornment>)}}
+          className={styles.search_bar}
+          label="Search Notification ID/Creator ID"
+          variant="outlined"
+          InputProps={{
+            endAdornment: (
+              <InputAdornment>
+                <IconButton onClick={handleSearchButtonClick}>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
           onChange={(e) => handleSearchBarChange(e.target.value)}
         />
         <div className={styles.annoucement_title_div}>
-          <Typography variant="h6" className={styles.annoucement_title}>Announcements</Typography>
+          <Typography variant="h6" className={styles.annoucement_title}>
+            Announcements
+          </Typography>
         </div>
         <div className={styles.announcement_list}>
           {displayedNotificationsState.map((notification, index) => {
-            return (
-              <NotificationRow notification={notification} key={index}/>
-            )
+            return <NotificationRow notification={notification} key={index} />;
           })}
         </div>
         <div className={styles.post_new_accouncement_div}>
-          <Button className={styles.big_bottom_buttons} align="center" variant="outlined" color="primary" onClick={handleNewAnnouncementClick}>Post New Announcement</Button>
+          <Button
+            className={styles.big_bottom_buttons}
+            align="center"
+            variant="outlined"
+            color="primary"
+            onClick={handleNewAnnouncementClick}
+          >
+            Post New Announcement
+          </Button>
         </div>
 
         {/* Dialog used for posting new announcement */}
@@ -170,12 +228,38 @@ function ManagerHome() {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"New Announcement"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">
+            {"New Announcement"}
+          </DialogTitle>
           <DialogContent>
-            <TextField className={styles.new_announcement_input} value={titleState} label="Title" variant="outlined" onChange={(e) => handleTitleChange(e.target.value)}/>
-            <TextField className={styles.new_announcement_input} value={messageState} label="Message" variant="outlined" onChange={(e) => handleMessageChange(e.target.value)}/>
-            <TextField className={styles.new_announcement_input} value={receiptDateState} label="Receipt Date (DD/MM/YYYY)" variant="outlined" onChange={(e) => handleReceiptDateChange(e.target.value)}/>
-            <TextField className={styles.new_announcement_input} value={endDateState} label="End Date (DD/MM/YYYY)" variant="outlined" onChange={(e) => handleEndDateChange(e.target.value)}/>
+            <TextField
+              className={styles.new_announcement_input}
+              value={titleState}
+              label="Title"
+              variant="outlined"
+              onChange={(e) => handleTitleChange(e.target.value)}
+            />
+            <TextField
+              className={styles.new_announcement_input}
+              value={messageState}
+              label="Message"
+              variant="outlined"
+              onChange={(e) => handleMessageChange(e.target.value)}
+            />
+            <TextField
+              className={styles.new_announcement_input}
+              value={receiptDateState}
+              label="Receipt Date (DD/MM/YYYY)"
+              variant="outlined"
+              onChange={(e) => handleReceiptDateChange(e.target.value)}
+            />
+            <TextField
+              className={styles.new_announcement_input}
+              value={endDateState}
+              label="End Date (DD/MM/YYYY)"
+              variant="outlined"
+              onChange={(e) => handleEndDateChange(e.target.value)}
+            />
             {/* <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Grid container justify="space-around">
                 <KeyboardDatePicker
@@ -203,7 +287,12 @@ function ManagerHome() {
             </MuiPickersUtilsProvider> */}
             <FormControl variant="outlined" className={styles.dialog_selector}>
               <InputLabel>Receivers</InputLabel>
-              <Select native label="Receivers" value={receiversState} onChange={(e) => handleReceiverChange(e.target.value)}>
+              <Select
+                native
+                label="Receivers"
+                value={receiversState}
+                onChange={(e) => handleReceiverChange(e.target.value)}
+              >
                 <option value={7}>All users</option>
                 <option value={5}>Manager and Tenant</option>
                 <option value={6}>Auditor and Tenant</option>
@@ -213,11 +302,17 @@ function ManagerHome() {
             </FormControl>
           </DialogContent>
           <DialogContent>
-            <Button className={styles.dialog_link} onClick={handleTipClick}>Tips</Button>
+            <Button className={styles.dialog_link} onClick={handleTipClick}>
+              Tips
+            </Button>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closePostNewDialog} color="secondary">Cancel</Button>
-            <Button onClick={submitNewAccouncement} color="primary">Continue</Button>
+            <Button onClick={closePostNewDialog} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={submitNewAccouncement} color="primary">
+              Continue
+            </Button>
           </DialogActions>
         </Dialog>
 
@@ -231,14 +326,30 @@ function ManagerHome() {
         >
           <DialogTitle id="alert-dialog-title">{"Tips"}</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">How to create new announcements?</DialogContentText>
-            <DialogContentText id="alert-dialog-description">* "Title" and "Message" is where you should post your announcement information</DialogContentText>
-            <DialogContentText id="alert-dialog-description">* "Receipt Date" is the day when the receipients should start to see the announcement</DialogContentText>
-            <DialogContentText id="alert-dialog-description">* "End Date" is the day when the recipients should stop getting the notification</DialogContentText>
-            <DialogContentText id="alert-dialog-description">* "Receivers" indicates the range of receipients who can see the announcement.</DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              How to create new announcements?
+            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              * "Title" and "Message" is where you should post your announcement
+              information
+            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              * "Receipt Date" is the day when the receipients should start to
+              see the announcement
+            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              * "End Date" is the day when the recipients should stop getting
+              the notification
+            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              * "Receivers" indicates the range of receipients who can see the
+              announcement.
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeTipDialog} color="primary">Ok</Button>
+            <Button onClick={closeTipDialog} color="primary">
+              Ok
+            </Button>
           </DialogActions>
         </Dialog>
 
@@ -250,17 +361,21 @@ function ManagerHome() {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"Changes updated!"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">
+            {"Changes updated!"}
+          </DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">Your changes have been updated</DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              Your changes have been updated
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleSuccessClick} color="primary">Ok</Button>
+            <Button onClick={handleSuccessClick} color="primary">
+              Ok
+            </Button>
           </DialogActions>
         </Dialog>
-        
       </div>
-      
     </main>
   );
 }
