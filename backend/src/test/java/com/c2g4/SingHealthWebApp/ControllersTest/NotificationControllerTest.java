@@ -9,6 +9,7 @@ import com.c2g4.SingHealthWebApp.Notifications.NotificationsModel;
 import com.c2g4.SingHealthWebApp.Notifications.NotificationsRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -725,12 +726,17 @@ public class NotificationControllerTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         HashMap<String,String> postBody = new HashMap<>();
-        postBody.put("receipt_date",objectMapper.writeValueAsString("2021-04-04"));
-        postBody.put("end_date",objectMapper.writeValueAsString("2021-04-04"));
+        ObjectNode body = objectMapper.createObjectNode();
 
-        if(title!=null) postBody.put("title",title);
-        if(message!=null) postBody.put("message",message);
-        if(to_role_ids!=null) postBody.put("to_role_ids",to_role_ids);
+
+        body.put("receipt_date","04/04/2021");
+        body.put("end_date","04/04/2021");
+
+        if(title!=null) body.put("title",title);
+        if(message!=null) body.put("message",message);
+        if(to_role_ids!=null) body.put("to_role_ids",to_role_ids);
+
+        postBody.put("new_notification",objectMapper.writeValueAsString(body));
 
         switch (statusExpected) {
             case statusOK -> {
@@ -792,13 +798,18 @@ public class NotificationControllerTest {
         String url = "/notifications/postModifyNotification";
         ObjectMapper objectMapper = new ObjectMapper();
         HashMap<String,String> postBody = new HashMap<>();
-        postBody.put("receipt_date",objectMapper.writeValueAsString("2021-04-04"));
-        postBody.put("end_date",objectMapper.writeValueAsString("2021-04-04"));
 
-        if(notification_id!=null) postBody.put("notification_id",notification_id);
-        if(title!=null) postBody.put("title",title);
-        if(message!=null) postBody.put("message",message);
-        if(to_role_ids!=null) postBody.put("to_role_ids",to_role_ids);
+        ObjectNode body = objectMapper.createObjectNode();
+
+        body.put("receipt_date","04/04/2021");
+        body.put("end_date","04/04/2021");
+
+        if(notification_id!=null) body.put("notification_id",notification_id);
+        if(title!=null) body.put("title",title);
+        if(message!=null) body.put("message",message);
+        if(to_role_ids!=null) body.put("to_role_ids",to_role_ids);
+
+        postBody.put("modifiedNotification",objectMapper.writeValueAsString(body));
 
         NotificationsModel notificationsModel = createNotificationModel(0,true,true, true);
         given(notificationsRepo.getNotificationByNotificationId(0)).willReturn(notificationsModel);
