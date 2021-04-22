@@ -4,7 +4,6 @@ import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
@@ -46,7 +45,7 @@ public class NotificationsController {
      */
     @GetMapping("/notifications/getAllAvailableNotifications")
     public ResponseEntity<?> getAllAvailableNotifications(@AuthenticationPrincipal UserDetails callerUser,
-                                         @RequestParam(required = false, defaultValue = "-1") String role_id){
+                                                          @RequestParam(required = false, defaultValue = "-1") String role_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");
@@ -143,7 +142,7 @@ public class NotificationsController {
      */
     @GetMapping("/notifications/getNotificationByNotificationId")
     public ResponseEntity<?> getNotificationByNotificationId(@AuthenticationPrincipal UserDetails callerUser,
-                                                     @RequestParam int notification_id){
+                                                             @RequestParam int notification_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");
@@ -171,7 +170,7 @@ public class NotificationsController {
      */
     @GetMapping("/notifications/getNotificationsByCreatorId")
     public ResponseEntity<?> getNotificationsByCreatorId(@AuthenticationPrincipal UserDetails callerUser,
-                                                     @RequestParam(required = false, defaultValue = "-1") int creator_id){
+                                                         @RequestParam(required = false, defaultValue = "-1") int creator_id){
         AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
         if (callerAccount==null) {
             logger.warn("CALLER ACCOUNT NULL");

@@ -68,28 +68,26 @@ function Account() {
       <AccountInfo category="Store Type" info={type_id}/>
       <br />
       <FormGroup column="true">
-        <Button
-          className={styles.buttons}
-          align="center"
-          variant="outlined"
-          fullWidth
-          color="primary"
-        >
-          <Link to="/edit_account">
+        <Link to="/edit_account">
+          <Button
+            className={styles.big_buttons}
+            align="center"
+            variant="outlined"
+            color="primary"
+          >
             Edit Account
-          </Link>
-        </Button>
-        <Button
-          className={styles.buttons}
-          align="center"
-          variant="outlined"
-          fullWidth
-          color="secondary"
-        >
-          <Link to="/edit_password">
+          </Button>
+        </Link>
+        <Link to="/edit_password">
+          <Button
+            className={styles.big_buttons}
+            align="center"
+            variant="outlined"
+            color="secondary"
+          >
             Edit Password
-          </Link>
-        </Button>
+          </Button>
+        </Link>
 
       </FormGroup>
 

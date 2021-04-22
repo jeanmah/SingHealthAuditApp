@@ -37,7 +37,7 @@ const Institution = () => {
           {selectedInstitution.map((institution, index) => {
             const { id, name, imageUrl } = institution;
             return (
-              <section key={id} className="institution-header">
+              <section key={index} className="institution-header">
                 <img
                   src={imageUrl}
                   className="institution-logo"

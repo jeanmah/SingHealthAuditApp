@@ -129,6 +129,7 @@ public class ChatController {
     public ResponseEntity<?> postCreateNewChat(@RequestParam(value = "auditor_id", required = true) int auditor_id,
                                                @RequestParam(value = "tenant_id", required = true) int tenant_id){
 
+        System.out.println("Testing");
         if(!tenantRepo.existsById(tenant_id)) return ResponseEntity.badRequest().body("tenant account not found");
         if(!auditorRepo.existsById(auditor_id)) return ResponseEntity.badRequest().body("auditor account not found");
         ChatModel existingChatmodel = chatRepo.findChatByUsers(auditor_id,tenant_id);

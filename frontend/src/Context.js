@@ -1,13 +1,14 @@
 import React, { useState, createContext, useCallback } from "react";
 import { audits, fbChecklist, tenants, institutions } from "./data";
 import axios from "axios";
-import { Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import AuthenticationService from "./AuthenticationService";
 
 export const Context = createContext();
 
 export const ContextProvider = (props) => {
   const API_URL = "http://localhost:8080";
+  const history = useHistory();
 
   /*
   =============== 
@@ -70,38 +71,269 @@ export const ContextProvider = (props) => {
       });
   };
 
+  const getAllAuditors = () => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/account/getAllUsersofType`, {
+        params: {
+          roleType: "Auditor",
+        },
+      });
+  };
+
+  const getAllTenants = () => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/account/getAllUsersofType`, {
+        params: {
+          roleType: "Tenant",
+        },
+      });
+  };
+
   const getAllChatsOfUser = () => {
     AuthenticationService.getStoredAxiosInterceptor();
     console.log("This is calling getAllChatsOfUser");
-    return (
-      axios
-        .get(`${API_URL}/chat/getAllChatsOfUser`, {
-          params: {},
-        })
-        .then((response) => {
-          console.log("Response from getAllChatsOfUser", response.data);
-          setAllChatsOfUserState(response.data);
-        })
-        // .then((response) => {
-        //   console.log("Response from getAllChatsOfUser", response.data);
-        //   // Since the response.data is an array of chats, use map() to push chats into the state one by one
-        //   response.data.map(chat => {
-        //     setAllChatsOfUserState([]); // Before pushing, clear the original state
-        //     console.log("Pushing new chat: " + chat.chat_id);
-        //     const chats = allChatsOfUserState;
-        //     chats.push(chat);
-        //     setAllChatsOfUserState(chats);
-        //   })
-        //   console.log("All chats pushed: " + allChatsOfUserState);
-        //   console.log("Type of allChatsOfUserState: " + typeof allChatsOfUserState);
-        //   console.log("Chat in chats: " + allChatsOfUserState[0]);
-        //   console.log("Chat in chats: " + allChatsOfUserState[0].chat_id);
-        // })
-        .catch(() => {
-          console.log("allChatsOfUser retrieval failed");
-        })
-    );
+    return axios
+      .get(`${API_URL}/chat/getAllChatsOfUser`, {
+        params: {},
+      });
   };
+
+  const getChatEntriesOfUser = (chatId) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log("This is calling getChatEntriesOfUser");
+    //console.log(typeof parseInt(chatId));
+    //console.log(typeof parseInt(numLastestEntries));
+    return axios
+      .get(`${API_URL}/chat/getChatEntriesOfUser`, {
+        params: {
+          parentChatId: parseInt(chatId),
+          //numLastestChatEntries: parseInt(numLastestChatEntries),
+        },
+      });
+  };
+
+  // function to post a new chat with another user
+  const postCreateNewChat = useCallback((auditor_id, tenant_id) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log(auditor_id);
+    console.log(tenant_id);
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append('auditor_id', auditor_id);
+    formdata.append('tenant_id', tenant_id);
+    return axios
+      .post(
+        `${API_URL}/chat/postCreateNewChat?auditor_id=${auditor_id}&tenant_id=${tenant_id}`, {
+          params: {
+            auditor_id: parseInt(auditor_id),
+            tenant_id: parseInt(tenant_id),
+          }
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        setChatSubmitState(response);
+      })
+      .catch((error) => {
+        console.log("Failed new chat creation");
+        console.log(error.response); // check if its null
+        let error_msg = error.response.data
+        console.log(error_msg); // use the response.data to redirect to the existed chat
+        let existing_chat_id = error_msg[error_msg.length-1];
+        history.push(`/chat/${existing_chat_id}`);
+      });
+  });
+
+  // function to post a new chat entry (message) in an existing chat
+  const postChatEntry = useCallback((parentChatId, subject, messageBody, attachments) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    let payload = {
+      subject: subject,
+      messageBody: messageBody,
+      attachments: attachments,
+    };
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append("messageContents", JSON.stringify(payload));
+    return axios
+      .post(
+        `${API_URL}/chat/postChatEntry?parentChatId=${parseInt(parentChatId)}`,
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        setChatSubmitState(response);
+      })
+      .catch(() => {
+        console.log("Failed new chat entry post");
+      });
+  });
+
+  const getAllAvailableNotifications = (role_id) => {
+    console.log("Getting allAvailableNotifications...");
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/notifications/getAllAvailableNotifications`, {
+        params: {
+          role_id: role_id,
+        },
+      });
+  }
+
+  const getCurrentNotifications = (role_id) => {
+    console.log("Getting currentNotifications...");
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/notifications/getCurrentNotifications`, {
+        params: {
+          role_id: role_id,
+        },
+      })
+      .then((response) => {
+        console.log("Current notifications: " + response.data);
+        setCurrentNotificationsState(response.data);
+        console.log("Notifications state: " + currentNotificationsState);
+      })
+      .catch (() => {
+        console.log("Failed to retrive currentNotifications");
+      });
+  }
+
+  const getNotificationByNotificationId = (notification_id) => {
+    console.log("Getting notificationByNotificationId...");
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/notifications/getNotificationByNotificationId`, {
+        params: {
+          notification_id: notification_id,
+        },
+      })
+      .then((response) => {
+        console.log("NotificationsByNotificationId: " + response.data);
+        setNotificationsByNotificationIdState(response.data);
+        console.log("Notifications state: " + notificationsByNotificationIdState);
+      })
+      .catch (() => {
+        console.log("Failed to retrive notificationsByNotificationId");
+      });
+  }
+
+  const getNotificationsByCreatorId = (creator_id) => {
+    console.log("Getting notificationsByCreatorId...");
+    AuthenticationService.getStoredAxiosInterceptor();
+    return axios
+      .get(`${API_URL}/notifications/getNotificationsByCreatorId`, {
+        params: {
+          creator_id: creator_id,
+        },
+      });
+  }
+
+  // Function to post a new notification (only available to managers)
+  const postNewNotification = useCallback((title, message, receipt_date, end_date, to_role_ids) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log(typeof title);
+    console.log(typeof message);
+    console.log(typeof receipt_date);
+    console.log(typeof end_date);
+    console.log(typeof to_role_ids);
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    let payload = {
+      title: title,
+      message: message,
+      receipt_date: receipt_date,
+      end_date: end_date,
+      to_role_ids: to_role_ids,
+    };
+    formdata.append("new_notification", JSON.stringify(payload));
+    return axios
+      .post(
+        `${API_URL}/notifications/postNewNotification`,
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        setChatSubmitState(response);
+      })
+      .catch(() => {
+        console.log("Failed new notification post");
+      });
+  });
+
+  // Function to modify existing notifiation (only available to managers)
+  const postModifyNotification = useCallback((notification_id, title, message, receipt_date, end_date, to_role_ids) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log(typeof notification_id); // Integer
+    console.log(typeof title); // String
+    console.log(typeof message); // String
+    console.log(typeof receipt_date); // String
+    console.log(typeof end_date); // String
+    console.log(typeof to_role_ids); // Integer
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    let payload = {
+      notification_id: notification_id,
+      title: title,
+      message: message,
+      receipt_date: receipt_date,
+      end_date: end_date,
+      to_role_ids: to_role_ids,
+    };
+    formdata.append("modifiedNotification", JSON.stringify(payload));
+    return axios
+      .post(
+        `${API_URL}/notifications/postModifyNotification`,
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        setChatSubmitState(response);
+      })
+      .catch(() => {
+        console.log("Failed modify notification post");
+      });
+  });
+
+  // Function to delete existing notifiation (only available to managers)
+  const deleteNotification = (notification_id) => {
+    AuthenticationService.getStoredAxiosInterceptor();
+    console.log("Deleting the announcement..." + notification_id);
+    console.log(typeof notification_id); // Integer
+    return axios
+      .delete(`${API_URL}/notifications/deleteNotification`, {
+        params: {
+          notification_id: notification_id,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        setChatSubmitState(response);
+      })
+      .catch(() => {
+        console.log("Failed to delete notification");
+      });
+  };
+
+
+
 
   //function to get Fb Checklist questions
   const getFbChecklistQuestions = () => {
@@ -246,7 +478,6 @@ export const ContextProvider = (props) => {
   //function to get user info given user id
   const getUserInfo = (userId) => {
     AuthenticationService.getStoredAxiosInterceptor();
-
     return axios.get(`${API_URL}/account/getUserProfile`, {
       params: { user_id: parseInt(userId) },
     });
@@ -348,6 +579,18 @@ export const ContextProvider = (props) => {
   const [accountState, setAccountState] = useState([]);
   //state for chats of user
   const [allChatsOfUserState, setAllChatsOfUserState] = useState([]);
+  //state for chat entries of a chat
+  const [chatEntriesOfUserState, setChatEntriesOfUserState] = useState([]);
+  //state for re-render AllChats & Chat
+  const [chatSubmitState, setChatSubmitState] = useState();
+  //state for current opened chat
+  const [currentChatState, setCurrentChatState] = useState();
+  //state for notifications to display
+  const [allAvailableNotificationsState, setAllAvailableNotificationsState] = useState([]);
+  //state for current notifications
+  const [currentNotificationsState, setCurrentNotificationsState] = useState([]);
+  //state for notification searched by id
+  const [notificationsByNotificationIdState, setNotificationsByNotificationIdState] = useState([]);
   //state of comments in modal
   const [comment, setComment] = useState("");
   //resolved state
@@ -490,10 +733,35 @@ export const ContextProvider = (props) => {
         accountState,
         setAccountState,
         getAccountInfo,
+        getAllAuditors,
+        getAllTenants,
 
         allChatsOfUserState,
         setAllChatsOfUserState,
         getAllChatsOfUser,
+        postCreateNewChat,
+
+        chatEntriesOfUserState,
+        setChatEntriesOfUserState,
+        getChatEntriesOfUser,
+        postChatEntry,
+
+        chatSubmitState,
+        setChatSubmitState,
+
+        currentChatState,
+        setCurrentChatState,
+
+        allAvailableNotificationsState,
+        getAllAvailableNotifications,
+        currentNotificationsState,
+        getCurrentNotifications,
+        notificationsByNotificationIdState,
+        getNotificationByNotificationId,
+        getNotificationsByCreatorId,
+        postNewNotification,
+        postModifyNotification,
+        deleteNotification,
 
         fbReportState,
         setFbReportState,

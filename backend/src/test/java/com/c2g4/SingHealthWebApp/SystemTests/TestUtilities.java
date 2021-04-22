@@ -68,7 +68,7 @@ public class TestUtilities {
 	public boolean checkElementExists(By by, int duration) {
 		try {
 			WebDriverWait wait = new WebDriverWait(driver, duration);
-			wait.until(ExpectedConditions.elementToBeClickable(by));
+			//wait.until(ExpectedConditions.elementToBeClickable(by));
 		}catch (Exception e) {
 			e.printStackTrace();
 			return false;

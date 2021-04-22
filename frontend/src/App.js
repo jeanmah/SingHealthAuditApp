@@ -25,9 +25,11 @@ import ManagerHome from "./pages/ManagerHome";
 import Store from "./pages/Store";
 import EditAccount from "./pages/EditAccount";
 import EditPassword from "./pages/EditPassword";
+import AllChats from "./pages/AllChats";
 import Chat from "./pages/Chat";
 import TenantReport from "./pages/TenantReport";
 import AuditEmail from "./pages/AuditEmail";
+import Announcement from "./pages/Announcements";
 
 function App() {
   return (
@@ -90,7 +92,11 @@ function App() {
             component={TenantReport}
           />
           <AuthenticatedRoute exact path="/t/store" component={Store} />
-          <AuthenticatedRoute exact path="/chat" component={Chat} />
+
+          <AuthenticatedRoute exact path="/allChats" component={AllChats} />
+          <AuthenticatedRoute exact path="/chat/:chatId" component={Chat} />
+          <AuthenticatedRoute exact path="/announcements" component={Announcement} />
+
           <AuthenticatedRoute exact path="/error" component={Error} />
           <Redirect to="/" component={LoginComponent} />
         </Switch>

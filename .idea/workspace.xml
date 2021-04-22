@@ -4,16 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0dccf774-ae68-4882-a661-022e7b1f268c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_13_2.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_2_2.xml" afterDir="false" />
+    <list default="true" id="e2e73f56-009c-4d10-bd76-657bd4afbd72" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/NotificationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/NotificationsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Context.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Context.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ChatCards.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ChatCards.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/testJwt/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/testJwt/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/utils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/data.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/data.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AllChats.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AllChats.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ManagerHome.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ManagerHome.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -24,6 +36,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -31,6 +44,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.3678161" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
   </component>
   <component name="RunManager">
     <configuration name="SingHealthWebAppApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -55,7 +69,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="0dccf774-ae68-4882-a661-022e7b1f268c" name="Default Changelist" comment="" />
+      <changelist id="e2e73f56-009c-4d10-bd76-657bd4afbd72" name="Default Changelist" comment="" />
       <created>1616592338116</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
