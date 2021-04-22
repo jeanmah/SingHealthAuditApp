@@ -1,33 +1,11 @@
-<<<<<<< HEAD
-import React, { useEffect, useContext, useState } from "react";
-import { Link } from "react-router-dom";
-import { Typography, Button } from "@material-ui/core";
-import axios from "axios";
-=======
 import { FormGroup } from "@material-ui/core";
 import { Typography, Button, Grid, TextField, List, ListItem } from "@material-ui/core";
 import React, { useState, useEffect, useContext, useLocation } from "react";
 import { useParams } from "react-router-dom";
->>>>>>> a8b9d981ebbb5f4adcb4ece47154562ce623ac09
 
 import { Context } from '../Context';
 import Navbar from "../Navbar";
 import useStyles from "../styles";
-<<<<<<< HEAD
-import { FormGroup } from "@material-ui/core";
-import ChatCards from "../components/ChatCards";
-import ChatEntriesCards from "../components/ChatEntriesCard";
-
-function Chat() {
-  const {
-    setAllChatsOfUserState,
-    allChatsOfUserState,
-    getAllChatsOfUser,
-    setChatEntriesOfUserState,
-    chatEntriesOfUserState,
-    getChatEntriesOfUser,
-    postCreateNewChat,
-=======
 import { getDateString, getTimeString } from "../components/utils";
 
 function Chat() {
@@ -42,7 +20,6 @@ function Chat() {
     postChatEntry, 
     accountState, 
     chatSubmitState,
->>>>>>> a8b9d981ebbb5f4adcb4ece47154562ce623ac09
   } = useContext(Context);
   const styles = useStyles();
   const { acc_id } = accountState;
@@ -57,61 +34,6 @@ function Chat() {
   const numLastestChatEntries = "1";
 
   useEffect(() => {
-<<<<<<< HEAD
-    //getAllChatsOfUser();
-    async function getResponse() {
-      try {
-        await getAllChatsOfUser().then((response) => {
-          console.log("allChatsOfUser: " + response.data);
-          response.data.map((chat) => {
-            //console.log(chat);
-            let newChat = {};
-            newChat.chat_id = chat.chat_id;
-            newChat.tenant_id = chat.tenant_id;
-            newChat.auditor_id = chat.auditor_id;
-            if (chat.messages.messages) {
-              newChat.messages = [...chat.messages.messages];
-            } else {
-              newChat.messages = ["No message"];
-            }
-            chatsArray.push(newChat);
-            console.log(newChat);
-          });
-          console.log(chatsArray);
-          setAllChatsOfUserState(chatsArray);
-        });
-      } catch {
-        console.log("Failed to retrive allChatsOfUser");
-      }
-
-      try {
-        await getChatEntriesOfUser(parentChatId).then((response) => {
-          console.log("chatEntriesOfUser: " + response.data);
-          console.log(response.data[0]);
-          console.log(response.data[1]);
-          response.data.map((entry) => {
-            console.log(entry);
-            chatEntriesArray.push(entry);
-          });
-          console.log("chatEntriedArray: " + chatEntriesArray);
-          setChatEntriesOfUserState(chatEntriesArray);
-          console.log("chatEntriesState: " + chatEntriesOfUserState);
-        });
-      } catch {
-        console.log("Failed to retrive chatEntriesOfUser");
-      }
-    }
-    getResponse();
-  }, []);
-
-  console.log(allChatsOfUserState);
-  const tenant_id = "1005";
-  const auditor_id = "1003";
-
-  function handleClick() {
-    postCreateNewChat(auditor_id, tenant_id);
-  }
-=======
     async function getResponse() {
       try{
         await getChatEntriesOfUser(chatId).then((response) => {
@@ -182,35 +104,11 @@ function Chat() {
   function bodyChangeHandler(body_input) {
     setBodyState(body_input);
   };
->>>>>>> a8b9d981ebbb5f4adcb4ece47154562ce623ac09
 
   return (
     <main className={styles.main}>
       <Navbar />
       <br />
-<<<<<<< HEAD
-      <Typography variant="h3" align="center">
-        Chat
-      </Typography>
-      <Button
-        align="center"
-        variant="outlined"
-        color="primary"
-        className={styles.buttons}
-        fullWidth
-      >
-        New Chat
-      </Button>
-      <br />
-      <br />
-      <Typography align="center">All Chats of the User</Typography>
-      <ChatCards />
-      <br />
-      <br />
-    </main>
-  );
-}
-=======
       <Typography variant="h5" align='center'>Chat ID: {chatId}</Typography>
       <br />
       <ul className={styles.chat_entries_list}>
@@ -274,6 +172,5 @@ function Chat() {
     </main>
   )
 };
->>>>>>> a8b9d981ebbb5f4adcb4ece47154562ce623ac09
 
 export default Chat;

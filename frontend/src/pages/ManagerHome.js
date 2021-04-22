@@ -165,9 +165,6 @@ function ManagerHome() {
   return (
     <main className={styles.main}>
       <Navbar />
-<<<<<<< HEAD
-      <div>This is manager homepage</div>
-=======
       <div className={styles.body}>
         <TextField
           className={styles.search_bar} 
@@ -289,7 +286,6 @@ function ManagerHome() {
         
       </div>
       
->>>>>>> a8b9d981ebbb5f4adcb4ece47154562ce623ac09
     </main>
   );
 }
