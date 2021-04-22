@@ -520,8 +520,8 @@ public class ReportController {
 
 
 		ArrayNode imageArray = objectMapper.createArrayNode();
-		if (lastReportEntry.getImages() != null) {
-			for(String image : lastReportEntry.getImages()){
+		if (foundReportEntry.getImages() != null) {
+			for(String image : foundReportEntry.getImages()){
 				imageArray.add(image);
 			}
 		}

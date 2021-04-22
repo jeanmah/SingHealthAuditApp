@@ -223,10 +223,10 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date));
+            Date receiptDate= new Date (new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(end_date));
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
@@ -246,6 +246,9 @@ public class NotificationsController {
         } catch (ParseException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Dates are not formatted correctly please use dd/mm/yy");
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("AN ERROR HAS OCCURRED");
         }
     }
 
@@ -285,10 +288,10 @@ public class NotificationsController {
             String title = notificationContentJson.get("title").asText();
             String message = notificationContentJson.get("message").asText();
             String receipt_date = notificationContentJson.get("receipt_date").asText();
-            Date receiptDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date));
+            Date receiptDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(receipt_date).getTime());
 
             String end_date = notificationContentJson.get("end_date").asText();
-            Date endDate= (Date)(new SimpleDateFormat("dd/MM/yyyy").parse(end_date));
+            Date endDate= new Date(new SimpleDateFormat("dd/MM/yyyy").parse(end_date).getTime());
             if(endDate.before(receiptDate)) return ResponseEntity.badRequest().body("end date is before start date");
 
             int to_role_ids = notificationContentJson.get("to_role_ids").asInt();
@@ -310,6 +313,9 @@ public class NotificationsController {
         } catch (ParseException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Dates are not formatted correctly please use dd/mm/yy");
+        } catch (NullPointerException e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("AN ERROR OCCURRED");
         }
 
 

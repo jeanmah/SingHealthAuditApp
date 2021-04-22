@@ -366,6 +366,24 @@ public class AccountController {
         return ResponseEntity.ok().body(null);
     }
 
+    @DeleteMapping("/account/deleteTenantAccount")
+    public ResponseEntity<?> deleteTenantAccount(@AuthenticationPrincipal UserDetails callerUser, @RequestParam int tenant_id){
+        AccountModel callerAccount = convertUserDetailsToAccount(callerUser);
+        if (callerAccount==null) return ResponseEntity.badRequest().body("user account not found");
+        if(callerAccount.getRole_id()!=ResourceString.MANAGER_ROLE_KEY){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not a manager");
+        }
+        if(!tenantRepo.existsById(tenant_id) || !accountRepo.existsById(tenant_id)){
+            return ResponseEntity.badRequest().body("Tenant does not exist in the database");
+        }
+        tenantRepo.deleteById(tenant_id);
+        accountRepo.deleteById(tenant_id);
+        if(tenantRepo.existsById(tenant_id) || accountRepo.existsById(tenant_id)){
+            return ResponseEntity.badRequest().body("Tenant could not be deleted from the database");
+        }
+        return ResponseEntity.ok("Tenant has been deleted from the database. This action cannot be undone");
+    }
+
     /**
      * checks if someone has access to get the info of other users
      * @param callerAccount the UserDetails of the caller taken from the Authentication Principal.
