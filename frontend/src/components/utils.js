@@ -31,3 +31,27 @@ export function getTimeString() {
   var seconds = addZero(today.getSeconds());
   return hours + ":" + minutes + ":" + seconds;
 };
+
+// Raw String => Valid String
+export function toValidFormat(raw_time_string) {
+  // YYYY-MM-DD
+  if (raw_time_string[4] === "-") {
+    var string_array = raw_time_string.split("-");
+    var year = string_array[0];
+    var month = string_array[1];
+    var day = string_array[2];
+  } 
+  // DD/MM/YYYY
+  else if (raw_time_string[2] === "/") {
+    var string_array = raw_time_string.split("/");
+    var year = string_array[2];
+    var month = string_array[1];
+    var day = string_array[0];
+  }
+  return day + "/" + month + "/" + year;
+}
+
+// Date object => Valid String
+export function dateToValidString(dateObject) {
+  
+}

@@ -5,19 +5,104 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2e73f56-009c-4d10-bd76-657bd4afbd72" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_15.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_io_commons_io_2_5.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_annotation_jsr250_api_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_enterprise_cdi_api_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_inject_javax_inject_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_java_dev_jna_jna_5_5_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_java_dev_jna_jna_platform_5_5_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_compress_1_20.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_httpcomponents_httpclient_4_5_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_httpcomponents_httpcore_4_4_14.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_aether_provider_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_artifact_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_core_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_model_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_model_builder_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_plugin_api_3_6_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_repository_metadata_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_settings_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_maven_settings_builder_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_shared_maven_common_artifact_filters_3_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_maven_shared_maven_shared_utils_3_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_attoparser_attoparser_2_0_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_plexus_plexus_classworlds_2_6_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_plexus_plexus_component_annotations_1_5_5.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_plexus_plexus_interpolation_1_14.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_plexus_plexus_utils_3_2_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_sisu_org_eclipse_sisu_inject_0_3_4.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_sisu_org_eclipse_sisu_plexus_0_3_4.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_aether_aether_api_1_7.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_aether_aether_impl_1_7.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_aether_aether_spi_1_7.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_aether_aether_util_1_7.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_plexus_plexus_build_api_0_0_7.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_plexus_plexus_cipher_1_4.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_plexus_plexus_sec_dispatcher_1_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_sisu_sisu_guice_noaop_2_1_7.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_sisu_sisu_inject_bean_1_4_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_sonatype_sisu_sisu_inject_plexus_1_4_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_buildpack_platform_2_4_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_loader_tools_2_4_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_maven_plugin_2_4_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_thymeleaf_2_4_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_thymeleaf_extras_thymeleaf_extras_java8time_3_0_4_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_thymeleaf_thymeleaf_3_0_12_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_thymeleaf_thymeleaf_spring5_3_0_12_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_unbescape_unbescape_1_1_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/OverDueAuditEntries.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/public/.DS_Store~a8b9d981ebbb5f4adcb4ece47154562ce623ac09" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/public/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/AuditReportCard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ChatEntriesCard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TenantReportCard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/images/864ab95b9e5da4465e15551eddbacd95.jpeg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/AuditEmail.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/NonFbChecklist.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/TenantReport.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Controllers/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Controllers/AccountController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Controllers/ReportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Controllers/ReportController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Models/AuditModelBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Models/AuditModelBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Report/CustomReportEntryDeserializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Report/CustomReportEntryDeserializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/AccountRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/AccountRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/BranchRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/BranchRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/CompletedAuditRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/CompletedAuditRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/OpenAuditRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Admin/Repositories/OpenAuditRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/JWT/JWTAuthenticationRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/JWT/JWTAuthenticationRestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/EmailServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/EmailServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/NotificationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/NotificationsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/OverDueEmailTemplate.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/OverDueEmailTemplate.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/OverDueRectificationEmailTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/OverDueRectificationEmailTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/ScheduledDueDateChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/ScheduledDueDateChecker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/c2g4/SingHealthWebApp/Notifications/SingHealth_Logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/SingHealth_Logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/AccountControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/AccountControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/ChatControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/ChatControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/HTTPRequestHelperTestFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/HTTPRequestHelperTestFunctions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/NotificationControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ControllersTest/NotificationControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ModelsTests/AuditModelBuilderTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/c2g4/SingHealthWebApp/ModelsTests/AuditModelBuilderTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/AuthenticationService.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/AuthenticationService.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/Context.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Context.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Navbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Navbar.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/ChatCards.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ChatCards.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/testJwt/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/testJwt/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/HomeAuditorTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/HomeAuditorTabs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/NotificationRow.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/NotificationRow.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Question.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Question.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/TenantHomeTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/TenantHomeTabs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/utils.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/data.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/data.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AllChats.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AllChats.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AuditReport.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AuditReport.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/Chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FbChecklist.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FbChecklist.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/ManagerHome.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ManagerHome.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Store.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Tenant.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Tenant.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

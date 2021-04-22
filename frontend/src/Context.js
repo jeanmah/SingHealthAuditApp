@@ -105,7 +105,7 @@ export const ContextProvider = (props) => {
         console.log(error.response); // check if its null
         let error_msg = error.response.data;
         console.log(error_msg); // use the response.data to redirect to the existed chat
-        let existing_chat_id = error_msg[error_msg.length - 1];
+        let existing_chat_id = error_msg.split(":")[1];
         history.push(`/chat/${existing_chat_id}`);
       });
   });
@@ -147,11 +147,12 @@ export const ContextProvider = (props) => {
   const getAllAvailableNotifications = (role_id) => {
     console.log("Getting allAvailableNotifications...");
     AuthenticationService.getStoredAxiosInterceptor();
-    return axios.get(`${API_URL}/notifications/getAllAvailableNotifications`, {
-      params: {
-        role_id: role_id,
-      },
-    });
+    return axios
+      .get(`${API_URL}/notifications/getAllAvailableNotifications`, {
+        params: {
+          role_id: role_id,
+        },
+      });
   };
 
   const getCurrentNotifications = (role_id) => {
@@ -162,14 +163,6 @@ export const ContextProvider = (props) => {
         params: {
           role_id: role_id,
         },
-      })
-      .then((response) => {
-        console.log("Current notifications: " + response.data);
-        setCurrentNotificationsState(response.data);
-        console.log("Notifications state: " + currentNotificationsState);
-      })
-      .catch(() => {
-        console.log("Failed to retrive currentNotifications");
       });
   };
 
@@ -181,27 +174,18 @@ export const ContextProvider = (props) => {
         params: {
           notification_id: notification_id,
         },
-      })
-      .then((response) => {
-        console.log("NotificationsByNotificationId: " + response.data);
-        setNotificationsByNotificationIdState(response.data);
-        console.log(
-          "Notifications state: " + notificationsByNotificationIdState
-        );
-      })
-      .catch(() => {
-        console.log("Failed to retrive notificationsByNotificationId");
       });
   };
 
   const getNotificationsByCreatorId = (creator_id) => {
     console.log("Getting notificationsByCreatorId...");
     AuthenticationService.getStoredAxiosInterceptor();
-    return axios.get(`${API_URL}/notifications/getNotificationsByCreatorId`, {
-      params: {
-        creator_id: creator_id,
-      },
-    });
+    return axios
+      .get(`${API_URL}/notifications/getNotificationsByCreatorId`, {
+        params: {
+          creator_id: creator_id,
+        },
+      });
   };
 
   // Function to post a new notification (only available to managers)
@@ -601,80 +585,6 @@ export const ContextProvider = (props) => {
     setNonFbReportState(array);
   }, []);
 
-  //function to update audits state
-  // const updateAudit = (
-  //   tenantid,
-  //   type,
-  //   tenantname,
-  //   // timeremaining,
-  //   status
-  //   // date
-  // ) => {
-  //   const tenantObject = tenantsState.find(
-  //     (tenant) => tenant.tenantid === tenantid
-  //   );
-  //   const tenantFbChecklist = tenantObject.fbChecklist;
-  //   let score = tenantFbChecklist.reduce((total, question) => {
-  //     if (question.checked === true) {
-  //       total += 1;
-  //     }
-  //     return total;
-  //   }, 0);
-
-  //   setAuditsState((prevAudits) => {
-  //     return [
-  //       ...prevAudits,
-  //       {
-  //         tenantid: tenantid,
-  //         type: type,
-  //         tenantname: tenantname,
-  //         // timeremaining: timeremaining,
-  //         status: status,
-  //         // date: date,
-  //         institution: tenantObject.institution,
-  //         score: score,
-  //       },
-  //     ];
-  //   });
-  // };
-
-  //function to reset tenant's fb checklist checked values
-  // const resetTenantFbChecklist = (tenantId) => {
-  //   const tenantObject = tenantsState.find(
-  //     (tenant) => tenant.tenantid === tenantId
-  //   );
-  //   //fbchecklist property for a tenant
-  //   const tenantFbChecklist = tenantObject.fbChecklist;
-  //   //reset each checked to false
-  //   tenantFbChecklist.forEach((question) => {
-  //     question.checked = false;
-  //   });
-  //   // //get tenants array without tenantObject
-  //   // const remainingTenants = tenantsState.filter((tenant) => {
-  //   //   return tenant.tenantid !== tenantId;
-  //   // });
-  //   // //update state with newTenantObject
-  //   // setTenantsState([...remainingTenants, tenantObject]);
-  // };
-
-  //functions to update tenant comment property
-  // const updateTenantComment = (tenantId, questionId) => {
-  //   //find object with specific tenantId
-  //   const tenantObject = tenantsState.find((tenant) => {
-  //     return tenant.tenantid === tenantId;
-  //   });
-  //   //fbchecklist property for a tenant
-  //   const tenantFbChecklist = tenantObject.fbChecklist;
-  //   //find question within the array of questions
-  //   const checklistQuestion = tenantFbChecklist.find((question) => {
-  //     return question.id === questionId;
-  //   });
-  //   //update checked property
-  //   checklistQuestion.comment = comment;
-  //   console.log(tenantId, questionId);
-  //   console.log(tenantObject);
-  //   console.log(tenantsState);
-  // };
 
   return (
     <Context.Provider
