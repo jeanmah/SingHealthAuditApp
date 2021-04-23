@@ -4,10 +4,8 @@ import {
   Button,
   Grid,
   TextField,
-  List,
-  ListItem,
 } from "@material-ui/core";
-import React, { useState, useEffect, useContext, useLocation } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 
 import { Context } from "../Context";
@@ -16,7 +14,7 @@ import useStyles from "../styles";
 import { getDateString, getTimeString } from "../components/utils";
 
 function Chat() {
-  const { chatId } = useParams(); // typeof chatId: String
+  const { chatId, storeName, accId } = useParams(); // typeof chatId: String
   const [chatEntriesState, setChatEntriesState] = useState([]);
   const [subjectState, setSubjectState] = useState("");
   const [bodyState, setBodyState] = useState("");
@@ -29,16 +27,7 @@ function Chat() {
     chatSubmitState,
   } = useContext(Context);
   const styles = useStyles();
-  const { acc_id } = accountState;
-
-  const [allChatsState, setAllChatsState] = useState([]);
-
-  const chatsArray = [];
-  const chatEntriesArray = [];
-  const chatsEntriesDict = {};
-
-  const parentChatId = "2";
-  const numLastestChatEntries = "1";
+  const { acc_id, role_id } = accountState;
 
   useEffect(() => {
     async function getResponse() {
@@ -48,16 +37,7 @@ function Chat() {
           setChatEntriesState(response.data.reverse());
           //console.log("state: " + chatEntriesState);
           allChatsOfUserState.map((chat, index) => {
-            //console.log(chat.chat_id);
-            //console.log(typeof chat.chat_id);
-            // if (chat.chat_id === parseInt(chatId)) {
-            //   currentChat = chat;
-            //   console.log("yes!")
-            // }
           });
-          //console.log(currentChat.chat_id);
-          //console.log(chatId);
-          //console.log(typeof chatId);
         });
       } catch {
         console.log("Failed to retrive allChatsOfUser");
@@ -66,21 +46,6 @@ function Chat() {
     getResponse();
   }, [chatSubmitState]);
 
-  //console.log(currentChat.chat_id);
-
-  // const ChatHeader = () => {
-  //   let friend_id = 0;
-  //   if (auditor_id === acc_id) {
-  //     friend_id = tenant_id;
-  //   } else if (tenant_id === acc_id) {
-  //     friend_id = auditor_id;
-  //   } else {
-  //     friend_id = null;
-  //   }
-  //   return (
-  //     <div>Chat with {friend_id}</div>
-  //   )
-  // }
 
   // Check if the message is sent by the user, or received by the user
   function isMine(sender_id) {
@@ -116,9 +81,17 @@ function Chat() {
     <main className={styles.main}>
       <Navbar />
       <br />
-      <Typography variant="h5" align="center">
-        Chat ID: {chatId}
-      </Typography>
+      {(role_id === "Auditor") ? 
+        <div>
+          <Typography variant="h5" align="center">{storeName}</Typography>
+          <Typography variant="body2" align="center">ID: {accId}</Typography>
+        </div>
+        : 
+        <div>
+          <Typography variant="h5" align="center">Chat ID: {chatId}</Typography>
+        </div>
+      }
+      
       <br />
       <ul className={styles.chat_entries_list}>
         {chatEntriesState.map((entry, index) => {

@@ -226,7 +226,6 @@ public class AuditModelBuilder {
 
 	public AuditModelBuilder setReport_type(String report_type) {
 
-
 		this.report_type = report_type;
 		return this;
 	}

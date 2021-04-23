@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
+<<<<<<< HEAD
 import {
   Button,
   IconButton,
@@ -21,6 +22,11 @@ import {
 import SearchIcon from "@material-ui/icons/Search";
 // import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
 // import DateFnsUtils from "@date-io/date-fns";
+=======
+import { Button, IconButton, TextField, FormControl, InputLabel, Select, Typography, Grid } from "@material-ui/core";
+import { InputAdornment, DialogActions, DialogContent, DialogTitle, Dialog, DialogContentText } from "@material-ui/core";
+import SearchIcon from '@material-ui/icons/Search';
+>>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
 
 import Navbar from "../Navbar";
 import useStyles from "../styles";
@@ -40,15 +46,18 @@ function ManagerHome() {
     getNotificationsByCreatorId,
   } = useContext(Context);
 
+<<<<<<< HEAD
   const [
     displayedNotificationsState,
     setDisplayedNotificationsState,
   ] = useState([]);
   const [notificationRangeState, setNotificationRangeState] = useState("all");
 
+=======
+  const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
+  const [rangeState, setRangeState] = useState("all");
+>>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
   const [searchBarInputState, setSearchBarInputState] = useState("");
-  const [searchIdState, setSearchIdState] = useState("");
-  const [searchManagerState, setSearchManagerState] = useState("");
 
   // States for inputs
   const [titleState, setTitleState] = useState("");
@@ -103,6 +112,14 @@ function ManagerHome() {
     setSuccessDialogState(false);
   }
 
+  function resetStates() {
+    setTitleState("");
+    setMessageState("");
+    setReceiptDateState("");
+    setEndDateState("");
+    setReceiversState(7);
+  }
+
   function submitNewAccouncement() {
     console.log("Submitting new announcement...");
     postNewNotification(
@@ -113,6 +130,7 @@ function ManagerHome() {
       receiversState
     );
     openSuccessDialog();
+    resetStates();
   }
 
   function handleSearchBarChange(search_input) {
@@ -123,15 +141,18 @@ function ManagerHome() {
     console.log("Submitting search bar input: " + searchBarInputState);
     console.log(typeof searchBarInputState);
     if (searchBarInputState < 1000 && searchBarInputState > 0) {
-      setNotificationRangeState("by_notification_id");
+      setRangeState("by_notification_id");
       console.log("Setting range to By Institution ID");
     } else if (searchBarInputState >= 1000) {
-      setNotificationRangeState("by_manager_id");
+      setRangeState("by_manager_id");
       console.log("Setting range to By Manager ID");
     } else {
-      setNotificationRangeState("all");
+      setRangeState("all");
       console.log("Setting range to All");
     }
+
+    console.log("Searchbar input: " + searchBarInputState);
+    console.log("Current range: " + rangeState);
   }
 
   function handleNewAnnouncementClick() {
@@ -149,6 +170,7 @@ function ManagerHome() {
   }
 
   useEffect(() => {
+<<<<<<< HEAD
     if (notificationRangeState === "by_notification_id") {
       console.log("Search ID State: " + searchBarInputState);
       getNotificationByNotificationId(searchBarInputState)
@@ -174,9 +196,21 @@ function ManagerHome() {
         console.log("Failed to retrive allAvailableNotifications");
       }
     }
+=======
+    
+    async function getResponse() {
+        try{
+          await getAllAvailableNotifications().then((response) => {
+            console.log("All available notifications: " + response.data);
+            setDisplayedNotificationsState(response.data);
+          })
+        } catch {
+          console.log("Failed to retrive allAvailableNotifications");
+        }
+    };
+>>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
     getResponse();
-    //getCurrentNotifications();
-    //getNotificationByNotificationId();
+
   }, [chatSubmitState]);
 
   return (
@@ -205,7 +239,22 @@ function ManagerHome() {
         </div>
         <div className={styles.announcement_list}>
           {displayedNotificationsState.map((notification, index) => {
+<<<<<<< HEAD
             return <NotificationRow notification={notification} key={index} />;
+=======
+            // return (
+            //   <NotificationRow notification={notification} key={index}/>
+            // )
+            if (rangeState === "all") {
+              return <NotificationRow notification={notification} key={index}/>
+            } else if (rangeState === "by_notification_id" && notification.notification_id === searchBarInputState) {
+              return <NotificationRow notification={notification} key={index}/>
+            } else if (rangeState === "by_manager_id" && notification.creator_id === searchBarInputState) {
+              return <NotificationRow notification={notification} key={index}/>
+            } else {
+              return null;
+            }
+>>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
           })}
         </div>
         <div className={styles.post_new_accouncement_div}>

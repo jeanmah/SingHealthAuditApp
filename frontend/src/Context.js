@@ -104,9 +104,13 @@ export const ContextProvider = (props) => {
         console.log("Failed new chat creation");
         console.log(error.response); // check if its null
         let error_msg = error.response.data;
-        console.log(error_msg); // use the response.data to redirect to the existed chat
-        let existing_chat_id = error_msg.split(":")[1];
-        history.push(`/chat/${existing_chat_id}`);
+        if (error_msg != null) {
+          console.log(error);
+          console.log(typeof error_msg);
+          console.log("error msg: " + error_msg); // use the response.data to redirect to the existed chat
+          let existing_chat_id = error_msg.split(":")[1];
+          history.push(`/chat/${existing_chat_id}`);
+        }
       });
   });
 

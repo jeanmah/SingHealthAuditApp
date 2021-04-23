@@ -19,6 +19,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -112,7 +113,8 @@ public class NotificationsController {
      */
     private List<NotificationsModel> addRelevantNotifications(List<NotificationsModel> unCheckedNotifications, String role_id){
         List<NotificationsModel> notificationsModels = new ArrayList<>();
-
+        System.out.println("UNCHECKED");
+        System.out.println(Arrays.toString(unCheckedNotifications.toArray()));
         for(NotificationsModel notificationsModel: unCheckedNotifications) {
             switch (role_id) {
                 case ResourceString.TENANT_ROLE_KEY:

@@ -17,10 +17,10 @@ public interface NotificationsRepo extends CrudRepository<NotificationsModel, In
     @Query("SELECT * FROM Notifications WHERE creator_id = :creator_id")
     List<NotificationsModel> getNotificationsByCreatorId(@Param("creator_id") int creator_id);
 
-    @Query("SELECT * FROM Notifications WHERE receipt_date <= curdate()")
+    @Query("SELECT * FROM Notifications WHERE receipt_date <= (DATE(NOW()) + INTERVAL 1 day)")
     List<NotificationsModel> getAllAvailableNotifications();
 
-    @Query("SELECT * FROM Notifications WHERE receipt_date <= curdate() AND end_date >= curdate()")
+    @Query("SELECT * FROM Notifications WHERE receipt_date <= (DATE(NOW()) + INTERVAL 1 day) AND end_date >= curdate()")
     List<NotificationsModel> getCurrentNotifications();
 
     @Modifying

@@ -5,7 +5,8 @@ import AuthenticationService from "./AuthenticationService";
 import { auditorNavLinks, tenantNavLinks, managerNavLinks } from "./data";
 import auditor from "./auditor.png";
 import { Context } from "./Context";
-import { Typography } from "@material-ui/core";
+import { Typography, Button } from "@material-ui/core";
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import useStyles from "./styles";
 
 function Navbar() {
@@ -83,6 +84,9 @@ function Navbar() {
             >
               Logout
             </Link>
+            {(role_id === "Manager") ? null : 
+              <Link to="/announcements"><Button><NotificationsIcon className={styles.NotificationsIcon}/></Button></Link>
+            }
           </ul>
         </div>
       </div>
