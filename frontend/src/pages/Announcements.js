@@ -8,6 +8,7 @@ import Navbar from "../Navbar";
 import useStyles from "../styles";
 import { Context } from "../Context"
 import NotificationRow from "../components/NotificationRow";
+import LimitedNotificationRow from "../components/LimitedNotificationRow";
 
 
 const Announcement = () => {
@@ -18,54 +19,51 @@ const Announcement = () => {
     allAvailableNotificationsState,
     getAllAvailableNotifications,
     currentNotificationsState,
-    getCurrentNotifications,
-    notificationsByNotificationIdState,
     getNotificationByNotificationId,
     chatSubmitState,
   } = useContext(Context);
 
   const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
-  const [notificationRangeState, setNotificationRangeState] = useState("current");
+  const [rangeState, setRangeState] = useState("all");
   const [searchBarInputState, setSearchBarInputState] = useState("");
 
   const { role_id } = accountState;
 
   function handleSearchBarChange(search_input) {
-    setSearchBarInputState(search_input);
+    setSearchBarInputState(parseInt(search_input)); // String => Integer
   }
 
-  function handleClick() {
-    //setDisplayedNotificationsState(allAvailableNotificationsState);
-    console.log("Search Button Clicked!");
-    console.log(searchBarInputState);
-    console.log("REAL notificationsState: " + allAvailableNotificationsState);
+  function handleSearchButtonClick() {
+    console.log("Submitting search bar input: " + searchBarInputState);
+    console.log(typeof searchBarInputState);
+    if (searchBarInputState < 1000 && searchBarInputState > 0) {
+      setRangeState("by_notification_id");
+      console.log("Setting range to By Institution ID");
+    } else if (searchBarInputState >= 1000) {
+      setRangeState("by_manager_id");
+      console.log("Setting range to By Manager ID");
+    } else {
+      setRangeState("all");
+      console.log("Setting range to All");
+    }
+    console.log("Searchbar input: " + searchBarInputState);
+    console.log("Current range: " + rangeState);
   }
 
   useEffect(() => {
-    async function getResponse(role_id) {
+
+    async function getResponse() {
         try{
           await getAllAvailableNotifications().then((response) => {
             console.log("All available notifications: " + response.data);
             setDisplayedNotificationsState(response.data);
-            console.log("Notifications state: " + displayedNotificationsState);
           })
         } catch {
           console.log("Failed to retrive allAvailableNotifications");
         }
-
-        // try{
-        //   await getCurrentNotifications().then((response) => {
-        //     console.log("Current notifications: " + response.data);
-        //     setNotificationsState(response.data);
-        //     console.log("Notifications state: " + notificationsState);
-        //   })
-        // } catch {
-        //   console.log("Failed to retrive currentNotifications");
-        // }
     };
     getResponse();
-    //getCurrentNotifications();
-    //getNotificationByNotificationId();
+
   }, [chatSubmitState]);
 
 
@@ -77,7 +75,7 @@ const Announcement = () => {
           className={styles.search_bar} 
           label="Search Notification ID/Creator ID" 
           variant="outlined" 
-          InputProps={{endAdornment: (<InputAdornment><IconButton onClick={handleClick}><SearchIcon/></IconButton></InputAdornment>)}}
+          InputProps={{endAdornment: (<InputAdornment><IconButton onClick={handleSearchButtonClick}><SearchIcon/></IconButton></InputAdornment>)}}
           onChange={(e) => handleSearchBarChange(e.target.value)}
         />
         <div className={styles.annoucement_title_div}>
@@ -85,25 +83,15 @@ const Announcement = () => {
         </div>
         <div className={styles.announcement_list}>
           {displayedNotificationsState.map((notification, index) => {
-            return (
-              <React.Fragment key={index}>
-                <div className={styles.announcement_bubble}>
-                  <Grid item xs={12} sm container>
-                    <Grid item xs container direction="column" spacing={2}>
-                      <Grid item xs>
-                        <Typography variant="subtitle2" color="textSecondary">{notification.title}</Typography>
-                        <Typography variant="body1">{notification.message}</Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid item>
-                      <Typography variant="body2" color="textSecondary">Announcement ID: {notification.notification_id}</Typography>
-                      <Typography variant="body2" color="textSecondary">Posted by {notification.creator_id} on {notification.receipt_date}</Typography>
-                      <Typography variant="body2" color="textSecondary">Valid period: {notification.receipt_date} to {notification.end_date}</Typography>
-                    </Grid>
-                  </Grid>
-                </div>
-              </React.Fragment>
-            )
+            if (rangeState === "all") {
+              return <LimitedNotificationRow notification={notification} key={index}/>
+            } else if (rangeState === "by_notification_id" && notification.notification_id === searchBarInputState) {
+              return <LimitedNotificationRow notification={notification} key={index}/>
+            } else if (rangeState === "by_manager_id" && notification.creator_id === searchBarInputState) {
+              return <LimitedNotificationRow notification={notification} key={index}/>
+            } else {
+              return null;
+            }
           })}
         </div>
       </div>    

@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, rgbToHex } from "@material-ui/core/styles";
 import singhealthBackground from "./images/singhealth_building.png";
 
 const useStyles = makeStyles((theme) => ({
@@ -142,21 +142,18 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
   },
   annoucement_title_div: {
-    position: "absolute",
-    bottom: "71%",
     width: "100%",
   },
   annoucement_title: {
     marginLeft: "4%",
+    marginTop: "2%",
   },
   contactlist_title: {
     marginLeft: "3%",
   },
   announcement_list: {
-    backgroundColor: "lightblue",
-    position: "absolute",
-    bottom: "10%",
-    height: "60%",
+    backgroundColor: "white",
+    height: "68%",
     overflow: "scroll",
     width: "100%"
   },
@@ -177,6 +174,7 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     left: "2%",
     top: "2%",
+    marginTop: "2%",
   },
   post_new_accouncement_div: {
     position: "absolute",
@@ -207,6 +205,9 @@ const useStyles = makeStyles((theme) => ({
   },
   dialog_date_picker: {
     width: "94%",
+  },
+  NotificationsIcon: {
+    color: "orange",
   },
 }));
 

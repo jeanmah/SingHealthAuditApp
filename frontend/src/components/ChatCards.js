@@ -45,7 +45,7 @@ const ChatCards = (props) => {
       <Button className={styles.chat_bubble}>
         <Typography variant="subtitle1">{targetUserState.store_name}</Typography>
         <Typography variant="body2" color="textSecondary">{target_role} ID: {target_id}</Typography>
-        <Typography variant="body2" color="textSecondary">Username: {targetUserState.username}</Typography>
+        <Typography variant="body2" color="textSecondary">{targetUserState.username}</Typography>
         <Typography variant="body2" color="textSecondary">Chat ID: {props.chat.chat_id}</Typography>        
       </Button>
     </NavLink>

@@ -66,21 +66,16 @@ export const auditorNavLinks = [
   },
   {
     id: 2,
-    url: "/announcements",
-    text: "Announcement",
-  },
-  {
-    id: 3,
     url: "/allChats",
     text: "Chat",
   },
   {
-    id: 4,
+    id: 3,
     url: "/institutions",
     text: "Institutions",
   },
   {
-    id: 5,
+    id: 4,
     url: "/account",
     text: "Account",
   },
@@ -99,21 +94,11 @@ export const tenantNavLinks = [
   },
   {
     id: 2,
-    url: "/announcements",
-    text: "Announcement",
-  },
-  {
-    id: 3,
     url: "/allChats",
     text: "Chat",
   },
   {
-    id: 4,
-    url: "/store",
-    text: "Store",
-  },
-  {
-    id: 5,
+    id: 3,
     url: "/account",
     text: "Account",
   },

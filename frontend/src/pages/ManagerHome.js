@@ -25,7 +25,6 @@ function ManagerHome() {
 
   const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
   const [rangeState, setRangeState] = useState("all");
-
   const [searchBarInputState, setSearchBarInputState] = useState("");
 
   // States for inputs
@@ -63,10 +62,19 @@ function ManagerHome() {
   function openSuccessDialog() {setSuccessDialogState(true);}
   function closeSuccessDialog() {setSuccessDialogState(false);}
 
+  function resetStates() {
+    setTitleState("");
+    setMessageState("");
+    setReceiptDateState("");
+    setEndDateState("");
+    setReceiversState(7);
+  }
+
   function submitNewAccouncement() {
     console.log("Submitting new announcement...");
     postNewNotification(titleState, messageState, receiptDateState, endDateState, receiversState);
     openSuccessDialog();
+    resetStates();
   }
 
   function handleSearchBarChange(search_input) {
@@ -111,7 +119,7 @@ function ManagerHome() {
         try{
           await getAllAvailableNotifications().then((response) => {
             console.log("All available notifications: " + response.data);
-              setDisplayedNotificationsState(response.data);
+            setDisplayedNotificationsState(response.data);
           })
         } catch {
           console.log("Failed to retrive allAvailableNotifications");

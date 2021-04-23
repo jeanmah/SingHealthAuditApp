@@ -5,14 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2e73f56-009c-4d10-bd76-657bd4afbd72" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SingHealthAuditApp.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/libs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/selenium_java_3_141.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Context.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Context.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/ChatCards.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ChatCards.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AllChats.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AllChats.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Chat.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ManagerHome.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ManagerHome.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +32,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/backend/external jars/selenium-java-3.141.59/libs" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.3678161" />
     <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
