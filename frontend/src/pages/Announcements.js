@@ -37,18 +37,11 @@ const Announcement = () => {
     chatSubmitState,
   } = useContext(Context);
 
-<<<<<<< HEAD
   const [
     displayedNotificationsState,
     setDisplayedNotificationsState,
   ] = useState([]);
-  const [notificationRangeState, setNotificationRangeState] = useState(
-    "current"
-  );
-=======
-  const [displayedNotificationsState, setDisplayedNotificationsState] = useState([]);
   const [rangeState, setRangeState] = useState("all");
->>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
   const [searchBarInputState, setSearchBarInputState] = useState("");
 
   const { role_id } = accountState;
@@ -75,44 +68,17 @@ const Announcement = () => {
   }
 
   useEffect(() => {
-<<<<<<< HEAD
-    async function getResponse(role_id) {
+    async function getResponse() {
       try {
         await getAllAvailableNotifications().then((response) => {
-          console.log(response);
           console.log("All available notifications: " + response.data);
           setDisplayedNotificationsState(response.data);
-          console.log("Notifications state: " + displayedNotificationsState);
         });
       } catch {
         console.log("Failed to retrive allAvailableNotifications");
       }
-
-      // try{
-      //   await getCurrentNotifications().then((response) => {
-      //     console.log("Current notifications: " + response.data);
-      //     setNotificationsState(response.data);
-      //     console.log("Notifications state: " + notificationsState);
-      //   })
-      // } catch {
-      //   console.log("Failed to retrive currentNotifications");
-      // }
     }
-=======
-
-    async function getResponse() {
-        try{
-          await getAllAvailableNotifications().then((response) => {
-            console.log("All available notifications: " + response.data);
-            setDisplayedNotificationsState(response.data);
-          })
-        } catch {
-          console.log("Failed to retrive allAvailableNotifications");
-        }
-    };
->>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
     getResponse();
-
   }, [chatSubmitState]);
 
   return (
@@ -120,25 +86,18 @@ const Announcement = () => {
       <Navbar />
       <div className={styles.body}>
         <TextField
-<<<<<<< HEAD
           className={styles.search_bar}
           label="Search Notification ID/Creator ID"
           variant="outlined"
           InputProps={{
             endAdornment: (
               <InputAdornment>
-                <IconButton onClick={handleClick}>
+                <IconButton onClick={handleSearchButtonClick}>
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
             ),
           }}
-=======
-          className={styles.search_bar} 
-          label="Search Notification ID/Creator ID" 
-          variant="outlined" 
-          InputProps={{endAdornment: (<InputAdornment><IconButton onClick={handleSearchButtonClick}><SearchIcon/></IconButton></InputAdornment>)}}
->>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
           onChange={(e) => handleSearchBarChange(e.target.value)}
         />
         <div className={styles.annoucement_title_div}>
@@ -148,49 +107,36 @@ const Announcement = () => {
         </div>
         <div className={styles.announcement_list}>
           {displayedNotificationsState.map((notification, index) => {
-<<<<<<< HEAD
-            return (
-              <React.Fragment key={index}>
-                <div className={styles.announcement_bubble}>
-                  <Grid item xs={12} sm container>
-                    <Grid item xs container direction="column" spacing={2}>
-                      <Grid item xs>
-                        <Typography variant="subtitle2" color="textSecondary">
-                          {notification.title}
-                        </Typography>
-                        <Typography variant="body1">
-                          {notification.message}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid item>
-                      <Typography variant="body2" color="textSecondary">
-                        Announcement ID: {notification.notification_id}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Posted by {notification.creator_id} on{" "}
-                        {notification.receipt_date}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Valid period: {notification.receipt_date} to{" "}
-                        {notification.end_date}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </div>
-              </React.Fragment>
-            );
-=======
             if (rangeState === "all") {
-              return <LimitedNotificationRow notification={notification} key={index}/>
-            } else if (rangeState === "by_notification_id" && notification.notification_id === searchBarInputState) {
-              return <LimitedNotificationRow notification={notification} key={index}/>
-            } else if (rangeState === "by_manager_id" && notification.creator_id === searchBarInputState) {
-              return <LimitedNotificationRow notification={notification} key={index}/>
+              return (
+                <LimitedNotificationRow
+                  notification={notification}
+                  key={index}
+                />
+              );
+            } else if (
+              rangeState === "by_notification_id" &&
+              notification.notification_id === searchBarInputState
+            ) {
+              return (
+                <LimitedNotificationRow
+                  notification={notification}
+                  key={index}
+                />
+              );
+            } else if (
+              rangeState === "by_manager_id" &&
+              notification.creator_id === searchBarInputState
+            ) {
+              return (
+                <LimitedNotificationRow
+                  notification={notification}
+                  key={index}
+                />
+              );
             } else {
               return null;
             }
->>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
           })}
         </div>
       </div>

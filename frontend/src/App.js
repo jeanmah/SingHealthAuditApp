@@ -101,22 +101,22 @@ function App() {
           <AuthenticatedRoute exact path="/store" component={Store} />
 
           <AuthenticatedRoute exact path="/allChats" component={AllChats} />
-<<<<<<< HEAD
-          <AuthenticatedRoute exact path="/chat/:chatId" component={Chat} />
-          <AuthenticatedRoute
-            exact
-            path="/announcements"
-            component={Announcement}
-          />
+
           <AuthenticatedRoute
             exact
             path="/fullreport/:reportId"
             component={StoreReport}
           />
-=======
-          <AuthenticatedRoute exact path="/chat/:chatId/:storeName/:accId" component={Chat} />
-          <AuthenticatedRoute exact path="/announcements" component={Announcement} />
->>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
+          <AuthenticatedRoute
+            exact
+            path="/chat/:chatId/:storeName/:accId"
+            component={Chat}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/announcements"
+            component={Announcement}
+          />
 
           <AuthenticatedRoute exact path="/error" component={Error} />
           <Redirect to="/" component={LoginComponent} />

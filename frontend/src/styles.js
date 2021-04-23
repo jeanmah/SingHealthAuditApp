@@ -73,7 +73,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 0, 2),
   },
   chat_bubble: {
-<<<<<<< HEAD
     border: "0.5px solid black",
     borderRadius: "10px",
     margin: "5px",
@@ -81,19 +80,8 @@ const useStyles = makeStyles((theme) => ({
     display: "inline-block",
     marginLeft: "2%",
     width: "96%",
-    height: "20%",
+    height: "25%",
     backgroundColor: "white",
-=======
-    border: '0.5px solid black',
-    borderRadius: '10px',
-    margin: '5px',
-    padding: '10px',
-    display: 'inline-block',
-    marginLeft: '2%',
-    width: '96%',
-    height: '25%',
-    backgroundColor: 'white',
->>>>>>> f83e239ca5bec302184503e8dd2087fb24ec9544
   },
   bubbleContainer: {
     width: "100%",
