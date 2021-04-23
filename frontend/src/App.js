@@ -14,6 +14,7 @@ import Institutions from "./pages/Institutions";
 import Institution from "./pages/Institution";
 import FbChecklist from "./pages/FbChecklist";
 import NonFbChecklist from "./pages/NonFbChecklist";
+import SMAChecklist from "./pages/SMAChecklist";
 import AuthenticatedRoute from "./components/testJwt/AuthenticatedRoute";
 import LoginComponent from "./components/testJwt/Login";
 import HomeAuditor from "./pages/HomeAuditor";
@@ -30,6 +31,7 @@ import Chat from "./pages/Chat";
 import TenantReport from "./pages/TenantReport";
 import AuditEmail from "./pages/AuditEmail";
 import Announcement from "./pages/Announcements";
+import StoreReport from "./pages/StoreReport";
 
 function App() {
   return (
@@ -78,6 +80,11 @@ function App() {
           />
           <AuthenticatedRoute
             exact
+            path="/tenant/smaChecklist/:tenantId"
+            component={SMAChecklist}
+          />
+          <AuthenticatedRoute
+            exact
             path="/tenant/report/:reportId"
             component={AuditReport}
           />
@@ -99,6 +106,11 @@ function App() {
             exact
             path="/announcements"
             component={Announcement}
+          />
+          <AuthenticatedRoute
+            exact
+            path="/fullreport/:reportId"
+            component={StoreReport}
           />
 
           <AuthenticatedRoute exact path="/error" component={Error} />

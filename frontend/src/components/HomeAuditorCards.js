@@ -150,7 +150,7 @@ export default function HomeAuditorCards() {
                           color="primary"
                           className={classes.button}
                         >
-                          View Report
+                          resolve
                         </Button>
                       </Link>
                     )}
@@ -160,7 +160,16 @@ export default function HomeAuditorCards() {
                         color="primary"
                         className={classes.button}
                       >
-                        Send Email
+                        email
+                      </Button>
+                    </Link>
+                    <Link to={`/fullreport/${report_id}`}>
+                      <Button
+                        size="medium"
+                        color="primary"
+                        className={classes.button}
+                      >
+                        report
                       </Button>
                     </Link>
                   </CardActions>

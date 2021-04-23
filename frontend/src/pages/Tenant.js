@@ -24,6 +24,7 @@ import ReceiptIcon from "@material-ui/icons/Receipt";
 import EmailIcon from "@material-ui/icons/Email";
 import Button from "@material-ui/core/Button";
 import ReportProblemIcon from "@material-ui/icons/ReportProblem";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -162,12 +163,12 @@ function Tenant() {
               aria-labelledby="nested-list-subheader"
               className={classes.list}
             >
-              <ListItem button divider={true} className={classes.listItem}>
+              {/* <ListItem button divider={true} className={classes.listItem}>
                 <ListItemIcon>
                   <QuestionAnswerIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="View Chats" />
-              </ListItem>
+              </ListItem> */}
               <ListItem
                 button
                 onClick={handlePrevAuditsClick}
@@ -205,6 +206,22 @@ function Tenant() {
                                 secondary={`Score: ${overall_score} `}
                               />
                             )}
+                            {report_type === "NFB" && (
+                              <ListItemText
+                                primary={`Non-F&B Checklist conducted on ${new Date(
+                                  open_date
+                                ).toString()}`}
+                                secondary={`Score: ${overall_score} `}
+                              />
+                            )}
+                            {report_type === "SMA" && (
+                              <ListItemText
+                                primary={`Safety Management Checklist conducted on ${new Date(
+                                  open_date
+                                ).toString()}`}
+                                secondary={`Score: ${overall_score} `}
+                              />
+                            )}
                             {overall_status === 1 && (
                               // <ListItemText className={classes.titleResolved}>
                               <Typography
@@ -227,7 +244,7 @@ function Tenant() {
                                   className={classes.button}
                                   startIcon={<ReportProblemIcon />}
                                 >
-                                  view non-compliance
+                                  resolve
                                 </Button>
                               </Link>
                             )}
@@ -239,7 +256,18 @@ function Tenant() {
                                 className={classes.button}
                                 startIcon={<EmailIcon />}
                               >
-                                send Email
+                                Email
+                              </Button>
+                            </Link>
+                            <Link to={`/fullreport/${report_id}`}>
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                                className={classes.button}
+                                startIcon={<CheckCircleIcon />}
+                              >
+                                report
                               </Button>
                             </Link>
                           </div>
@@ -258,7 +286,7 @@ function Tenant() {
                 <ListItemIcon>
                   <AssignmentTurnedInIcon color="primary" />
                 </ListItemIcon>
-                <ListItemText primary="Select Checklist" />
+                <ListItemText primary="Start Audit" />
                 {openChecklist ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
 
@@ -280,12 +308,14 @@ function Tenant() {
                       <ListItemText primary="Conduct Non-F&B Audit" />
                     </ListItem>
                   </Link>
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <LocalHospitalIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct Safe Managment Audit" />
-                  </ListItem>
+                  <Link to={`/tenant/smaChecklist/${tenantId}`}>
+                    <ListItem button className={classes.nested}>
+                      <ListItemIcon>
+                        <LocalHospitalIcon color="secondary" />
+                      </ListItemIcon>
+                      <ListItemText primary="Conduct Safe Managment Audit" />
+                    </ListItem>
+                  </Link>
                 </List>
               </Collapse>
             </List>

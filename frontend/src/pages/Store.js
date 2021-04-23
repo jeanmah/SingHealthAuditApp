@@ -21,6 +21,10 @@ import StoreIcon from "@material-ui/icons/Store";
 import LocalHospitalIcon from "@material-ui/icons/LocalHospital";
 import Grid from "@material-ui/core/Grid";
 import ReceiptIcon from "@material-ui/icons/Receipt";
+import EmailIcon from "@material-ui/icons/Email";
+import Button from "@material-ui/core/Button";
+import ReportProblemIcon from "@material-ui/icons/ReportProblem";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,10 +39,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     // margin: theme.spacing(4, 0, 10, 0),
   },
-  titleResolved: {
-    // padding: theme.spacing(0, 2, 0, 2),
-    color: "#F15A22",
-  },
+
   nested: {
     // display: "flex",
     paddingLeft: theme.spacing(4),
@@ -49,6 +50,15 @@ const useStyles = makeStyles((theme) => ({
   },
   listItem: {
     padding: theme.spacing(2, 2, 2, 2),
+  },
+  previousAuditsButtons: {
+    display: "flex",
+    padding: theme.spacing(0, 2, 3, 2),
+    justifyContent: "center",
+    // justifyContent: "space-evenly",
+  },
+  button: {
+    margin: theme.spacing(1, 2, 1, 2),
   },
   resolvedLabel: {
     color: "#F15A22",
@@ -131,12 +141,12 @@ function Store() {
               aria-labelledby="nested-list-subheader"
               className={classes.list}
             >
-              <ListItem button divider={true} className={classes.listItem}>
+              {/* <ListItem button divider={true} className={classes.listItem}>
                 <ListItemIcon>
                   <QuestionAnswerIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="View Chats" />
-              </ListItem>
+              </ListItem> */}
               <ListItem
                 button
                 onClick={handlePrevAuditsClick}
@@ -159,8 +169,8 @@ function Store() {
                     overall_status,
                   } = audit;
                   return (
-                    <Link to={`/t/report/${report_id}`}>
-                      <List component="div" disablePadding>
+                    <List component="div" disablePadding>
+                      <Box boxShadow={1}>
                         <ListItem button className={classes.nested}>
                           <ListItemIcon>
                             <ReceiptIcon color="secondary" />
@@ -168,6 +178,22 @@ function Store() {
                           {report_type === "FB" && (
                             <ListItemText
                               primary={`F&B Checklist conducted on ${new Date(
+                                open_date
+                              ).toString()}`}
+                              secondary={`Score: ${overall_score} `}
+                            />
+                          )}
+                          {report_type === "SMA" && (
+                            <ListItemText
+                              primary={`Safety Management Checklist conducted on ${new Date(
+                                open_date
+                              ).toString()}`}
+                              secondary={`Score: ${overall_score} `}
+                            />
+                          )}
+                          {report_type === "NFB" && (
+                            <ListItemText
+                              primary={`Non-F&B Checklist conducted on ${new Date(
                                 open_date
                               ).toString()}`}
                               secondary={`Score: ${overall_score} `}
@@ -184,47 +210,37 @@ function Store() {
                             // </ListItemText>
                           )}
                         </ListItem>
-                      </List>
-                    </Link>
+                        <div className={classes.previousAuditsButtons}>
+                          {overall_status !== 1 && (
+                            <Link to={`/t/report/${report_id}`}>
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                                className={classes.button}
+                                startIcon={<ReportProblemIcon />}
+                              >
+                                Rectify
+                              </Button>
+                            </Link>
+                          )}
+                          <Link to={`/fullreport/${report_id}`}>
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              size="small"
+                              className={classes.button}
+                              startIcon={<CheckCircleIcon />}
+                            >
+                              View Report
+                            </Button>
+                          </Link>
+                        </div>
+                      </Box>
+                    </List>
                   );
                 })}
               </Collapse>
-              {/* <ListItem
-                button
-                onClick={handleChecklistClick}
-                divider={true}
-                className={classes.listItem}
-              >
-                <ListItemIcon>
-                  <AssignmentTurnedInIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="Select Checklist" />
-                {openChecklist ? <ExpandLess /> : <ExpandMore />}
-              </ListItem>
-
-              <Collapse in={openChecklist} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <FastfoodIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct F&B Audit" />
-                  </ListItem>
-
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <StoreIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct Non-F&B Audit" />
-                  </ListItem>
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <LocalHospitalIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct Safe Managment Audit" />
-                  </ListItem>
-                </List>
-              </Collapse> */}
             </List>
           </div>
         </>

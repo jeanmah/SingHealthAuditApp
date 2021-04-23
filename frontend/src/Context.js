@@ -147,45 +147,44 @@ export const ContextProvider = (props) => {
   const getAllAvailableNotifications = (role_id) => {
     console.log("Getting allAvailableNotifications...");
     AuthenticationService.getStoredAxiosInterceptor();
-    return axios
-      .get(`${API_URL}/notifications/getAllAvailableNotifications`, {
-        params: {
-          role_id: role_id,
-        },
-      });
+    return axios.get(`${API_URL}/notifications/getAllAvailableNotifications`, {
+      params: {
+        role_id: role_id,
+      },
+    });
   };
 
   const getCurrentNotifications = (role_id) => {
     console.log("Getting currentNotifications...");
     AuthenticationService.getStoredAxiosInterceptor();
-    return axios
-      .get(`${API_URL}/notifications/getCurrentNotifications`, {
-        params: {
-          role_id: role_id,
-        },
-      });
+    return axios.get(`${API_URL}/notifications/getCurrentNotifications`, {
+      params: {
+        role_id: role_id,
+      },
+    });
   };
 
   const getNotificationByNotificationId = (notification_id) => {
     console.log("Getting notificationByNotificationId...");
     AuthenticationService.getStoredAxiosInterceptor();
-    return axios
-      .get(`${API_URL}/notifications/getNotificationByNotificationId`, {
+    return axios.get(
+      `${API_URL}/notifications/getNotificationByNotificationId`,
+      {
         params: {
           notification_id: notification_id,
         },
-      });
+      }
+    );
   };
 
   const getNotificationsByCreatorId = (creator_id) => {
     console.log("Getting notificationsByCreatorId...");
     AuthenticationService.getStoredAxiosInterceptor();
-    return axios
-      .get(`${API_URL}/notifications/getNotificationsByCreatorId`, {
-        params: {
-          creator_id: creator_id,
-        },
-      });
+    return axios.get(`${API_URL}/notifications/getNotificationsByCreatorId`, {
+      params: {
+        creator_id: creator_id,
+      },
+    });
   };
 
   // Function to post a new notification (only available to managers)
@@ -301,7 +300,7 @@ export const ContextProvider = (props) => {
     AuthenticationService.getStoredAxiosInterceptor();
 
     return axios.get(`${API_URL}/report/getAllQuestions`, {
-      params: { type: "NFB" },
+      params: { type: "SMA" },
     });
   };
 
@@ -334,7 +333,7 @@ export const ContextProvider = (props) => {
       });
   });
 
-  //function to submit FbChecklist report to compute the score
+  //function to submit nfbChecklist report to compute the score
   const submitNonFbReport = useCallback((tenantid, nfbreport) => {
     console.log(nfbreport);
     let FormData = require("form-data");
@@ -359,7 +358,36 @@ export const ContextProvider = (props) => {
         // }
       })
       .catch(() => {
-        console.log("Failed FB report submission");
+        console.log("Failed NFB report submission");
+      });
+  });
+
+  //function to submit smaChecklist report to compute the score
+  const submitSMAReport = useCallback((tenantid, smareport) => {
+    console.log(smareport);
+    let FormData = require("form-data");
+    let formdata = new FormData();
+    formdata.append("checklist", JSON.stringify(smareport));
+    return axios
+      .post(
+        `${API_URL}/report/postReportSubmission?type=SMA&tenant_id=${tenantid}&remarks=`,
+        formdata,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formdata._boundary}`,
+          },
+          // params: { type: "FB", tenant_id: t_id, remarks: "" },
+          // data: formdata,
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        // if (response.status === 200) {
+        //   return <Redirect to={`/tenant/${tenantid}`} />;
+        // }
+      })
+      .catch(() => {
+        console.log("Failed SMA report submission");
       });
   });
 
@@ -512,6 +540,8 @@ export const ContextProvider = (props) => {
   const [fbReportState, setFbReportState] = useState([]);
   //state for nfb report
   const [nfbReportState, setNonFbReportState] = useState();
+  //state for sma report
+  const [smaReportState, setSMAReportState] = useState();
   //state to keep track of audit
   const [auditsState, setAuditsState] = useState();
   //state to keep track of all tenants
@@ -580,11 +610,26 @@ export const ContextProvider = (props) => {
         remarks: "",
         images: "",
       });
-    });
-    //set fbreportstate to array
+    }); //set fbreportstate to array
     setNonFbReportState(array);
   }, []);
 
+  const createSMAReportState = useCallback((checklist, response) => {
+    console.log(checklist);
+    //create temporary array
+    let array = [];
+    checklist.forEach((question) => {
+      const { sma_qn_id } = question;
+      array.push({
+        qn_id: sma_qn_id,
+        status: true,
+        severity: 0,
+        remarks: "",
+        images: "",
+      });
+    }); //set fbreportstate to array
+    setSMAReportState(array);
+  }, []);
 
   return (
     <Context.Provider
@@ -658,11 +703,14 @@ export const ContextProvider = (props) => {
         getReportEntry,
         submitReportUpdate,
         getTenantRectification,
-        getChatEntriesOfUser,
-        postCreateNewChat,
+
         getOriginalReport,
         resolvedState,
         setResolvedState,
+        smaReportState,
+        setSMAReportState,
+        createSMAReportState,
+        submitSMAReport,
       }}
     >
       {props.children}

@@ -858,4 +858,8 @@ export const tenantImages = [
     name: "Mr Bean",
     imageUrl: "../images/mr_bean.jpeg",
   },
+  {
+    name: "Mothercare",
+    imageUrl: "../images/mothercare.jpeg",
+  },
 ];
