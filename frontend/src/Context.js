@@ -546,6 +546,8 @@ export const ContextProvider = (props) => {
   const [nfbReportState, setNonFbReportState] = useState();
   //state for sma report
   const [smaReportState, setSMAReportState] = useState();
+  //state of tenant type
+  const [tenantType, setTenantType] = useState();
   //state to keep track of audit
   const [auditsState, setAuditsState] = useState();
   //state to keep track of all tenants
@@ -655,7 +657,6 @@ export const ContextProvider = (props) => {
         nfbReportState,
         setNonFbReportState,
         submitNonFbReport,
-
         getSMAChecklistQuestions,
 
         accountState,
@@ -715,6 +716,8 @@ export const ContextProvider = (props) => {
         setSMAReportState,
         createSMAReportState,
         submitSMAReport,
+        tenantType,
+        setTenantType,
       }}
     >
       {props.children}

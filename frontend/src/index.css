@@ -199,6 +199,7 @@ nav {
   }
   .links {
     display: flex;
+    align-items: center;
   }
   .links a {
     padding: 0;

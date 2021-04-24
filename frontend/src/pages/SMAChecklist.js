@@ -61,6 +61,8 @@ function SMAChecklist() {
     getUserInfo,
     smaReportState,
     submitSMAReport,
+    tenantType,
+    setTenantType,
   } = useContext(Context);
 
   //state to update nfb checklist questions
@@ -72,6 +74,7 @@ function SMAChecklist() {
     async function getTenantName() {
       try {
         const tenant_name = await getUserInfo(tenantId).then((response) => {
+          setTenantType("SMA");
           return response.data.store_name;
         });
         console.log(tenant_name);
@@ -98,7 +101,7 @@ function SMAChecklist() {
 
   return (
     <>
-      {smaChecklistState && tenantName ? (
+      {smaChecklistState && tenantName && tenantType ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -118,6 +121,7 @@ function SMAChecklist() {
                       fb_qn_id={sma_qn_id}
                       requirement={requirement}
                       labelId={labelId}
+                      type={tenantType}
                     />
                   </>
                 );

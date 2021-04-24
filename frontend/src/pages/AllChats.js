@@ -1,6 +1,20 @@
 import React, { useEffect, useContext, useState } from "react";
-import { Typography, TextField, Button, FormGroup, FormControl, InputLabel, Select} from "@material-ui/core";
-import { DialogActions, DialogContent, DialogTitle, Dialog, DialogContentText } from "@material-ui/core";
+import {
+  Typography,
+  TextField,
+  Button,
+  FormGroup,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@material-ui/core";
+import {
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Dialog,
+  DialogContentText,
+} from "@material-ui/core";
 
 import { Context } from "../Context";
 import Navbar from "../Navbar";
@@ -8,7 +22,6 @@ import useStyles from "../styles";
 import ChatCards from "../components/ChatCards";
 
 function Chat() {
-
   const {
     setAllChatsOfUserState,
     allChatsOfUserState,
@@ -32,11 +45,15 @@ function Chat() {
   const styles = useStyles();
   const chatsArray = [];
 
-  function openDialog() {setDialogState(true);}
-  function closeDialog() {setDialogState(false);}
+  function openDialog() {
+    setDialogState(true);
+  }
+  function closeDialog() {
+    setDialogState(false);
+  }
 
   function isAuditor() {
-    return role_id === "Auditor"
+    return role_id === "Auditor";
   }
 
   function handleNewTargetChange(target_user_string) {
@@ -61,7 +78,6 @@ function Chat() {
   }
 
   useEffect(() => {
-
     getAllTenants()
       .then((response) => {
         setAllTenantsState(response.data);
@@ -72,7 +88,7 @@ function Chat() {
       });
 
     async function getResponse() {
-      try{
+      try {
         await getAllChatsOfUser().then((response) => {
           console.log("allChatsOfUser: " + response.data);
           setAllChatsOfUserState(response.data);
@@ -89,7 +105,7 @@ function Chat() {
     console.log("auditor id: " + auditorIdState);
     console.log("tenant id: " + tenantIdState);
     // If no tenant is selected
-    if (auditorIdState.length===0 || tenantIdState.length===0) {
+    if (auditorIdState.length === 0 || tenantIdState.length === 0) {
       openDialog();
     } else {
       postCreateNewChat(auditorIdState, tenantIdState);
@@ -100,42 +116,55 @@ function Chat() {
     <main className={styles.main}>
       <Navbar />
 
-      {(isAuditor()) ? 
-      <div className={styles.chat_edit}>
-        <Typography variant="subtitle1" className={styles.contactlist_title}>Select a tenant</Typography>
-        <FormControl variant="outlined" className={styles.chats_dialog_selector}>
-          <Select native value={newTargetState} onChange={(e) => handleNewTargetChange(e.target.value)}>
-            {allTenantsState.map((tenant, index) => (
-                <option key={index} value={`${tenant.store_name}-${tenant.acc_id}`} id={tenant.acc_id}>
-                  {tenant.store_name} {tenant.acc_id}
+      {isAuditor() ? (
+        <div className={styles.chat_edit}>
+          <Typography variant="subtitle1" className={styles.contactlist_title}>
+            Select a tenant
+          </Typography>
+          <FormControl
+            variant="outlined"
+            className={styles.chats_dialog_selector}
+          >
+            <Select
+              native
+              value={newTargetState}
+              onChange={(e) => handleNewTargetChange(e.target.value)}
+            >
+              {allTenantsState.map((tenant, index) => (
+                <option
+                  key={index}
+                  value={`${tenant.store_name}-${tenant.acc_id}`}
+                  id={tenant.acc_id}
+                >
+                  {tenant.branch_id} {tenant.store_name} {tenant.acc_id}
                 </option>
-              ))
-            }
-          </Select>
-        </FormControl>
-        
-        <Button 
-          align="center"
-          variant="outlined"
-          color="secondary"
-          className={styles.big_buttons}
-          onClick={() => handleCreateNewChatClick()}
-        >
-          Create Chat
-        </Button>
-      </div> : null}
+              ))}
+            </Select>
+          </FormControl>
+
+          <Button
+            align="center"
+            variant="outlined"
+            color="secondary"
+            className={styles.big_buttons}
+            onClick={() => handleCreateNewChatClick()}
+          >
+            Create Chat
+          </Button>
+        </div>
+      ) : null}
 
       <br />
       <div className={styles.chat_list}>
         {allChatsOfUserState.map((chat, index) => {
           return (
             <React.Fragment key={index}>
-              <ChatCards chat={chat}/>
+              <ChatCards chat={chat} />
             </React.Fragment>
           );
         })}
       </div>
-      
+
       <Dialog
         className={styles.post_new_announcement_dialog}
         open={dialogState}
@@ -143,17 +172,22 @@ function Chat() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Failed to create new chat"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"Failed to create new chat"}
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">Please enter a valid user ID</DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            Please enter a valid user ID
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDialog} color="primary">Ok</Button>
+          <Button onClick={closeDialog} color="primary">
+            Ok
+          </Button>
         </DialogActions>
       </Dialog>
-
     </main>
-  )
+  );
 }
 
 export default Chat;

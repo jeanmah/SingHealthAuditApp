@@ -59,6 +59,8 @@ function FbChecklist() {
     getUserInfo,
     fbReportState,
     submitFbReport,
+    tenantType,
+    setTenantType,
   } = useContext(Context);
 
   //state to update fb checklist questions
@@ -70,6 +72,8 @@ function FbChecklist() {
     async function getTenantName() {
       try {
         const tenant_name = await getUserInfo(tenantId).then((response) => {
+          console.log(response);
+          setTenantType(response.data.type_id);
           return response.data.store_name;
         });
         console.log(tenant_name);
@@ -96,7 +100,7 @@ function FbChecklist() {
 
   return (
     <>
-      {fbChecklistState && tenantName ? (
+      {fbChecklistState && tenantName && tenantType ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -115,6 +119,7 @@ function FbChecklist() {
                       fb_qn_id={fb_qn_id}
                       requirement={requirement}
                       labelId={labelId}
+                      type={tenantType}
                     />
                   </>
                 );

@@ -16,6 +16,7 @@ import Container from "@material-ui/core/Container";
 import { Context } from "../Context";
 import { tenantImages } from "../data";
 import zIndex from "@material-ui/core/styles/zIndex";
+import defaultShop from "../images/defaultshop.jpeg";
 
 // function Copyright() {
 //   return (
@@ -96,10 +97,11 @@ export default function HomeAuditorCards() {
               report_type,
               report_id,
             } = audit;
+
             let imageObject = tenantImages.find(
               (image) => image.name === store_name
             );
-
+            console.log(imageObject);
             return (
               <Grid item key={index} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
@@ -109,9 +111,9 @@ export default function HomeAuditorCards() {
                     className={classes.cardMedia}
                     // image={`${imageObject.imageUrl}`}
                     image={
-                      imageObject.imageUrl
+                      imageObject !== undefined
                         ? `${imageObject.imageUrl}`
-                        : `url(https://source.unsplash.com/random)`
+                        : `${defaultShop}`
                     }
                     title="Image title"
                   />

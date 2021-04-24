@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
     display: "inline-block",
     marginLeft: "2%",
     width: "96%",
-    height: "25%",
+    height: "30%",
     backgroundColor: "white",
   },
   bubbleContainer: {
@@ -207,6 +207,7 @@ const useStyles = makeStyles((theme) => ({
   },
   NotificationsIcon: {
     color: "orange",
+    // height: 20,
   },
 }));
 

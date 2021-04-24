@@ -99,6 +99,11 @@ export const tenantNavLinks = [
   },
   {
     id: 3,
+    url: "/store",
+    text: "Store",
+  },
+  {
+    id: 4,
     url: "/account",
     text: "Account",
   },

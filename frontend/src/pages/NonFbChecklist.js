@@ -61,6 +61,8 @@ function NonFbChecklist() {
     getUserInfo,
     nfbReportState,
     submitNonFbReport,
+    tenantType,
+    setTenantType,
   } = useContext(Context);
 
   //state to update nfb checklist questions
@@ -72,6 +74,7 @@ function NonFbChecklist() {
     async function getTenantName() {
       try {
         const tenant_name = await getUserInfo(tenantId).then((response) => {
+          setTenantType(response.data.type_id);
           return response.data.store_name;
         });
         console.log(tenant_name);
@@ -97,7 +100,7 @@ function NonFbChecklist() {
 
   return (
     <>
-      {nfbChecklistState && tenantName ? (
+      {nfbChecklistState && tenantName && tenantType ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -116,6 +119,7 @@ function NonFbChecklist() {
                       fb_qn_id={nfb_qn_id}
                       requirement={requirement}
                       labelId={labelId}
+                      type={tenantType}
                     />
                   </>
                 );

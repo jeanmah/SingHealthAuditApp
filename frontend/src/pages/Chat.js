@@ -1,10 +1,5 @@
 import { FormGroup } from "@material-ui/core";
-import {
-  Typography,
-  Button,
-  Grid,
-  TextField,
-} from "@material-ui/core";
+import { Typography, Button, Grid, TextField } from "@material-ui/core";
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 
@@ -14,7 +9,7 @@ import useStyles from "../styles";
 import { getDateString, getTimeString } from "../components/utils";
 
 function Chat() {
-  const { chatId, storeName, accId } = useParams(); // typeof chatId: String
+  const { chatId } = useParams(); // typeof chatId: String
   const [chatEntriesState, setChatEntriesState] = useState([]);
   const [subjectState, setSubjectState] = useState("");
   const [bodyState, setBodyState] = useState("");
@@ -36,8 +31,7 @@ function Chat() {
           console.log("Chat: allChatsOfUser: " + response.data);
           setChatEntriesState(response.data.reverse());
           //console.log("state: " + chatEntriesState);
-          allChatsOfUserState.map((chat, index) => {
-          });
+          allChatsOfUserState.map((chat, index) => {});
         });
       } catch {
         console.log("Failed to retrive allChatsOfUser");
@@ -45,7 +39,6 @@ function Chat() {
     }
     getResponse();
   }, [chatSubmitState]);
-
 
   // Check if the message is sent by the user, or received by the user
   function isMine(sender_id) {
@@ -81,17 +74,19 @@ function Chat() {
     <main className={styles.main}>
       <Navbar />
       <br />
-      {(role_id === "Auditor") ? 
+      {/* {(role_id === "Auditor") ? 
         <div>
           <Typography variant="h5" align="center">{storeName}</Typography>
           <Typography variant="body2" align="center">ID: {accId}</Typography>
         </div>
-        : 
-        <div>
-          <Typography variant="h5" align="center">Chat ID: {chatId}</Typography>
-        </div>
-      }
-      
+        :  */}
+      <div>
+        <Typography variant="h5" align="center">
+          Chat ID: {chatId}
+        </Typography>
+      </div>
+      {/* } */}
+
       <br />
       <ul className={styles.chat_entries_list}>
         {chatEntriesState.map((entry, index) => {

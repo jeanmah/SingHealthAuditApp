@@ -107,11 +107,7 @@ function App() {
             path="/fullreport/:reportId"
             component={StoreReport}
           />
-          <AuthenticatedRoute
-            exact
-            path="/chat/:chatId/:storeName/:accId"
-            component={Chat}
-          />
+          <AuthenticatedRoute exact path="/chat/:chatId" component={Chat} />
           <AuthenticatedRoute
             exact
             path="/announcements"

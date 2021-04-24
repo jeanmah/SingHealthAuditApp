@@ -104,10 +104,17 @@ IconContainer.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
-function Question({ fb_qn_id, requirement, labelId }) {
+function Question({ fb_qn_id, requirement, labelId, type }) {
   const classes = useStyles();
 
-  const { fbReportState, setFbReportState } = useContext(Context);
+  const {
+    fbReportState,
+    setFbReportState,
+    nfbReportState,
+    setNonFbReportState,
+    smaReportState,
+    setSMAReportState,
+  } = useContext(Context);
 
   //state to update number of checked boxes
   const [checked, setChecked] = useState([]);
@@ -132,15 +139,41 @@ function Question({ fb_qn_id, requirement, labelId }) {
     }
     // update the checked state
     setChecked(newChecked);
-    console.log(fbReportState);
-    //update fb report state
-    setFbReportState((prevState) => {
-      return prevState.map((question) =>
-        question.qn_id === question_id
-          ? { ...question, status: !question.status }
-          : question
-      );
-    });
+
+    //update report state depending on the type
+
+    switch (type) {
+      case "FB":
+        setFbReportState((prevState) => {
+          return prevState.map((question) =>
+            question.qn_id === question_id
+              ? { ...question, status: !question.status }
+              : question
+          );
+        });
+        break;
+      case "NFB":
+        setNonFbReportState((prevState) => {
+          return prevState.map((question) =>
+            question.qn_id === question_id
+              ? { ...question, status: !question.status }
+              : question
+          );
+        });
+        break;
+      case "SMA":
+        setSMAReportState((prevState) => {
+          return prevState.map((question) =>
+            question.qn_id === question_id
+              ? { ...question, status: !question.status }
+              : question
+          );
+        });
+        break;
+      default:
+        console.log("Invalid type of checklist");
+        break;
+    }
   };
   //function to update comment state
   const handleComment = (e) => {
@@ -207,20 +240,55 @@ function Question({ fb_qn_id, requirement, labelId }) {
         : (today.getMonth() + 1).toString()) +
       today.getFullYear().toString().slice(2, 4);
 
-    console.log(severityDate);
+    console.log(parseInt(severity + severityDate));
 
-    setFbReportState((prevState) => {
-      return prevState.map((question) =>
-        question.qn_id === fb_qn_id && severity !== "0"
-          ? {
-              ...question,
-              severity: parseInt(severity + severityDate),
-              remarks: comment,
-              images: [imageState],
-            }
-          : question
-      );
-    });
+    switch (type) {
+      case "FB":
+        setFbReportState((prevState) => {
+          return prevState.map((question) =>
+            question.qn_id === fb_qn_id && severity !== "0"
+              ? {
+                  ...question,
+                  severity: parseInt(severity + severityDate),
+                  remarks: comment,
+                  images: [imageState],
+                }
+              : question
+          );
+        });
+        break;
+      case "NFB":
+        setNonFbReportState((prevState) => {
+          return prevState.map((question) =>
+            question.qn_id === fb_qn_id && severity !== "0"
+              ? {
+                  ...question,
+                  severity: parseInt(severity + severityDate),
+                  remarks: comment,
+                  images: [imageState],
+                }
+              : question
+          );
+        });
+        break;
+      case "SMA":
+        setSMAReportState((prevState) => {
+          return prevState.map((question) =>
+            question.qn_id === fb_qn_id && severity !== "0"
+              ? {
+                  ...question,
+                  severity: parseInt(severity + severityDate),
+                  remarks: comment,
+                  images: [imageState],
+                }
+              : question
+          );
+        });
+        break;
+      default:
+        console.log("Invalid type of checklist");
+        break;
+    }
   };
 
   return (

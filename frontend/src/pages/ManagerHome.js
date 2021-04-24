@@ -158,7 +158,7 @@ function ManagerHome() {
   useEffect(() => {
     async function getResponse() {
       try {
-        await getAllAvailableNotifications().then((response) => {
+        await getNotificationsByCreatorId().then((response) => {
           console.log("All available notifications: " + response.data);
           setDisplayedNotificationsState(response.data);
         });
