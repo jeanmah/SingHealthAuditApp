@@ -290,13 +290,6 @@ export const ContextProvider = (props) => {
       params: { type: "FB" },
     });
   };
-<<<<<<< HEAD
-  /*
-  ---------------
-  FbReport
-  ---------------
-  */
-=======
 
   const getNonFbChecklistQuestions = () => {
     AuthenticationService.getStoredAxiosInterceptor();
@@ -314,7 +307,6 @@ export const ContextProvider = (props) => {
     });
   };
 
->>>>>>> mainMarcus
   //function to submit FbChecklist report to compute the score
   const submitFbReport = useCallback((tenantid, fbreport) => {
     console.log(fbreport);
@@ -475,11 +467,7 @@ export const ContextProvider = (props) => {
   /*
   --------------------- 
   Home Auditor & Tenant
-<<<<<<< HEAD
-  ---------------------
-=======
   ----------------------
->>>>>>> mainMarcus
   */
 
   //function to get all the audits done given auditor's username
@@ -719,10 +707,6 @@ export const ContextProvider = (props) => {
         getUserInfoNoParams,
         getAudits,
         getReport,
-<<<<<<< HEAD
-        filterAudits,
-        getAuditsTenant,
-=======
         getQuestionInfo,
         // getClosedTenantAudits,
         getTenantAudits,
@@ -740,7 +724,6 @@ export const ContextProvider = (props) => {
         submitSMAReport,
         tenantType,
         setTenantType,
->>>>>>> mainMarcus
       }}
     >
       {props.children}

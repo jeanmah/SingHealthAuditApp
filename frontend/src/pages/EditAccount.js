@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
-import { Typography, Button, TextField, FormGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
+import {
+  Typography,
+  Button,
+  TextField,
+  FormGroup,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@material-ui/core";
 import axios from "axios";
 
 import { Context } from "../Context";
@@ -49,7 +59,7 @@ function EditAccount() {
       firstnameState,
       lastnameState,
       emailState,
-      hpState,
+      hpState
     );
     openAlert();
   }
@@ -80,22 +90,14 @@ function EditAccount() {
     if (props.info == null) {
       return null;
     } else if (disabledInfo.includes(props.category)) {
-<<<<<<< HEAD
       return (
         <TextField
+          className={styles.big_textfield}
           label={props.category}
           defaultValue={props.info}
           disabled={true}
         />
       );
-=======
-      return <TextField
-        className={styles.big_textfield}
-        label={props.category} 
-        defaultValue={props.info} 
-        disabled={true}
-      />
->>>>>>> mainMarcus
     } else {
       console.log("You shouldn't use this function.");
     }
@@ -143,34 +145,31 @@ function EditAccount() {
         Edit Account
       </Typography>
       <FormGroup column="true">
-<<<<<<< HEAD
         <TextField
+          className={styles.big_textfield}
           label="Username"
           onChange={(e) => setUsernameState(e.target.value)}
         />
         <TextField
+          className={styles.big_textfield}
           label="First Name"
           onChange={(e) => setFirstnameState(e.target.value)}
         />
         <TextField
+          className={styles.big_textfield}
           label="Last Name"
           onChange={(e) => setLastnameState(e.target.value)}
         />
         <TextField
+          className={styles.big_textfield}
           label="Email"
           onChange={(e) => setEmailState(e.target.value)}
         />
         <TextField
+          className={styles.big_textfield}
           label="Contact Number"
           onChange={(e) => setHpState(e.target.value)}
         />
-=======
-        <TextField className={styles.big_textfield} label="Username" onChange={(e) => setUsernameState(e.target.value)} />
-        <TextField className={styles.big_textfield} label="First Name" onChange={(e) => setFirstnameState(e.target.value)} />
-        <TextField className={styles.big_textfield} label="Last Name" onChange={(e) => setLastnameState(e.target.value)} />
-        <TextField className={styles.big_textfield} label="Email" onChange={(e) => setEmailState(e.target.value)} />
-        <TextField className={styles.big_textfield} label="Contact Number" onChange={(e) => setHpState(e.target.value)} />
->>>>>>> mainMarcus
         <br />
         <EditAccountInfo category="Role" info={role_id} />
         <EditAccountInfo category="Account ID" info={acc_id} />
@@ -187,19 +186,7 @@ function EditAccount() {
         variant="outlined"
         color="primary"
         fullWidth
-<<<<<<< HEAD
-        onClick={() =>
-          postAccountChange(
-            usernameState,
-            firstnameState,
-            lastnameState,
-            emailState,
-            hpState
-          )
-        }
-=======
         onClick={submitAccountUpdate}
->>>>>>> mainMarcus
       >
         Submit
       </Button>
@@ -224,7 +211,6 @@ function EditAccount() {
           </Button>
         </DialogActions>
       </Dialog>
-
     </main>
   );
 }

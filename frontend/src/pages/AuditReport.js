@@ -1,48 +1,26 @@
-<<<<<<< HEAD
-import React, { useEffect, useState } from "react";
-=======
 import React, { useEffect, useState, useContext } from "react";
->>>>>>> mainMarcus
 import { useParams } from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import Navbar from "../Navbar";
 import { makeStyles } from "@material-ui/core/styles";
-<<<<<<< HEAD
-=======
 import { Context } from "../Context";
 import Loading from "./Loading";
 import AuditReportCard from "../components/AuditReportCard";
->>>>>>> mainMarcus
 
 const useStyles = makeStyles((theme) => ({
   header: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2, 0, 2, 0),
   },
-<<<<<<< HEAD
-=======
   root: {
     width: "100%",
     padding: theme.spacing(4, 0, 10, 0),
   },
->>>>>>> mainMarcus
 }));
 
 function AuditReport() {
   const { reportId } = useParams();
-<<<<<<< HEAD
-
-  const classes = useStyles();
-
-  useEffect(() => {}, []);
-  return (
-    <div>
-      <Navbar />
-      <Box className={classes.header} textAlign="center" boxShadow={1}>
-        <Typography variant="h5">Report</Typography>
-      </Box>
-=======
   const {
     getReportStats,
     getUserInfoNoParams,
@@ -179,7 +157,6 @@ function AuditReport() {
       ) : (
         <Loading />
       )}
->>>>>>> mainMarcus
     </div>
   );
 }

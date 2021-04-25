@@ -105,10 +105,6 @@ export const tenantNavLinks = [
   {
     id: 4,
     url: "/account",
-<<<<<<< HEAD
-    text: "My Account",
-  },
-=======
     text: "Account",
   },
   // {
@@ -116,7 +112,6 @@ export const tenantNavLinks = [
   //   url: "/",
   //   text: "Log Out",
   // },
->>>>>>> mainMarcus
 ];
 
 export const managerNavLinks = [
@@ -130,14 +125,11 @@ export const managerNavLinks = [
     url: "/account",
     text: "My Account",
   },
-<<<<<<< HEAD
-=======
   // {
   //   id: 3,
   //   url: "/",
   //   text: "Log Out",
   // },
->>>>>>> mainMarcus
 ];
 
 export const audits = [
@@ -856,11 +848,8 @@ export const tenantImages = [
     name: "Mr Bean",
     imageUrl: "../images/mr_bean.jpeg",
   },
-<<<<<<< HEAD
-=======
   {
     name: "Mothercare",
     imageUrl: "../images/mothercare.jpeg",
   },
->>>>>>> mainMarcus
 ];

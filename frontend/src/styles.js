@@ -1,22 +1,9 @@
-<<<<<<< HEAD
-import { makeStyles } from "@material-ui/core/styles";
-import singhealthBackground from "./images/singhealthBuilding.png";
-=======
 import { makeStyles, rgbToHex } from "@material-ui/core/styles";
 import singhealthBackground from "./images/singhealth_building.png";
->>>>>>> mainMarcus
 
 const useStyles = makeStyles((theme) => ({
   main: {
     backgroundColor: "white",
-<<<<<<< HEAD
-  },
-  container: {
-    backgroundColor: "lightblue",
-  },
-  buttons: {
-    marginTop: "10px",
-=======
     height: "100vh",
   },
   navbar: {
@@ -53,17 +40,11 @@ const useStyles = makeStyles((theme) => ({
     width: "96%",
     position: "absolute",
     bottom: 0,
->>>>>>> mainMarcus
   },
   root: {
     height: "100vh",
   },
-<<<<<<< HEAD
-  loginImage: {
-    // backgroundImage: "url(https://source.unsplash.com/random)",
-=======
   image: {
->>>>>>> mainMarcus
     backgroundImage: `url(${singhealthBackground})`,
     backgroundRepeat: "no-repeat",
     backgroundColor:
@@ -91,8 +72,6 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-<<<<<<< HEAD
-=======
   chat_bubble: {
     border: "0.5px solid black",
     borderRadius: "10px",
@@ -230,7 +209,6 @@ const useStyles = makeStyles((theme) => ({
     color: "orange",
     // height: 20,
   },
->>>>>>> mainMarcus
 }));
 
 export default useStyles;

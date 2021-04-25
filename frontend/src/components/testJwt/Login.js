@@ -13,11 +13,7 @@ import {
   Checkbox,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-<<<<<<< HEAD
-// import red from '@material-ui/core/colors/red';
-=======
 import singhealthBackground from "../../images/singhealth_building.png";
->>>>>>> mainMarcus
 
 import AuthenticationService from "../../AuthenticationService";
 import useStyles from "../../../src/styles";
@@ -145,6 +141,5 @@ function Login() {
     </Grid>
   );
 }
-
 
 export default Login;

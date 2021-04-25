@@ -21,13 +21,10 @@ import StoreIcon from "@material-ui/icons/Store";
 import LocalHospitalIcon from "@material-ui/icons/LocalHospital";
 import Grid from "@material-ui/core/Grid";
 import ReceiptIcon from "@material-ui/icons/Receipt";
-<<<<<<< HEAD
-=======
 import EmailIcon from "@material-ui/icons/Email";
 import Button from "@material-ui/core/Button";
 import ReportProblemIcon from "@material-ui/icons/ReportProblem";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
->>>>>>> mainMarcus
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,15 +71,6 @@ function Tenant() {
   // console.log(tenantId);
   //tenant state
   const [tenantState, setTenantState] = useState();
-<<<<<<< HEAD
-  //tenant audits state
-  const [tenantAuditsState, setTenantAuditsState] = useState();
-
-  const [openChecklist, setOpenChecklist] = useState(false);
-  const [openPrevAudits, setOpenPrevAudits] = useState(false);
-  //Context: getUserInfo method
-  const { getUserInfo, getAuditsTenant, getReport } = useContext(Context);
-=======
   const [tenantAudits, setTenantAudits] = useState();
   const [openChecklist, setOpenChecklist] = useState(false);
   const [openPrevAudits, setOpenPrevAudits] = useState(false);
@@ -90,7 +78,6 @@ function Tenant() {
   const { getUserInfo, getTenantAudits, getReport, getAudits } = useContext(
     Context
   );
->>>>>>> mainMarcus
 
   const classes = useStyles();
 
@@ -103,23 +90,6 @@ function Tenant() {
       .catch(() => {
         console.log("Failed to retrieve tenant info");
       });
-<<<<<<< HEAD
-    //get tenant past audits
-    async function getResponse() {
-      try {
-        const reportIdArray = await getAuditsTenant(tenantId).then(
-          (response) => {
-            // setTenantAuditsState([
-            //   ...response.data.CLOSED.past_audits,
-            //   response.data.LATEST,
-            // ]);
-            return [
-              ...response.data.CLOSED.past_audits,
-              response.data.LATEST.toString(),
-            ];
-          }
-        );
-=======
 
     // console.log(tenantId);
     const username = sessionStorage.getItem("authenticatedUser");
@@ -148,7 +118,6 @@ function Tenant() {
         //     ...response.data.OPEN.outstanding_audits,
         //   ];
         // });
->>>>>>> mainMarcus
 
         //initialize array to store all objects of report info
         let reportInfoArray = [];
@@ -156,24 +125,15 @@ function Tenant() {
         for (let i = 0; i < reportIdArray.length; i++) {
           let reportInfo = await getReport(reportIdArray[i]).then(
             (response) => {
-<<<<<<< HEAD
-              console.log(response.data);
-=======
->>>>>>> mainMarcus
               return response.data;
             }
           );
           reportInfoArray.push(reportInfo);
         }
-<<<<<<< HEAD
-        if (reportInfoArray.length === reportIdArray.length) {
-          setTenantAuditsState(reportInfoArray);
-=======
 
         if (reportInfoArray.length === reportIdArray.length) {
           console.log(reportInfoArray);
           setTenantAudits(reportInfoArray);
->>>>>>> mainMarcus
         }
       } catch (err) {
         console.log(err);
@@ -191,11 +151,7 @@ function Tenant() {
 
   return (
     <div>
-<<<<<<< HEAD
-      {tenantState && tenantAuditsState ? (
-=======
       {tenantState && tenantAudits ? (
->>>>>>> mainMarcus
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -212,12 +168,7 @@ function Tenant() {
                   <QuestionAnswerIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="View Chats" />
-<<<<<<< HEAD
-              </ListItem>
-
-=======
               </ListItem> */}
->>>>>>> mainMarcus
               <ListItem
                 button
                 onClick={handlePrevAuditsClick}
@@ -231,55 +182,6 @@ function Tenant() {
                 {openPrevAudits ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
               <Collapse in={openPrevAudits} timeout="auto" unmountOnExit>
-<<<<<<< HEAD
-                {tenantAuditsState.map((audit, index) => {
-                  const {
-                    report_id,
-                    overall_score,
-                    overall_status,
-                    report_type,
-                    open_date,
-                  } = audit;
-                  return (
-                    <Link to={`/tenant/report/${report_id}`}>
-                      <List key={index} component="div" disablePadding>
-                        <ListItem button className={classes.nested}>
-                          <ListItemIcon>
-                            <ReceiptIcon color="secondary" />
-                          </ListItemIcon>
-                          {report_type === "FB" && (
-                            <ListItemText
-                              primary={`F&B Checklist conducted on ${new Date(
-                                parseInt(open_date)
-                              ).toString()}`}
-                              // secondary={`Score: ${overall_score}`}
-                              secondary={
-                                overall_status === 0
-                                  ? `Score: ${overall_score} (UNRESOLVED)`
-                                  : `Score: ${overall_score} `
-                              }
-                            />
-                          )}
-                          {report_type === "NFB" && (
-                            <ListItemText
-                              primary={`F&B Checklist conducted on ${new Date(
-                                parseInt(open_date)
-                              ).toString()}`}
-                              secondary={`Score: ${overall_score}`}
-                            />
-                          )}
-                          {report_type === "SNM" && (
-                            <ListItemText
-                              primary={`F&B Checklist conducted on ${new Date(
-                                parseInt(open_date)
-                              ).toString()}`}
-                              secondary={`Score: ${overall_score}`}
-                            />
-                          )}
-                        </ListItem>
-                      </List>
-                    </Link>
-=======
                 {tenantAudits.map((audit, index) => {
                   const {
                     open_date,
@@ -372,7 +274,6 @@ function Tenant() {
                         </Box>
                       </List>
                     </>
->>>>>>> mainMarcus
                   );
                 })}
               </Collapse>
@@ -385,16 +286,10 @@ function Tenant() {
                 <ListItemIcon>
                   <AssignmentTurnedInIcon color="primary" />
                 </ListItemIcon>
-<<<<<<< HEAD
-                <ListItemText primary="Conduct Audit" />
-                {openChecklist ? <ExpandLess /> : <ExpandMore />}
-              </ListItem>
-=======
                 <ListItemText primary="Start Audit" />
                 {openChecklist ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
 
->>>>>>> mainMarcus
               <Collapse in={openChecklist} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <Link to={`/tenant/fbChecklist/${tenantId}`}>
