@@ -25,6 +25,7 @@ public class ReportEntry {
 	  private int qn_id;
 	  private Date date;
 	  private Time time;
+	  private int from_account_id;
 	
 	  @Nullable
 	  private int severity; // 7 digits XDDMMYY - X 0-nothing, 1-low, 2-med, 3-high, DDMMYY = 020421 2nd of Apr 2021
@@ -138,6 +139,14 @@ public class ReportEntry {
 		c.set(Calendar.DAY_OF_MONTH,DD);
 		return new Date(c.getTimeInMillis());
 	  }
+
+	public int getFrom_account_id() {
+		return from_account_id;
+	}
+
+	public void setFrom_account_id(int from_account_id) {
+		this.from_account_id = from_account_id;
+	}
 }
 
 

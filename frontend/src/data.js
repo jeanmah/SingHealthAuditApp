@@ -66,7 +66,7 @@ export const auditorNavLinks = [
   },
   {
     id: 2,
-    url: "/chat",
+    url: "/allChats",
     text: "Chat",
   },
   {
@@ -77,8 +77,13 @@ export const auditorNavLinks = [
   {
     id: 4,
     url: "/account",
-    text: "My Account",
+    text: "Account",
   },
+  // {
+  //   id: 5,
+  //   url: "/",
+  //   text: "Log Out",
+  // },
 ];
 
 export const tenantNavLinks = [
@@ -89,19 +94,29 @@ export const tenantNavLinks = [
   },
   {
     id: 2,
-    url: "/chat",
+    url: "/allChats",
     text: "Chat",
   },
   {
     id: 3,
     url: "/store",
-    text: "My Store",
+    text: "Store",
   },
   {
     id: 4,
     url: "/account",
+<<<<<<< HEAD
     text: "My Account",
   },
+=======
+    text: "Account",
+  },
+  // {
+  //   id: 5,
+  //   url: "/",
+  //   text: "Log Out",
+  // },
+>>>>>>> mainMarcus
 ];
 
 export const managerNavLinks = [
@@ -115,6 +130,14 @@ export const managerNavLinks = [
     url: "/account",
     text: "My Account",
   },
+<<<<<<< HEAD
+=======
+  // {
+  //   id: 3,
+  //   url: "/",
+  //   text: "Log Out",
+  // },
+>>>>>>> mainMarcus
 ];
 
 export const audits = [
@@ -701,6 +724,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/cgh.png",
+    address: "2 Simei Street 3, Singapore 529889",
   },
   {
     id: "2",
@@ -708,6 +732,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/kkh.png",
+    address: "100 Bukit Timah Rd, Singapore 229899",
   },
   {
     id: "3",
@@ -715,6 +740,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/sgh.png",
+    address: "Outram Rd, Singapore 169608",
   },
   {
     id: "4",
@@ -722,6 +748,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/skh.png",
+    address: "110 Sengkang E Way, Singapore 544886",
   },
   {
     id: "5",
@@ -729,6 +756,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/nccs.png",
+    address: "11 Hospital Crescent, Singapore 169610",
   },
   {
     id: "6",
@@ -736,6 +764,7 @@ export const institutions = [
     tenantNames: [],
     tenantIDs: [],
     imageUrl: "../images/ndcs.jpeg",
+    address: "5 Second Hospital Ave, Singapore 168938",
   },
 ];
 
@@ -827,4 +856,11 @@ export const tenantImages = [
     name: "Mr Bean",
     imageUrl: "../images/mr_bean.jpeg",
   },
+<<<<<<< HEAD
+=======
+  {
+    name: "Mothercare",
+    imageUrl: "../images/mothercare.jpeg",
+  },
+>>>>>>> mainMarcus
 ];

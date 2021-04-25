@@ -17,12 +17,14 @@ function HomeAuditor() {
     async function getResponse() {
       try {
         const reportIdArray = await getAudits(username).then((response) => {
+          console.log(response);
           return [
             ...response.data.CLOSED.completed_audits,
             ...response.data.OPEN.outstanding_audits,
           ];
         });
         //initialize array to store all objects of report info
+        console.log("reportIDArray: " + reportIdArray);
         let reportInfoArray = [];
 
         for (let i = 0; i < reportIdArray.length; i++) {
@@ -34,6 +36,7 @@ function HomeAuditor() {
           );
           reportInfoArray.push(reportInfo);
         }
+        console.log("reportInfoArray: " + reportInfoArray);
 
         //set state of audits to be an array of report info objects
         if (reportInfoArray.length === reportIdArray.length) {

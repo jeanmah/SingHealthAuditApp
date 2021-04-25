@@ -30,21 +30,19 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: "center",
   },
   button: {
-    color: "#F15A22",
+    // color: "#F15A22",
     fontWeight: "medium",
-    width: "100%",
+    // width: "100%",
     // maxWidth: 800,
-    backgroundColor: theme.palette.background.paper,
-    height: 50,
+    backgroundColor: "#F15A22",
+    // height: 50,
   },
   header: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2, 2, 2, 2),
   },
   link: {
-    width: "100%",
-    maxWidth: 800,
-    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(2, 0, 2, 0),
   },
 }));
 
@@ -61,6 +59,8 @@ function FbChecklist() {
     getUserInfo,
     fbReportState,
     submitFbReport,
+    tenantType,
+    setTenantType,
   } = useContext(Context);
 
   //state to update fb checklist questions
@@ -72,6 +72,8 @@ function FbChecklist() {
     async function getTenantName() {
       try {
         const tenant_name = await getUserInfo(tenantId).then((response) => {
+          console.log(response);
+          setTenantType(response.data.type_id);
           return response.data.store_name;
         });
         // console.log(tenant_name);
@@ -91,15 +93,14 @@ function FbChecklist() {
       });
   }, []);
 
-  //function to submit report upon click of submit
-  async function handleSubmit(tenantid, report) {
-    let score = await submitFbReport(tenantid, report);
-    // console.log(score);
-  }
+  const handleSubmit = (tenantid, report) => {
+    console.log(report);
+    submitFbReport(tenantid, report);
+  };
 
   return (
     <>
-      {fbChecklistState && tenantName ? (
+      {fbChecklistState && tenantName && tenantType ? (
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -118,6 +119,7 @@ function FbChecklist() {
                       fb_qn_id={fb_qn_id}
                       requirement={requirement}
                       labelId={labelId}
+                      type={tenantType}
                     />
                   </>
                 );
@@ -126,13 +128,15 @@ function FbChecklist() {
             <Link to={`/tenant/${tenantId}`} className={classes.link}>
               <Button
                 className={classes.button}
-                size="small"
+                size="large"
+                color="primary"
+                variant="contained"
                 onClick={() => {
                   handleSubmit(tenantId, fbReportState);
                 }}
                 // color="secondary"
               >
-                Submit checklist
+                Submit
               </Button>
             </Link>
           </Grid>

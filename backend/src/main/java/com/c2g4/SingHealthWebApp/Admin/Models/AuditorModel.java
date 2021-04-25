@@ -31,7 +31,7 @@ public class AuditorModel implements typeAccountModel{
 	private String branch_id;
 	private int mgr_id;
 
-	@Override
+	//@Override
 	public int getAcc_id() {
 		return acc_id;
 	}

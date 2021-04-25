@@ -4,17 +4,22 @@ import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
 import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
+import com.c2g4.SingHealthWebApp.Notifications.NotificationsModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONObject;
-import static org.hamcrest.Matchers.hasSize;
+
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doAnswer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,11 +27,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.ManagerModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
-import org.springframework.web.context.WebApplicationContext;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -686,6 +693,73 @@ public class AccountControllerTest {
             case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,null);
         }
     }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void deleteTenantManagerOK() throws Exception {
+        deleteTenantAccount(statusOK,String.valueOf(TENANTID));
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void deleteTenantManagerTenantNotFound() throws Exception {
+        deleteTenantAccount("NotFound",String.valueOf(TENANTID));
+    }
+
+    @Test
+    @WithMockUser(username = MANAGERUSENAME, password = KNOWN_USER_PASSWORD, roles = { MANAGER })
+    public void deleteTenantManagerTenantCannotDelete() throws Exception {
+        deleteTenantAccount("CannotDelete",String.valueOf(TENANTID));
+    }
+
+    @Test
+    @WithMockUser(username = AUDITORUSENAME, password = KNOWN_USER_PASSWORD, roles = { AUDITOR })
+    public void deleteTenantAuditor() throws Exception {
+        deleteTenantAccount(statusUnauthorized,String.valueOf(TENANTID));
+    }
+    @Test
+    @WithMockUser(username = TENANTUSENAME, password = KNOWN_USER_PASSWORD, roles = { TENANT })
+    public void deleteTenantTenant() throws Exception {
+        deleteTenantAccount(statusUnauthorized,String.valueOf(TENANTID));
+    }
+
+    private void deleteTenantAccount(String statusExpected, String tenant_id) throws Exception {
+        String url = "/account/deleteTenantAccount";
+        HashMap<String,String> params = new HashMap<>();
+        if(tenant_id!=null) params.put("tenant_id",tenant_id);
+
+        switch (statusExpected) {
+            case statusOK -> {
+                doAnswer(new Answer() {
+                    private int count = 0;
+
+                    public Object answer(InvocationOnMock invocation) {
+                        return count++ == 0;
+                    }
+                }).when(tenantRepo).existsById(TENANTID);
+
+                doAnswer(new Answer() {
+                    private int count = 0;
+                    public Object answer(InvocationOnMock invocation) {
+                        return count++ == 0;
+                    }
+                }).when(accountRepo).existsById(TENANTID);
+                HTTPRequestHelperTestFunctions.deleteHttpOk(mvc, url, params, "Tenant has been deleted from the database. This action cannot be undone");
+            }
+            case statusBad -> HTTPRequestHelperTestFunctions.deleteHttpBadRequest(mvc, url, params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.deleteHttpUnauthorizedRequest(mvc,url, params);
+            case "NotFound" -> {
+                given(accountRepo.existsById(TENANTID)).willReturn(false);
+                given(tenantRepo.existsById(TENANTID)).willReturn(false);
+                HTTPRequestHelperTestFunctions.deleteHttpBadRequest(mvc,url, params);
+            }
+            case "CannotDelete" -> {
+                given(accountRepo.existsById(TENANTID)).willReturn(true);
+                HTTPRequestHelperTestFunctions.deleteHttpBadRequest(mvc,url, params);
+            }
+        }
+    }
+
 
     private void createArbitraryTenants(ArrayList<TenantModel> tenantModels, ArrayList<AccountModel> accountModels){
         createTenantWithAccount("John","doh",tenantModels,accountModels);

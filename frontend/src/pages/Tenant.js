@@ -21,13 +21,20 @@ import StoreIcon from "@material-ui/icons/Store";
 import LocalHospitalIcon from "@material-ui/icons/LocalHospital";
 import Grid from "@material-ui/core/Grid";
 import ReceiptIcon from "@material-ui/icons/Receipt";
+<<<<<<< HEAD
+=======
+import EmailIcon from "@material-ui/icons/Email";
+import Button from "@material-ui/core/Button";
+import ReportProblemIcon from "@material-ui/icons/ReportProblem";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+>>>>>>> mainMarcus
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: theme.spacing(4, 0, 10, 0),
+    padding: theme.spacing(4, 2, 10, 2),
   },
   list: {
     width: "100%",
@@ -36,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
     // margin: theme.spacing(4, 0, 10, 0),
   },
   nested: {
+    // display: "flex",
     paddingLeft: theme.spacing(4),
   },
   header: {
@@ -45,14 +53,28 @@ const useStyles = makeStyles((theme) => ({
   listItem: {
     padding: theme.spacing(2, 2, 2, 2),
   },
+  previousAuditsButtons: {
+    display: "flex",
+    padding: theme.spacing(0, 2, 3, 2),
+    justifyContent: "center",
+    // justifyContent: "space-evenly",
+  },
+  button: {
+    margin: theme.spacing(1, 2, 1, 2),
+  },
+  resolvedLabel: {
+    color: "#F15A22",
+    padding: theme.spacing(0, 2, 0, 2),
+  },
 }));
 
 function Tenant() {
   //get tenantid from url
   const { tenantId } = useParams();
-  console.log(tenantId);
+  // console.log(tenantId);
   //tenant state
   const [tenantState, setTenantState] = useState();
+<<<<<<< HEAD
   //tenant audits state
   const [tenantAuditsState, setTenantAuditsState] = useState();
 
@@ -60,18 +82,28 @@ function Tenant() {
   const [openPrevAudits, setOpenPrevAudits] = useState(false);
   //Context: getUserInfo method
   const { getUserInfo, getAuditsTenant, getReport } = useContext(Context);
+=======
+  const [tenantAudits, setTenantAudits] = useState();
+  const [openChecklist, setOpenChecklist] = useState(false);
+  const [openPrevAudits, setOpenPrevAudits] = useState(false);
+  //Context: getUserInfo method
+  const { getUserInfo, getTenantAudits, getReport, getAudits } = useContext(
+    Context
+  );
+>>>>>>> mainMarcus
 
   const classes = useStyles();
 
   useEffect(() => {
     getUserInfo(tenantId)
       .then((response) => {
-        console.log(response);
+        // console.log(response);
         setTenantState(response.data);
       })
       .catch(() => {
         console.log("Failed to retrieve tenant info");
       });
+<<<<<<< HEAD
     //get tenant past audits
     async function getResponse() {
       try {
@@ -87,6 +119,36 @@ function Tenant() {
             ];
           }
         );
+=======
+
+    // console.log(tenantId);
+    const username = sessionStorage.getItem("authenticatedUser");
+    async function getResponse() {
+      try {
+        const reportIdArray = await getTenantAudits(tenantId).then(
+          (response) => {
+            console.log(response);
+
+            if (response.data.LATEST === -1) {
+              return [...response.data.CLOSED.past_audits];
+            }
+
+            return [...response.data.CLOSED.past_audits, response.data.LATEST];
+
+            // return [response.data.LATEST, ...response.data.CLOSED];
+          }
+        );
+        // console.log(reportIdArray);
+        // console.log(reportIdArray);
+
+        // const reportIdArray = await getAudits(username).then((response) => {
+        //   console.log(response);
+        //   return [
+        //     ...response.data.CLOSED.completed_audits,
+        //     ...response.data.OPEN.outstanding_audits,
+        //   ];
+        // });
+>>>>>>> mainMarcus
 
         //initialize array to store all objects of report info
         let reportInfoArray = [];
@@ -94,14 +156,24 @@ function Tenant() {
         for (let i = 0; i < reportIdArray.length; i++) {
           let reportInfo = await getReport(reportIdArray[i]).then(
             (response) => {
+<<<<<<< HEAD
               console.log(response.data);
+=======
+>>>>>>> mainMarcus
               return response.data;
             }
           );
           reportInfoArray.push(reportInfo);
         }
+<<<<<<< HEAD
         if (reportInfoArray.length === reportIdArray.length) {
           setTenantAuditsState(reportInfoArray);
+=======
+
+        if (reportInfoArray.length === reportIdArray.length) {
+          console.log(reportInfoArray);
+          setTenantAudits(reportInfoArray);
+>>>>>>> mainMarcus
         }
       } catch (err) {
         console.log(err);
@@ -119,7 +191,11 @@ function Tenant() {
 
   return (
     <div>
+<<<<<<< HEAD
       {tenantState && tenantAuditsState ? (
+=======
+      {tenantState && tenantAudits ? (
+>>>>>>> mainMarcus
         <>
           <Navbar />
           <Box className={classes.header} textAlign="center" boxShadow={1}>
@@ -131,13 +207,17 @@ function Tenant() {
               aria-labelledby="nested-list-subheader"
               className={classes.list}
             >
-              <ListItem button divider={true} className={classes.listItem}>
+              {/* <ListItem button divider={true} className={classes.listItem}>
                 <ListItemIcon>
                   <QuestionAnswerIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="View Chats" />
+<<<<<<< HEAD
               </ListItem>
 
+=======
+              </ListItem> */}
+>>>>>>> mainMarcus
               <ListItem
                 button
                 onClick={handlePrevAuditsClick}
@@ -151,6 +231,7 @@ function Tenant() {
                 {openPrevAudits ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
               <Collapse in={openPrevAudits} timeout="auto" unmountOnExit>
+<<<<<<< HEAD
                 {tenantAuditsState.map((audit, index) => {
                   const {
                     report_id,
@@ -198,6 +279,100 @@ function Tenant() {
                         </ListItem>
                       </List>
                     </Link>
+=======
+                {tenantAudits.map((audit, index) => {
+                  const {
+                    open_date,
+                    overall_score,
+                    report_id,
+                    report_type,
+                    overall_status,
+                  } = audit;
+                  return (
+                    <>
+                      <List component="div" disablePadding>
+                        <Box boxShadow={1}>
+                          <ListItem className={classes.nested}>
+                            <ListItemIcon>
+                              <ReceiptIcon color="secondary" />
+                            </ListItemIcon>
+                            {report_type === "FB" && (
+                              <ListItemText
+                                primary={`F&B Checklist conducted on ${new Date(
+                                  open_date
+                                ).toString()}`}
+                                secondary={`Score: ${overall_score} `}
+                              />
+                            )}
+                            {report_type === "NFB" && (
+                              <ListItemText
+                                primary={`Non-F&B Checklist conducted on ${new Date(
+                                  open_date
+                                ).toString()}`}
+                                secondary={`Score: ${overall_score} `}
+                              />
+                            )}
+                            {report_type === "SMA" && (
+                              <ListItemText
+                                primary={`Safety Management Checklist conducted on ${new Date(
+                                  open_date
+                                ).toString()}`}
+                                secondary={`Score: ${overall_score} `}
+                              />
+                            )}
+                            {overall_status === 1 && (
+                              // <ListItemText className={classes.titleResolved}>
+                              <Typography
+                                variant="button"
+                                className={classes.resolvedLabel}
+                              >
+                                Resolved
+                              </Typography>
+                              // </ListItemText>
+                            )}
+                          </ListItem>
+
+                          <div className={classes.previousAuditsButtons}>
+                            {overall_status !== 1 && (
+                              <Link to={`/tenant/report/${report_id}`}>
+                                <Button
+                                  variant="contained"
+                                  color="secondary"
+                                  size="small"
+                                  className={classes.button}
+                                  startIcon={<ReportProblemIcon />}
+                                >
+                                  resolve
+                                </Button>
+                              </Link>
+                            )}
+                            <Link to={`/tenant/email/${report_id}`}>
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                                className={classes.button}
+                                startIcon={<EmailIcon />}
+                              >
+                                Email
+                              </Button>
+                            </Link>
+                            <Link to={`/fullreport/${report_id}`}>
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                                className={classes.button}
+                                startIcon={<CheckCircleIcon />}
+                              >
+                                report
+                              </Button>
+                            </Link>
+                          </div>
+                        </Box>
+                      </List>
+                    </>
+>>>>>>> mainMarcus
                   );
                 })}
               </Collapse>
@@ -210,9 +385,16 @@ function Tenant() {
                 <ListItemIcon>
                   <AssignmentTurnedInIcon color="primary" />
                 </ListItemIcon>
+<<<<<<< HEAD
                 <ListItemText primary="Conduct Audit" />
                 {openChecklist ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
+=======
+                <ListItemText primary="Start Audit" />
+                {openChecklist ? <ExpandLess /> : <ExpandMore />}
+              </ListItem>
+
+>>>>>>> mainMarcus
               <Collapse in={openChecklist} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <Link to={`/tenant/fbChecklist/${tenantId}`}>
@@ -223,18 +405,22 @@ function Tenant() {
                       <ListItemText primary="Conduct F&B Audit" />
                     </ListItem>
                   </Link>
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <StoreIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct Non-F&B Audit" />
-                  </ListItem>
-                  <ListItem button className={classes.nested}>
-                    <ListItemIcon>
-                      <LocalHospitalIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText primary="Conduct Safe Managment Audit" />
-                  </ListItem>
+                  <Link to={`/tenant/nfbChecklist/${tenantId}`}>
+                    <ListItem button className={classes.nested}>
+                      <ListItemIcon>
+                        <StoreIcon color="secondary" />
+                      </ListItemIcon>
+                      <ListItemText primary="Conduct Non-F&B Audit" />
+                    </ListItem>
+                  </Link>
+                  <Link to={`/tenant/smaChecklist/${tenantId}`}>
+                    <ListItem button className={classes.nested}>
+                      <ListItemIcon>
+                        <LocalHospitalIcon color="secondary" />
+                      </ListItemIcon>
+                      <ListItemText primary="Conduct Safe Managment Audit" />
+                    </ListItem>
+                  </Link>
                 </List>
               </Collapse>
             </List>

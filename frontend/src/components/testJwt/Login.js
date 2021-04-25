@@ -13,7 +13,11 @@ import {
   Checkbox,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+<<<<<<< HEAD
 // import red from '@material-ui/core/colors/red';
+=======
+import singhealthBackground from "../../images/singhealth_building.png";
+>>>>>>> mainMarcus
 
 import AuthenticationService from "../../AuthenticationService";
 import useStyles from "../../../src/styles";
@@ -111,10 +115,6 @@ function Login() {
               onChange={(e) => setPasswordState(e.target.value)}
             />
             <DisplayMessage />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               fullWidth
               variant="contained"
@@ -124,7 +124,7 @@ function Login() {
             >
               Sign In
             </Button>
-            <Grid container>
+            {/* <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
@@ -135,7 +135,7 @@ function Login() {
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
-            </Grid>
+            </Grid> */}
             {/* <Box mt={5}>
               <Copyright />
             </Box> */}
@@ -146,92 +146,5 @@ function Login() {
   );
 }
 
-class LoginComponent extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      username: "",
-      password: "",
-      hasLoginFailed: false,
-      showSuccessMessage: false,
-    };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.loginClicked = this.loginClicked.bind(this);
-  }
-
-  handleChange(event) {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
-  }
-
-  loginClicked() {
-    console.log(this.state.username);
-    console.log(this.state.password);
-    AuthenticationService.executeJwtAuthenticationService(
-      this.state.username,
-      this.state.password
-    )
-      .then((response) => {
-        console.log(response);
-        console.log(response.data);
-        AuthenticationService.registerSuccessfulLoginForJwt(
-          this.state.username,
-          response.data.token
-        );
-
-        if (response.data.accountType === "Auditor") {
-          this.props.history.push(`/home/a`);
-        } else if (response.data.accountType === "Tenant") {
-          this.props.history.push(`/home/t`);
-        } else if (response.data.accountType === "Manager") {
-          this.props.history.push(`/home/m`);
-        }
-      })
-      .catch(() => {
-        this.setState({ showSuccessMessage: false });
-        this.setState({ hasLoginFailed: true });
-      });
-  }
-
-  render() {
-    return (
-      <div>
-        <h2>Login</h2>
-        <div className="container">
-          {/*<ShowInvalidCredentials hasLoginFailed={this.state.hasLoginFailed}/>*/}
-          {this.state.hasLoginFailed && (
-            <div className="alert alert-warning">Invalid Credentials</div>
-          )}
-          {this.state.showSuccessMessage && <div>Login Sucessful</div>}
-          {/*<ShowLoginSuccessMessage showSuccessMessage={this.state.showSuccessMessage}/>*/}
-          <div>
-            User Name:{" "}
-            <input
-              type="text"
-              name="username"
-              value={this.state.username}
-              onChange={this.handleChange}
-            />
-          </div>
-          <div>
-            Password:{" "}
-            <input
-              type="password"
-              name="password"
-              value={this.state.password}
-              onChange={this.handleChange}
-            />
-          </div>
-          <button className="btn btn-success" onClick={this.loginClicked}>
-            Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-}
 
 export default Login;

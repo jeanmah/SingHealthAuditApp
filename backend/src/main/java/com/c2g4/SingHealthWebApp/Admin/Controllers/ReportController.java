@@ -1,12 +1,12 @@
 package com.c2g4.SingHealthWebApp.Admin.Controllers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.c2g4.SingHealthWebApp.Admin.Repositories.*;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.c2g4.SingHealthWebApp.Admin.Models.AccountModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListFBModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListNFBModel;
+import com.c2g4.SingHealthWebApp.Admin.Models.AuditCheckListSMAModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.AuditorModel;
 import com.c2g4.SingHealthWebApp.Admin.Models.TenantModel;
 import com.c2g4.SingHealthWebApp.Admin.Report.ClosedReport;
@@ -31,6 +34,15 @@ import com.c2g4.SingHealthWebApp.Admin.Report.OpenReport;
 import com.c2g4.SingHealthWebApp.Admin.Report.Report;
 import com.c2g4.SingHealthWebApp.Admin.Report.ReportBuilder;
 import com.c2g4.SingHealthWebApp.Admin.Report.ReportEntry;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AccountRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListFBRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListNFBRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditCheckListSMARepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.AuditorRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.CompletedAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.ManagerRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.OpenAuditRepo;
+import com.c2g4.SingHealthWebApp.Admin.Repositories.TenantRepo;
 import com.c2g4.SingHealthWebApp.Others.ResourceString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -38,9 +50,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin(origins = { "http://localhost:3000" })
 @RestController
@@ -131,6 +142,9 @@ public class ReportController {
         
         try {
             entryList = objectMapper.readValue(checklist, customClassCollection);
+            for(ReportEntry entry: entryList){
+            	entry.setFrom_account_id(auditor_id);
+			}
         } catch (JsonProcessingException e) {
             logger.warn("JSON PROCESSING EXCEPTION {} POST",report_type);
             e.printStackTrace();
@@ -186,6 +200,9 @@ public class ReportController {
 	        try {
 	            List<ReportEntry> tentries = objectMapper.readValue(strEntry, customClassCollection);
 	            entries = new ArrayList<>(tentries);
+				for(ReportEntry entry: entries){
+					entry.setFrom_account_id(callerAccount.getAccount_id());
+				}
 	        } catch (JsonProcessingException e) {
 	            logger.warn("JSON PROCESSING EXCEPTION {} POST");
 	            return ResponseEntity.badRequest().body(null);
@@ -193,6 +210,8 @@ public class ReportController {
 		}else {
 			try {
 				ReportEntry entry = objectMapper.readValue(strEntry, ReportEntry.class);
+				logger.info("UPDATE QUESTION SET FROM ID {}",callerAccount.getAccount_id());
+				entry.setFrom_account_id(callerAccount.getAccount_id());
 				entries.add(entry);
 			} catch (JsonMappingException e) {
 				e.printStackTrace();
@@ -305,26 +324,98 @@ public class ReportController {
 		ObjectNode jNode = objectMapper.createObjectNode();
 		
 		//Get failed entries
-		List<Integer> failed_entry_ids = new ArrayList<>();
+		ArrayNode failed_entry_ids = objectMapper.createArrayNode();
 		for(ReportEntry entry:builder.getEntries()) {
 			if(entry.getStatus()==Component_Status.FAIL) {
 				failed_entry_ids.add(entry.getEntry_id());
 			}
 		}
-		
-		try {
-			jNode.put("Failed_Entries", objectMapper.writeValueAsString(failed_entry_ids));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		
+
+		List<Integer> failedQuestions =  new ArrayList<>();
+		List<Integer> resolvedQuestions =  new ArrayList<>();
+		List<Integer> currentFailedQuestions =  new ArrayList<>();
+		getFailedQuestions(builder.getEntries(),failedQuestions,resolvedQuestions,currentFailedQuestions);
+		jNode.put("Failed_Entries", failed_entry_ids);
+		jNode.put("FailedQuestions", objectMapper.valueToTree(failedQuestions));
+		jNode.put("ResolvedQuestions", objectMapper.valueToTree(resolvedQuestions));
+		jNode.put("CurrentFailedQuestions", objectMapper.valueToTree(currentFailedQuestions));
+
 		//Get score
 		jNode.put("Score", builder.getOverall_score());
-		
+
 		JsonNode statistics = jNode;
 		
 		return ResponseEntity.ok(statistics);
+	}
+	
+	@GetMapping("/report/getNumOfOpenAuditsAtInstituion")
+	public ResponseEntity<?> getNumOfOpenAuditsAtInstitution(@RequestParam(required = true) int days) {
+		List<Integer> listOfTenantIds = openAuditRepo.getTenantIds(days);
 		
+		HashMap<Integer, String> idToBranchId = new HashMap<>();
+		HashMap<String, Integer> branchIdFreqList = new HashMap<>();
+		for(Integer id:listOfTenantIds) {
+			String branch_id;
+			if(idToBranchId.containsKey(id)) {
+				branch_id = idToBranchId.get(id);
+			}else {
+				branch_id = accountRepo.getBranchIdFromAccountId(id);
+				idToBranchId.put(id, branch_id);
+			}
+			
+			if(branchIdFreqList.containsKey(branch_id)) {
+				branchIdFreqList.put(branch_id, branchIdFreqList.get(branch_id) + 1);
+			}else {
+				branchIdFreqList.put(branch_id, 1);
+			}
+		}
+		return ResponseEntity.ok(branchIdFreqList);	
+	}
+	
+	@GetMapping("/report/getNumOfClosedAuditsAtInstituion")
+	public ResponseEntity<?> getNumOfClosedAuditsAtInstitution(@RequestParam(required = true) int days) {
+		List<Integer> listOfTenantIds = completedAuditRepo.getTenantIds(days);
+		
+		HashMap<Integer, String> idToBranchId = new HashMap<>();
+		HashMap<String, Integer> branchIdFreqList = new HashMap<>();
+		for(Integer id:listOfTenantIds) {
+			String branch_id;
+			if(idToBranchId.containsKey(id)) {
+				branch_id = idToBranchId.get(id);
+			}else {
+				branch_id = accountRepo.getBranchIdFromAccountId(id);
+				idToBranchId.put(id, branch_id);
+			}
+			
+			if(branchIdFreqList.containsKey(branch_id)) {
+				branchIdFreqList.put(branch_id, branchIdFreqList.get(branch_id) + 1);
+			}else {
+				branchIdFreqList.put(branch_id, 1);
+			}
+		}
+		return ResponseEntity.ok(branchIdFreqList);	
+	}
+
+	private void getFailedQuestions(List<ReportEntry> entries,List<Integer>
+			failedQuestions,List<Integer> resolvedQuestions,List<Integer> currentFailedQuestions){
+		sortEntries(entries);
+		for(ReportEntry entry:entries){
+			if(entry.getStatus().equals(Component_Status.FAIL)){
+				if(!failedQuestions.contains(entry.getQn_id())){
+					failedQuestions.add(entry.getQn_id());
+				}
+			} else if(entry.getStatus().equals(Component_Status.PASS)){
+				if(failedQuestions.contains(entry.getQn_id())){
+					resolvedQuestions.add(entry.getQn_id());
+				}
+			}
+		}
+
+		for(int qn_id: failedQuestions){
+			if(!resolvedQuestions.contains(qn_id)){
+				currentFailedQuestions.add(qn_id);
+			}
+		}
 	}
 	
 	@GetMapping("/report/getReportEntry")
@@ -335,11 +426,114 @@ public class ReportController {
 		if(builder == null) {
 			return ResponseEntity.notFound().build();
 		}
-		ReportEntry entry = builder.getEntries().get(entry_id);
-		
-		return ResponseEntity.ok(entry);
+		ReportEntry entry = null;
+		for(ReportEntry reportEntry: builder.getEntries()){
+			if(reportEntry.getEntry_id() ==entry_id){
+				entry = reportEntry;
+			}
+		}
+		if (entry == null) {
+			logger.warn("entry not found");
+			return ResponseEntity.badRequest().body("entry "+entry_id+" not found");
+		}
+
+		ObjectNode entryOutput = addAdditionalEntryFields(entry,builder.getReportType());
+		return ResponseEntity.ok(entryOutput);
 	}
-	
+
+	private ObjectNode addAdditionalEntryFields(ReportEntry entry, String reportType){
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode entryOutput = objectMapper.valueToTree(entry);
+		String requirement = "";
+		if(reportType.equals(ResourceString.FB_KEY)){
+			AuditCheckListFBModel auditCheckListModel = auditCheckListFBRepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		} else if(reportType.equals(ResourceString.NFB_KEY)){
+			AuditCheckListNFBModel auditCheckListModel = auditCheckListNFBRepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		} else {
+			AuditCheckListSMAModel auditCheckListModel = auditCheckListSMARepo.getQuestion(entry.getQn_id());
+			requirement = auditCheckListModel.getRequirement();
+		}
+		entryOutput.put("Requirement",requirement);
+		return entryOutput;
+	}
+
+	@GetMapping("/report/getQuestionInfo")
+	public ResponseEntity<?> getQuestionInfo(
+			@RequestParam(required=true) int report_id,
+			@RequestParam(required=true) int qn_id){
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode jNode = objectMapper.createObjectNode();
+		String requirement=null;
+		switch (builder.getReportType()) {
+			case ResourceString.NFB_KEY -> {
+				AuditCheckListNFBModel question = auditCheckListNFBRepo.getQuestion(qn_id);
+				jNode.put("requirement", question.getRequirement());
+				break;
+			}
+			case ResourceString.FB_KEY -> {
+				AuditCheckListFBModel question = auditCheckListFBRepo.getQuestion(qn_id);
+				jNode.put("requirement", question.getRequirement());
+				break;
+			}
+			case ResourceString.SMA_KEY -> {
+				AuditCheckListSMAModel question = auditCheckListSMARepo.getQuestion(qn_id);
+				jNode.put("requirement", question.getRequirement());
+				break;
+			}
+		}
+		List<ReportEntry> entries = builder.getEntries();
+		sortEntries(entries);
+		ReportEntry foundReportEntry = null;
+		ReportEntry lastReportEntry = null;
+		for(ReportEntry entry: entries){
+			if(entry.getQn_id()==qn_id){
+				if(lastReportEntry==null) {
+					foundReportEntry = entry;
+				}
+				lastReportEntry = entry;
+			}
+		}
+		if(foundReportEntry==null) return ResponseEntity.badRequest().body(null);
+
+
+
+		try {
+			jNode.put("date", objectMapper.valueToTree(foundReportEntry.getDate()));
+			jNode.put("time", foundReportEntry.getTime().toString());
+			jNode.put("original_remarks", foundReportEntry.getRemarks());
+			jNode.put("severity", objectMapper.valueToTree(foundReportEntry.getSeverity()));
+			jNode.put("current_qn_status", String.valueOf(lastReportEntry.getStatus()));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().body(null);
+		}
+
+
+
+		ArrayNode imageArray = objectMapper.createArrayNode();
+		if (foundReportEntry.getImages() != null) {
+			for(String image : foundReportEntry.getImages()){
+				imageArray.add(image);
+			}
+		}
+
+		jNode.put("images",imageArray);
+
+		jNode.put("qn_id", qn_id);
+		JsonNode questionInfo = jNode;
+
+		return ResponseEntity.ok(questionInfo);
+	}
+
 	@GetMapping("/report/getReportIDs")
 	public ResponseEntity<?> getReportIDs(
 			@RequestParam(required=false, defaultValue="-1") String username,
@@ -383,6 +577,46 @@ public class ReportController {
 		
 		return ResponseEntity.ok(report_ids);
 	}
+	@GetMapping("/report/getOriginalAuditEntries")
+	public ResponseEntity<?> getOriginalAuditEntries(@RequestParam int report_id){
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		ArrayNode originalEntriesArrayNode = objectMapper.createArrayNode();
+
+		//Get original entries
+		sortEntries(builder.getEntries());
+		ArrayList<ReportEntry> originalEntries = new ArrayList<>();
+		ArrayList<Integer> questionsAdded = new ArrayList<>();
+
+		for(ReportEntry entry:builder.getEntries()) {
+			if(!questionsAdded.contains(entry.getQn_id())) {
+				originalEntries.add(entry);
+				questionsAdded.add(entry.getQn_id());
+			} else{
+				break;
+			}
+		}
+		if(originalEntries.size()==0){
+			return ResponseEntity.badRequest().body("no entries found");
+		} else {
+			sortEntriesByQuestion(originalEntries);
+			String reportType = builder.getReportType();
+			for(ReportEntry re: originalEntries){
+				ObjectNode entryOutput = addAdditionalEntryFields(re,reportType);
+				originalEntriesArrayNode.add(entryOutput);
+			}
+		}
+		return ResponseEntity.ok(originalEntriesArrayNode);
+	}
+
+	private static void sortEntriesByQuestion(List<ReportEntry> entries){
+		Comparator<ReportEntry> compareByQuestion = Comparator.comparing(ReportEntry::getQn_id);
+		entries.sort(compareByQuestion);
+	}
 	
 	private JsonNode getTenantReportIds(int tenant_id, String type) {
 		TenantModel tenant = tenantRepo.getTenantById(tenant_id);
@@ -390,14 +624,33 @@ public class ReportController {
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, tenant.getPast_audits());
+			JsonNode pastAudits = tenant.getPast_audits();
+			if(!pastAudits.has(ResourceString.TENANT_PAST_AUDITS_JSON_KEY)) {
+				ObjectNode pastAuditNode = objectmapper.createObjectNode();
+				pastAuditNode.put(ResourceString.TENANT_PAST_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+				pastAudits = pastAuditNode;
+			}
+			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, pastAudits);
 			logger.info("past audit tenant {}", tenant.getPast_audits().asText());
-
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
 				|| type.matches(ResourceString.GETREPORT_FILTER_LATEST)) {
 			report_ids.put(ResourceString.GETREPORT_FILTER_LATEST, tenant.getLatest_audit());
 			logger.info("latest audit tenant {}", tenant.getLatest_audit());
+		}
+		if(type.matches(ResourceString.GETREPORT_FILTER_ALL)
+				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
+			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
+			int latest_audit = tenant.getLatest_audit();
+
+			if(latest_audit!=-1){
+				outstandingAuditIds.add(latest_audit);
+				ArrayNode overdue = getOverDueAudits(outstandingAuditIds);
+				if(overdue.size()==0) report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,-1);
+				else report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds).get(0));
+			} else{
+				report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE,-1);
+			}
 		}
 		return report_ids;
 	}
@@ -408,28 +661,38 @@ public class ReportController {
 		ObjectMapper objectmapper = new ObjectMapper();
 		ObjectNode report_ids = objectmapper.createObjectNode();
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
-
-			report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED, auditor.getCompleted_audits());
-
+			  || type.matches(ResourceString.GETREPORT_FILTER_CLOSED)) {
+			ObjectNode completed_audits = (ObjectNode) auditor.getCompleted_audits();
+			if(!completed_audits.has(ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY)) {
+				completed_audits.put(ResourceString.AUDITOR_COMPLETED_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+			}
+			 report_ids.put(ResourceString.GETREPORT_FILTER_CLOSED,completed_audits);
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, auditor.getOutstanding_audit_ids());
-			logger.info("outstanding {}", auditor.getOutstanding_audit_ids());
+			  || type.matches(ResourceString.GETREPORT_FILTER_OPEN)) {
+			ObjectNode outstandingAuditIds = (ObjectNode) auditor.getOutstanding_audit_ids();
+			if(!outstandingAuditIds.has(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY)) {
+				outstandingAuditIds.put(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY,objectmapper.createArrayNode());
+			}
+			 report_ids.put(ResourceString.GETREPORT_FILTER_OPEN, outstandingAuditIds);
+			 logger.info("outstanding {}", auditor.getOutstanding_audit_ids());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_APPEALED)) {
-			report_ids.put(ResourceString.GETREPORT_FILTER_APPEALED, auditor.getAppealed_audits());
+			  || type.matches(ResourceString.GETREPORT_FILTER_APPEALED)) {
+			 report_ids.put(ResourceString.GETREPORT_FILTER_APPEALED, auditor.getAppealed_audits());
 		}
 		if(type.matches(ResourceString.GETREPORT_FILTER_ALL) 
-				|| type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
-			ArrayNode outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
-					.get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
+			  || type.matches(ResourceString.GETREPORT_FILTER_OVERDUE)) {
+			JsonNode outstandingAudits = auditor.getOutstanding_audit_ids();
+			ArrayNode outstandingAuditIds = objectmapper.createArrayNode();
+			if(outstandingAudits.has(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY)) {
+				outstandingAuditIds = (ArrayNode) auditor.getOutstanding_audit_ids()
+						.get(ResourceString.AUDITOR_OUTSTANDING_AUDITS_JSON_KEY);
+			}
 			report_ids.put(ResourceString.GETREPORT_FILTER_OVERDUE, getOverDueAudits(outstandingAuditIds));
 		}
 		return report_ids;
-	}
+	 }
 
 	private ArrayNode getOverDueAudits(ArrayNode outstandingAuditIds){
 		ObjectMapper objectmapper = new ObjectMapper();
@@ -446,6 +709,8 @@ public class ReportController {
 		}
 		return overdueAudits;
 	}
+
+
 	
 
 
@@ -457,6 +722,100 @@ public class ReportController {
 		logger.info(strRequest2);
 		return ResponseEntity.ok(strRequest + "<><>" + strRequest2);
 	}
+
+	@GetMapping("/report/getRectificationEntryOfQn")
+	public ResponseEntity<?> getRectificationEntryOfQn(@RequestParam int report_id,
+													   @RequestParam int tenant_id,
+													   @RequestParam int qn_id){
+		if(!tenantRepo.existsById(tenant_id)) return ResponseEntity.badRequest().body("tenant id not a tenant");
+		ObjectMapper objectMapper = new ObjectMapper();
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+		List<ReportEntry> entries = getRelevantRectificationEntries(builder.getEntries(),qn_id,tenant_id);
+
+		ObjectNode root = rectificationEntriesOutput(entries,builder.getReportType());
+		return ResponseEntity.ok(root);
+	}
+
+	private static void sortEntries(List<ReportEntry> entries){
+		Comparator<ReportEntry> compareByDateTime = new Comparator<ReportEntry>() {
+			@Override
+			public int compare(ReportEntry r1, ReportEntry r2) {
+				int dateCompare = r1.getDate().compareTo(r2.getDate());
+				if(dateCompare==0){
+					return r1.getTime().compareTo(r2.getTime());
+				}
+				return dateCompare;
+			}
+		};
+		entries.sort(compareByDateTime);
+	}
+
+	@GetMapping("/report/getAuditorRectificationResponseOfQn")
+	public ResponseEntity<?> getAuditorRectificationResponseOfQn(@RequestParam int report_id,
+																 @RequestParam int auditor_id,
+																 @RequestParam int qn_id){
+		if(!auditorRepo.existsById(auditor_id)) return ResponseEntity.badRequest().body("auditor id not a auditor");
+		ReportBuilder builder = ReportBuilder.getLoadedReportBuilder(openAuditRepo, completedAuditRepo, report_id);
+		if(builder == null) {
+			return ResponseEntity.notFound().build();
+		}
+		List<ReportEntry> entries = getRelevantRectificationEntries(builder.getEntries(),qn_id,auditor_id);
+		if(entries.size()==1) entries.clear();
+		else{
+			Comparator<ReportEntry> compareByDateTime = new Comparator<ReportEntry>() {
+				@Override
+				public int compare(ReportEntry r1, ReportEntry r2) {
+					int dateCompare = r1.getDate().compareTo(r2.getDate());
+					if(dateCompare==0){
+						return r1.getTime().compareTo(r2.getTime());
+					}
+					return dateCompare;
+				}
+			};
+			entries.sort(compareByDateTime);
+			entries.remove(0);
+		}
+
+		ObjectNode root = rectificationEntriesOutput(entries,builder.getReportType());
+		return ResponseEntity.ok(root);
+	}
+
+
+	private List<ReportEntry> getRelevantRectificationEntries(List<ReportEntry> allEntries,
+													   int qn_id, int acc_id) {
+		List<ReportEntry> entries = new ArrayList<>();
+		for (ReportEntry reportEntry : allEntries) {
+			logger.info("Entry qn {} from account{}", reportEntry.getQn_id(), reportEntry.getFrom_account_id());
+			if (reportEntry.getQn_id() == qn_id && reportEntry.getFrom_account_id() == acc_id) {
+				entries.add(reportEntry);
+			}
+		}
+		return entries;
+	}
+	private ObjectNode rectificationEntriesOutput(List<ReportEntry> entries,String reportType){
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode root = objectMapper.createObjectNode();
+		ArrayNode entriesArrayNode = objectMapper.createArrayNode();
+
+		if(entries.size()==0){
+			root.put("hasRectification",false);
+			root.put("entries", entriesArrayNode);
+		} else {
+			root.put("hasRectification",true);
+			for(ReportEntry re: entries){
+				ObjectNode entryOutput = addAdditionalEntryFields(re,reportType);
+				entriesArrayNode.add(entryOutput);
+			}
+			root.put("entries", entriesArrayNode);
+		}
+		return root;
+	}
+
+
 
 	private AccountModel convertUserDetailsToAccount(UserDetails callerUser){
 		logger.info("CALLER USER USERNAME {}",callerUser.getUsername());

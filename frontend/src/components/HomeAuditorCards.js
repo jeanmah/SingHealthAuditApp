@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
+import { Link } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import CameraIcon from "@material-ui/icons/PhotoCamera";
 import Card from "@material-ui/core/Card";
@@ -11,10 +12,11 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Link from "@material-ui/core/Link";
+// import Link from "@material-ui/core/Link";
 import { Context } from "../Context";
 import { tenantImages } from "../data";
 import zIndex from "@material-ui/core/styles/zIndex";
+import defaultShop from "../images/defaultshop.jpeg";
 
 // function Copyright() {
 //   return (
@@ -58,6 +60,17 @@ const useStyles = makeStyles((theme) => ({
   cardContent: {
     flexGrow: 1,
   },
+  cardTitle: {
+    display: "flex",
+    // justifyContent: "space-between",
+  },
+  resolvedLabel: {
+    color: "#F15A22",
+    padding: theme.spacing(0.5, 2, 0, 2),
+  },
+  button: {
+    // color: "#F15A22",
+  },
   // footer: {
   //   backgroundColor: theme.palette.background.paper,
   //   padding: theme.spacing(6),
@@ -75,11 +88,20 @@ export default function HomeAuditorCards() {
         {/* End hero unit */}
         <Grid container spacing={4}>
           {auditsState.map((audit, index) => {
-            const { store_name } = audit;
+            console.log(audit);
+            const {
+              store_name,
+              open_date,
+              overall_status,
+              overall_score,
+              report_type,
+              report_id,
+            } = audit;
+
             let imageObject = tenantImages.find(
               (image) => image.name === store_name
             );
-
+            console.log(imageObject);
             return (
               <Grid item key={index} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
@@ -87,29 +109,78 @@ export default function HomeAuditorCards() {
                     component="img"
                     alt="tenant-image"
                     className={classes.cardMedia}
+<<<<<<< HEAD
                     image={
                       imageObject.imageUrl
                         ? `${imageObject.imageUrl}`
                         : "url(https://source.unsplash.com/random)"
+=======
+                    // image={`${imageObject.imageUrl}`}
+                    image={
+                      imageObject !== undefined
+                        ? `${imageObject.imageUrl}`
+                        : `${defaultShop}`
+>>>>>>> mainMarcus
                     }
                     title="Image title"
                   />
                   <CardContent className={classes.cardContent}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {store_name}
-                    </Typography>
-                    <Typography>
-                      This is a media card. You can use this section to describe
-                      the content.
+                    <div className={classes.cardTitle}>
+                      <Typography gutterBottom variant="h5" component="h2">
+                        {store_name}
+                      </Typography>
+                      {overall_status === 1 && (
+                        <Typography
+                          variant="button"
+                          className={classes.resolvedLabel}
+                        >
+                          Resolved
+                        </Typography>
+                      )}
+                    </div>
+
+                    <Typography variant="caption">
+                      <div>Date: {new Date(open_date).toString()}</div>
+                      {report_type === "FB" && <div>Type: Food & Beverage</div>}
+                      {report_type === "NFB" && (
+                        <div>Type: Non-Food & Beverage</div>
+                      )}
+                      {report_type === "SMA" && (
+                        <div>Type: Safe Management</div>
+                      )}
+                      <div>Score: {overall_score}</div>
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button size="small" color="primary">
-                      View
-                    </Button>
-                    <Button size="small" color="primary">
-                      Edit
-                    </Button>
+                    {overall_status === 0 && (
+                      <Link to={`/tenant/report/${report_id}`}>
+                        <Button
+                          size="medium"
+                          color="primary"
+                          className={classes.button}
+                        >
+                          resolve
+                        </Button>
+                      </Link>
+                    )}
+                    <Link to={`/tenant/email/${report_id}`}>
+                      <Button
+                        size="medium"
+                        color="primary"
+                        className={classes.button}
+                      >
+                        email
+                      </Button>
+                    </Link>
+                    <Link to={`/fullreport/${report_id}`}>
+                      <Button
+                        size="medium"
+                        color="primary"
+                        className={classes.button}
+                      >
+                        report
+                      </Button>
+                    </Link>
                   </CardActions>
                 </Card>
               </Grid>

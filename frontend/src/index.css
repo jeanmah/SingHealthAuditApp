@@ -182,6 +182,7 @@ nav {
     align-items: center;
     justify-content: space-around;
     padding: 2rem;
+    z-index: 1;
   }
   .nav-mobile {
     padding: 0;
@@ -198,6 +199,7 @@ nav {
   }
   .links {
     display: flex;
+    align-items: center;
   }
   .links a {
     padding: 0;

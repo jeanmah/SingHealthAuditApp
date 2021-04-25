@@ -8,6 +8,9 @@ import com.c2g4.SingHealthWebApp.Chat.ChatEntriesModel;
 import com.c2g4.SingHealthWebApp.Chat.ChatEntriesRepo;
 import com.c2g4.SingHealthWebApp.Chat.ChatModel;
 import com.c2g4.SingHealthWebApp.Chat.ChatRepo;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -292,9 +295,9 @@ public class ChatControllerTest {
     private void postCreateNewChat(String statusExpected, String auditor_id, String tenant_id) throws Exception {
         String url = "/chat/postCreateNewChat";
 
-        HashMap<String,String> postBody = new HashMap<>();
-        if(auditor_id!=null) postBody.put("auditor_id",auditor_id);
-        if(tenant_id!=null) postBody.put("tenant_id",tenant_id);
+        HashMap<String,String> params = new HashMap<>();
+        if(auditor_id!=null) params.put("auditor_id",auditor_id);
+        if(tenant_id!=null) params.put("tenant_id",tenant_id);
 
         switch (statusExpected) {
             case statusOK -> {
@@ -304,9 +307,9 @@ public class ChatControllerTest {
                     chatModel.setChat_id(0);
                     return chatModel;
                 });
-                HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,postBody,null,"0" ,true);
+                HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,null,params,"0" ,true);
             }
-            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,null);
+            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, null,params);
         }
     }
 
@@ -371,10 +374,16 @@ public class ChatControllerTest {
         String url = "/chat/postChatEntry";
 
         HashMap<String,String> postBody = new HashMap<>();
-        if(parentChatId!=null) postBody.put("parentChatId",parentChatId);
-        if(subject!=null) postBody.put("subject",subject);
-        if(messageBody!=null) postBody.put("messageBody",messageBody);
-        if(attachments!=null) postBody.put("attachments",attachments);
+        HashMap<String,String> params = new HashMap<>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ObjectNode body = objectMapper.createObjectNode();
+        if(parentChatId!=null) params.put("parentChatId",parentChatId);
+        if(subject!=null) body.put("subject",subject);
+        if(messageBody!=null) body.put("messageBody",messageBody);
+        if(attachments!=null) body.put("attachments",attachments);
+        postBody.put("messageContents",objectMapper.writeValueAsString(body));
 
         switch (statusExpected) {
             case statusOK -> {
@@ -386,10 +395,10 @@ public class ChatControllerTest {
                     chatEntriesModel.setChat_entry_id(0);
                     return chatEntriesModel;
                 });
-                HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,postBody,null,"0" ,true);
+                HTTPRequestHelperTestFunctions.postHttpOK(mvc,url,postBody,params,"0" ,true);
             }
-            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,null);
-            case statusUnauthorized -> HTTPRequestHelperTestFunctions.postHttpUnauthorizedRequest(mvc,url, postBody,null);
+            case statusBad -> HTTPRequestHelperTestFunctions.postHttpBadRequest(mvc,url, postBody,params);
+            case statusUnauthorized -> HTTPRequestHelperTestFunctions.postHttpUnauthorizedRequest(mvc,url, postBody,params);
         }
     }
 

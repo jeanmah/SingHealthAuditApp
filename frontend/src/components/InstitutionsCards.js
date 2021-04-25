@@ -58,8 +58,8 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   button: {
-    color: "#F15A22",
-    fontWeight: "medium",
+    // color: "#F15A22",
+    // fontWeight: "medium",
   },
   // footer: {
   //   backgroundColor: theme.palette.background.paper,
@@ -86,6 +86,7 @@ export default function HomeAuditorCards() {
         <Grid container spacing={4}>
           {institutions.map((institution, index) => {
             const { name, imageUrl } = institution;
+            console.log(institution);
             return (
               <Grid item key={index} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
@@ -100,16 +101,16 @@ export default function HomeAuditorCards() {
                     <Typography gutterBottom variant="h5" component="h2">
                       {name}
                     </Typography>
-                    <Typography>
-                      This is a media card. You can use this section to describe
-                      the content.
+                    <Typography variant="caption">
+                      Address: {institution.address}
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Link to={`/institution/${name}`}>
                       <Button
                         className={classes.button}
-                        size="small"
+                        size="medium"
+                        color="primary"
                         // color="secondary"
                       >
                         View Tenants
