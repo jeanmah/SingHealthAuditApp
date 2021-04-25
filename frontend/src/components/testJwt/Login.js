@@ -74,7 +74,7 @@ function Login() {
   return (
     <Grid container component="main" className={styles.root}>
       <CssBaseline />
-      <Grid item xs={false} sm={4} md={7} className={styles.loginImage} />
+      <Grid item xs={false} sm={4} md={7} className={styles.image} />
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={styles.paper}>
           <Avatar className={styles.avatar}>
@@ -111,6 +111,10 @@ function Login() {
               onChange={(e) => setPasswordState(e.target.value)}
             />
             <DisplayMessage />
+            <FormControlLabel
+              control={<Checkbox value="remember" color="primary" />}
+              label="Remember me"
+            />
             <Button
               fullWidth
               variant="contained"
